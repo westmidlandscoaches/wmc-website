@@ -1,0 +1,44 @@
+---
+export interface Props {
+  as?: keyof HTMLElementTagNameMap;
+  surface?: 'warm-white' | 'heritage-ivory' | 'obsidian' | 'night-graphite';
+}
+
+const { as: Tag = 'section', surface = 'warm-white' } = Astro.props;
+---
+
+<Tag class="wmc-section" data-surface={surface}>
+  <slot />
+</Tag>
+
+<style>
+  .wmc-section {
+    padding-block: var(--space-7);
+  }
+
+  .wmc-section[data-surface='warm-white'] {
+    background-color: var(--color-warm-white);
+    color: var(--color-ink);
+  }
+
+  .wmc-section[data-surface='heritage-ivory'] {
+    background-color: var(--color-heritage-ivory);
+    color: var(--color-ink);
+  }
+
+  .wmc-section[data-surface='obsidian'] {
+    background-color: var(--color-obsidian);
+    color: var(--color-warm-white);
+  }
+
+  .wmc-section[data-surface='night-graphite'] {
+    background-color: var(--color-night-graphite);
+    color: var(--color-warm-white);
+  }
+
+  @media (min-width: 1024px) {
+    .wmc-section {
+      padding-block: var(--space-9);
+    }
+  }
+</style>

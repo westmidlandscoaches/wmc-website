@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageContainer from '../components/ui/PageContainer.astro';
+import Section from '../components/ui/Section.astro';
+import Button from '../components/ui/Button.astro';
+---
+
+<BaseLayout
+  title="Page not found | West Midlands Coaches"
+  description="The page you were looking for could not be found."
+  path="/404/"
+  noindex
+>
+  <Section as="div" surface="warm-white">
+    <PageContainer>
+      <div class="not-found">
+        <p class="text-small not-found__eyebrow">404</p>
+        <h1>Page not found</h1>
+        <p class="text-body-large not-found__copy">
+          The page you were looking for doesn't exist or may have moved.
+        </p>
+        <Button href="/">Return to homepage</Button>
+      </div>
+    </PageContainer>
+  </Section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    max-inline-size: 40rem;
+    padding-block: var(--space-9);
+  }
+
+  .not-found__eyebrow {
+    color: var(--color-slate-taupe);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: var(--font-weight-semibold);
+    margin-block-end: var(--space-2);
+  }
+
+  .not-found__copy {
+    color: var(--color-slate-taupe);
+    margin-block: var(--space-2) var(--space-5);
+  }
+</style>

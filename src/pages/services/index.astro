@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageContainer from '../../components/ui/PageContainer.astro';
+import Section from '../../components/ui/Section.astro';
+import Button from '../../components/ui/Button.astro';
+
+const services = [
+  {
+    id: 'airport-transfers',
+    title: 'Airport Transfers',
+    copy: 'Transport organised around flight times, terminals and passenger numbers, for individual travellers or groups.',
+  },
+  {
+    id: 'corporate-transport',
+    title: 'Corporate Transport',
+    copy: 'Transport for staff, clients or business events, organised around the schedule of the day.',
+  },
+  {
+    id: 'private-group-transport',
+    title: 'Private Group Transport',
+    copy: 'Transport for private groups travelling together, matched to passenger numbers and the route required.',
+  },
+  {
+    id: 'wedding-transport',
+    title: 'Wedding Transport',
+    copy: 'Transport organised around the timing and party of a wedding day.',
+  },
+  {
+    id: 'schools-education',
+    title: 'Schools & Education',
+    copy: 'Transport for school and education groups, organised around timing, numbers and destination.',
+  },
+  {
+    id: 'day-trips-excursions',
+    title: 'Day Trips & Excursions',
+    copy: 'Transport for day trips and group excursions, organised around the itinerary.',
+  },
+];
+---
+
+<BaseLayout
+  title="Services | West Midlands Coaches"
+  description="Airport transfers, corporate transport, private group transport, wedding transport, schools and education, and day trips organised by West Midlands Coaches."
+  path="/services/"
+>
+  <Section as="div" surface="warm-white">
+    <PageContainer>
+      <h1>What are you organising?</h1>
+      <p class="text-lead intro">
+        WMC organises private passenger transport around the people, route and requirements of the journey.
+      </p>
+    </PageContainer>
+  </Section>
+
+  <Section as="div" surface="heritage-ivory">
+    <PageContainer>
+      <div class="services">
+        {services.map((service) => (
+          <div id={service.id} class="services__item">
+            <h2 class="text-h4">{service.title}</h2>
+            <p class="text-body services__copy">{service.copy}</p>
+            <Button href="/request-a-quote/" variant="secondary">Request a Quote</Button>
+          </div>
+        ))}
+      </div>
+    </PageContainer>
+  </Section>
+</BaseLayout>
+
+<style>
+  .intro {
+    color: var(--color-slate-taupe);
+    max-inline-size: 50ch;
+  }
+
+  .services {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .services__item {
+    scroll-margin-block-start: 110px;
+    padding-block-end: var(--space-5);
+    border-block-end: var(--border-width-hairline) solid var(--color-linen-border);
+  }
+
+  .services__item:last-child {
+    border-block-end: none;
+    padding-block-end: 0;
+  }
+
+  .services__copy {
+    color: var(--color-slate-taupe);
+    max-inline-size: 60ch;
+    margin-block: var(--space-2) var(--space-3);
+  }
+
+  @media (min-width: 768px) {
+    .services {
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: var(--space-6);
+    }
+  }
+</style>

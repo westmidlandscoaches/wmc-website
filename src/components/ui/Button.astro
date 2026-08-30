@@ -1,0 +1,78 @@
+---
+export interface Props {
+  href?: string;
+  variant?: 'primary' | 'secondary';
+  /** Use 'dark' when the button sits on an obsidian/night-graphite surface. */
+  tone?: 'light' | 'dark';
+  type?: 'button' | 'submit' | 'reset';
+}
+
+const { href, variant = 'primary', tone = 'light', type = 'button' } = Astro.props;
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag
+  class="wmc-button text-button"
+  data-variant={variant}
+  data-tone={tone}
+  href={href}
+  type={href ? undefined : type}
+>
+  <slot />
+</Tag>
+
+<style>
+  .wmc-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    min-block-size: var(--touch-target-min);
+    padding-inline: var(--space-3);
+    border-radius: var(--radius-control);
+    border: var(--border-width-hairline) solid transparent;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--motion-fast) var(--motion-easing-standard),
+      border-color var(--motion-fast) var(--motion-easing-standard),
+      color var(--motion-fast) var(--motion-easing-standard);
+  }
+
+  .wmc-button[data-variant='primary'][data-tone='light'] {
+    background-color: var(--color-obsidian);
+    color: var(--color-warm-white);
+  }
+
+  .wmc-button[data-variant='primary'][data-tone='light']:hover {
+    background-color: var(--color-night-graphite);
+  }
+
+  .wmc-button[data-variant='secondary'][data-tone='light'] {
+    background-color: transparent;
+    border-color: var(--color-charcoal-border);
+    color: var(--color-ink);
+  }
+
+  .wmc-button[data-variant='secondary'][data-tone='light']:hover {
+    border-color: var(--color-champagne-gold);
+  }
+
+  .wmc-button[data-variant='primary'][data-tone='dark'] {
+    background-color: var(--color-champagne-gold);
+    color: var(--color-obsidian);
+  }
+
+  .wmc-button[data-variant='primary'][data-tone='dark']:hover {
+    background-color: var(--color-heritage-ivory);
+  }
+
+  .wmc-button[data-variant='secondary'][data-tone='dark'] {
+    background-color: transparent;
+    border-color: var(--color-charcoal-border);
+    color: var(--color-warm-white);
+  }
+
+  .wmc-button[data-variant='secondary'][data-tone='dark']:hover {
+    border-color: var(--color-champagne-gold);
+  }
+</style>

@@ -1,0 +1,103 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageContainer from '../../components/ui/PageContainer.astro';
+import Section from '../../components/ui/Section.astro';
+import { getFleetVisuals } from '../../data/fleetVisuals';
+
+const categories = [
+  {
+    id: 'cars',
+    title: 'Cars',
+    copy: 'Chauffeur-driven transport for individual and smaller-party requirements.',
+    visuals: getFleetVisuals('car'),
+  },
+  {
+    id: 'minibuses',
+    title: 'Minibuses',
+    copy: 'Group transport for journeys that require more passenger capacity.',
+    visuals: getFleetVisuals('minibus'),
+  },
+  {
+    id: 'coaches',
+    title: 'Coaches',
+    copy: 'Larger-group passenger transport.',
+    visuals: getFleetVisuals('coach'),
+  },
+];
+---
+
+<BaseLayout
+  title="Fleet | West Midlands Coaches"
+  description="Cars, Minibuses and Coaches in the WMC-owned fleet, serving Birmingham and the West Midlands."
+  path="/fleet/"
+>
+  <Section as="div" surface="warm-white">
+    <PageContainer>
+      <h1>The WMC fleet.</h1>
+      <p class="text-lead intro">
+        14 WMC-owned vehicles across Cars, Minibuses and Coaches, each driver-operated.
+      </p>
+    </PageContainer>
+  </Section>
+
+  {categories.map((category, index) => (
+    <Section as="div" surface={index % 2 === 0 ? 'heritage-ivory' : 'warm-white'}>
+      <PageContainer>
+        <div id={category.id} class="category">
+          <h2>{category.title}</h2>
+          <p class="text-body-large category__copy">{category.copy}</p>
+          <div class="category__gallery">
+            {category.visuals.map((visual) => (
+              <Image
+                src={visual.image}
+                alt={visual.alt}
+                widths={[400, 640, 900]}
+                sizes="(min-width: 768px) 33vw, 100vw"
+                loading="lazy"
+                class="category__image"
+              />
+            ))}
+          </div>
+        </div>
+      </PageContainer>
+    </Section>
+  ))}
+</BaseLayout>
+
+<style>
+  .intro {
+    color: var(--color-slate-taupe);
+    max-inline-size: 50ch;
+  }
+
+  .category {
+    scroll-margin-block-start: 110px;
+  }
+
+  .category__copy {
+    color: var(--color-slate-taupe);
+    max-inline-size: 60ch;
+    margin-block-end: var(--space-4);
+  }
+
+  .category__gallery {
+    display: grid;
+    gap: var(--space-3);
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .category__gallery :global(img) {
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-panel);
+  }
+
+  @media (min-width: 768px) {
+    .category__gallery {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

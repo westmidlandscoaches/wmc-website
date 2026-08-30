@@ -1,0 +1,105 @@
+---
+import PageContainer from '../ui/PageContainer.astro';
+import { contact } from '../../data/navigation';
+
+const links = [
+  { label: 'Fleet', href: '/fleet/' },
+  { label: 'Services', href: '/services/' },
+  { label: 'About', href: '/about/' },
+  { label: 'Contact', href: '/contact/' },
+  { label: 'Request a Quote', href: '/request-a-quote/' },
+];
+---
+
+<footer class="site-footer">
+  <PageContainer>
+    <div class="site-footer__grid">
+      <div>
+        <p class="site-footer__brand">{contact.companyName}</p>
+        <p class="text-small site-footer__address">{contact.address}</p>
+      </div>
+
+      <nav aria-label="Footer">
+        <ul class="site-footer__links">
+          {links.map((link) => (
+            <li><a href={link.href}>{link.label}</a></li>
+          ))}
+        </ul>
+      </nav>
+
+      <div class="site-footer__contact">
+        <a class="text-body-large" href={`tel:${contact.phoneHref.replace('tel:', '')}`}>{contact.phoneDisplay}</a>
+      </div>
+    </div>
+
+    <div class="site-footer__legal">
+      <p class="text-small">
+        {contact.registeredName} &middot; Company No. {contact.companyNumber}
+      </p>
+    </div>
+  </PageContainer>
+</footer>
+
+<style>
+  .site-footer {
+    background-color: var(--color-obsidian);
+    color: var(--color-mist-taupe);
+    padding-block: var(--space-7);
+  }
+
+  .site-footer__grid {
+    display: grid;
+    gap: var(--space-5);
+    padding-block-end: var(--space-5);
+    border-block-end: var(--border-width-hairline) solid var(--color-charcoal-border);
+  }
+
+  @media (min-width: 768px) {
+    .site-footer__grid {
+      grid-template-columns: 1.4fr 1fr 1fr;
+    }
+  }
+
+  .site-footer__brand {
+    color: var(--color-warm-white);
+    font-weight: var(--font-weight-semibold);
+    font-size: 1.125rem;
+    margin: 0 0 var(--space-2);
+  }
+
+  .site-footer__address {
+    margin: 0;
+    max-inline-size: 32ch;
+  }
+
+  .site-footer__links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .site-footer__links a {
+    color: var(--color-mist-taupe);
+    text-decoration: none;
+  }
+
+  .site-footer__links a:hover {
+    color: var(--color-warm-white);
+  }
+
+  .site-footer__contact a {
+    color: var(--color-warm-white);
+    text-decoration: none;
+  }
+
+  .site-footer__legal {
+    padding-block-start: var(--space-4);
+  }
+
+  .site-footer__legal p {
+    margin: 0;
+  }
+</style>

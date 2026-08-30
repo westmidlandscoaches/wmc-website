@@ -1,0 +1,83 @@
+/* WMC design tokens — foundation layer. Do not duplicate these values elsewhere. */
+:root {
+  /* Colour — brand surfaces */
+  --color-obsidian: #0b0a09;
+  --color-champagne-gold: #c29c59;
+  --color-warm-white: #fbf9f4;
+  --color-heritage-ivory: #fcf8eb;
+  --color-night-graphite: #11110f;
+  --color-ink: #171715;
+  --color-slate-taupe: #66625b;
+  --color-graphite-surface: #1a1a17;
+  --color-soft-ivory: #f7f3e9;
+  --color-mist-taupe: #bdb7aa;
+  --color-linen-border: #d8d2c5;
+  --color-charcoal-border: #38362f;
+
+  /*
+   * WMC Silver is intentionally NOT defined yet.
+   * There is an unresolved governance discrepancy over the approved hex value
+   * (candidates under review include #B4B2B0 and #BBBAB8 — neither is confirmed).
+   * Do not reference a --color-wmc-silver custom property until this is resolved.
+   * When approved, add it here rather than hard-coding it at call sites.
+   */
+
+  /* Colour — functional */
+  --color-success-light: #2e7d5a;
+  --color-success-dark: #6fc39b;
+  --color-warning-light: #8c5a12;
+  --color-warning-dark: #d5a24d;
+  --color-error-light: #b74b4b;
+  --color-error-dark: #e17b79;
+  --color-information-light: #2f6f8f;
+  --color-information-dark: #6ea8c2;
+
+  /* Typography */
+  --font-family-base: 'Source Sans 3', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Layout */
+  --content-max-width: 1280px;
+  --grid-columns-desktop: 12;
+  --grid-columns-tablet: 8;
+  --grid-columns-mobile: 4;
+
+  /* Spacing rhythm (8px base) */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
+  --space-7: 64px;
+  --space-8: 80px;
+  --space-9: 96px;
+  --space-10: 112px;
+  --space-11: 128px;
+
+  /* Radii */
+  --radius-control: 4px;
+  --radius-panel: 8px;
+  --radius-media: 12px;
+
+  /* Borders */
+  --border-width-hairline: 1px;
+
+  /* Shadows — restrained, low-depth only */
+  --shadow-low: 0 1px 2px rgb(11 10 9 / 0.06), 0 1px 1px rgb(11 10 9 / 0.04);
+  --shadow-medium: 0 4px 12px rgb(11 10 9 / 0.08);
+
+  /* Motion durations */
+  --motion-fast: 140ms;
+  --motion-standard: 200ms;
+  --motion-reveal-medium: 380ms;
+  --motion-reveal-editorial: 550ms;
+  --motion-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Touch targets */
+  --touch-target-min: 44px;
+}

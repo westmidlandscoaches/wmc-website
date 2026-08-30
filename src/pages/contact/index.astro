@@ -1,0 +1,77 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageContainer from '../../components/ui/PageContainer.astro';
+import Section from '../../components/ui/Section.astro';
+import Button from '../../components/ui/Button.astro';
+import { contact } from '../../data/navigation';
+---
+
+<BaseLayout
+  title="Contact | West Midlands Coaches"
+  description="Contact West Midlands Coaches by phone or WhatsApp to discuss a journey, or request a quotation."
+  path="/contact/"
+>
+  <Section as="div" surface="warm-white">
+    <PageContainer>
+      <h1>Contact West Midlands Coaches.</h1>
+      <p class="text-lead intro">
+        Speak to WMC directly about a journey, or request a quotation online.
+      </p>
+
+      <div class="contact-details">
+        <div>
+          <h2 class="text-h5">Phone</h2>
+          <a class="text-body-large" href={contact.phoneHref}>{contact.phoneDisplay}</a>
+        </div>
+        <div>
+          <h2 class="text-h5">WhatsApp</h2>
+          <a class="text-body-large" href={contact.whatsappHref}>Message WMC on WhatsApp</a>
+        </div>
+        <div>
+          <h2 class="text-h5">Address</h2>
+          <p class="text-body-large">{contact.address}</p>
+        </div>
+      </div>
+
+      <div class="contact-actions">
+        <Button href="/request-a-quote/" variant="primary">Request a Quote</Button>
+        <Button href={contact.phoneHref} variant="secondary">Call {contact.phoneDisplay}</Button>
+      </div>
+    </PageContainer>
+  </Section>
+</BaseLayout>
+
+<style>
+  .intro {
+    color: var(--color-slate-taupe);
+    max-inline-size: 55ch;
+    margin-block-end: var(--space-5);
+  }
+
+  .contact-details {
+    display: grid;
+    gap: var(--space-4);
+    margin-block-end: var(--space-6);
+  }
+
+  .contact-details a {
+    text-decoration: none;
+    color: var(--color-obsidian);
+  }
+
+  .contact-details p {
+    margin: 0;
+  }
+
+  .contact-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  @media (min-width: 768px) {
+    .contact-details {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

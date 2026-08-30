@@ -1,0 +1,24 @@
+---
+/**
+ * Renders the approved WMC logo asset. This component intentionally has no
+ * default source and no placeholder graphic — it must be supplied a real,
+ * approved brand asset from public/brand/ once one exists.
+ */
+export interface Props {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+}
+
+const { src, alt, width, height } = Astro.props;
+---
+
+<img class="brand-logo" src={src} alt={alt} width={width} height={height} decoding="async" />
+
+<style>
+  .brand-logo {
+    block-size: auto;
+    max-inline-size: 100%;
+  }
+</style>

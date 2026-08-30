@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageContainer from '../../components/ui/PageContainer.astro';
+import Section from '../../components/ui/Section.astro';
+---
+
+<BaseLayout
+  title="About | West Midlands Coaches"
+  description="West Midlands Coaches organises private passenger transport across Birmingham and the West Midlands with a company-owned fleet of Cars, Minibuses and Coaches."
+  path="/about/"
+>
+  <Section as="div" surface="warm-white">
+    <PageContainer>
+      <h1>About West Midlands Coaches.</h1>
+      <p class="text-lead intro">
+        West Midlands Coaches organises private passenger transport across Birmingham and the West
+        Midlands, established in 2014.
+      </p>
+      <div class="about-body">
+        <p class="text-body-large">
+          WMC operates a company-owned fleet of 14 vehicles across Cars, Minibuses and Coaches, all
+          driver-operated. Rather than simply supplying a vehicle, WMC organises the journey itself
+          &mdash; matching appropriate transport to the people, route and requirements involved, and
+          preparing a bespoke quotation around those details.
+        </p>
+        <p class="text-body-large">
+          WMC's primary market is Birmingham and the wider West Midlands.
+        </p>
+      </div>
+    </PageContainer>
+  </Section>
+</BaseLayout>
+
+<style>
+  .intro {
+    color: var(--color-slate-taupe);
+    max-inline-size: 55ch;
+    margin-block-end: var(--space-5);
+  }
+
+  .about-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-inline-size: 65ch;
+    color: var(--color-ink);
+  }
+</style>

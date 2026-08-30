@@ -1,0 +1,498 @@
+---
+import { Image, getImage } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageContainer from '../components/ui/PageContainer.astro';
+import Section from '../components/ui/Section.astro';
+import Button from '../components/ui/Button.astro';
+import Reveal from '../components/ui/Reveal.tsx';
+import FaqAccordion from '../components/content/FaqAccordion.astro';
+import FeaturedFleet, { type FeaturedFleetItem } from '../components/fleet/FeaturedFleet.tsx';
+import { getFleetVisuals, getHomepageHero } from '../data/fleetVisuals';
+import { contact } from '../data/navigation';
+
+const hero = getHomepageHero()!;
+
+const carPanel = getFleetVisuals('car', 'exterior')[0];
+const minibusPanel = getFleetVisuals('minibus', 'exterior')[0];
+const coachPanel = getFleetVisuals('coach', 'exterior')[0];
+
+const featuredSource: { category: FeaturedFleetItem['category']; label: string; copy: string }[] = [
+  { category: 'car', label: 'Cars', copy: 'Chauffeur-driven transport for individual and smaller-party requirements.' },
+  { category: 'minibus', label: 'Minibuses', copy: 'Group transport for journeys that require more passenger capacity.' },
+  { category: 'coach', label: 'Coaches', copy: 'Larger-group passenger transport.' },
+];
+
+const featuredItems: FeaturedFleetItem[] = await Promise.all(
+  featuredSource.map(async ({ category, label, copy }) => {
+    const visual = getFleetVisuals(category, 'exterior').find((v) => v.homepageFeatured) ?? getFleetVisuals(category, 'exterior')[0];
+    const optimised = await getImage({ src: visual.image, width: 1200 });
+    return {
+      category,
+      label,
+      copy,
+      src: optimised.src,
+      width: optimised.attributes.width as number,
+      height: optimised.attributes.height as number,
+      alt: visual.alt,
+    };
+  }),
+);
+
+const faqItems = [
+  {
+    question: 'Is WMC transport driver-operated?',
+    answer: 'Yes. All WMC vehicles are driver-operated; self-drive hire is not offered.',
+  },
+  {
+    question: 'What information do I need for a quotation?',
+    answer: 'The route, dates and times, and the number of passengers travelling. The more detail you can provide about the journey, the more accurate the quotation.',
+  },
+  {
+    question: 'What if I do not know which vehicle I need?',
+    answer: 'Tell us about the journey and passenger numbers and WMC will recommend suitable transport as part of preparing your quotation.',
+  },
+  {
+    question: 'Can I request a particular vehicle?',
+    answer: 'Yes, you can note a preference when requesting a quotation and WMC will confirm availability.',
+  },
+  {
+    question: 'Does WMC provide airport transport?',
+    answer: 'Yes, airport transfers are one of the journeys WMC organises. See Services for more detail.',
+  },
+];
+---
+
+<BaseLayout
+  title="West Midlands Coaches | Coach, Minibus & Chauffeur Hire"
+  description="Coach, Minibus & Chauffeur-Driven Car Hire in Birmingham and the West Midlands, organised around the people, route and requirements of each journey."
+  path="/"
+>
+  <!-- 1. HERO -->
+  <Section as="div" surface="obsidian">
+    <PageContainer>
+      <div class="hero">
+        <div class="hero__copy">
+          <h1>Private transport, properly organised.</h1>
+          <p class="text-lead hero__lead">
+            Coach, Minibus &amp; Chauffeur-Driven Car Hire in Birmingham and the West Midlands, organised
+            around the people, route and requirements of each journey.
+          </p>
+          <div class="hero__actions">
+            <Button href="/request-a-quote/" variant="primary" tone="dark">Request a Quote</Button>
+            <Button href="/fleet/" variant="secondary" tone="dark">View Fleet</Button>
+          </div>
+        </div>
+        <div class="hero__media">
+          <Image
+            src={hero.image}
+            alt={hero.alt}
+            widths={[640, 960, 1200, 1600, 2000]}
+            sizes="(min-width: 1024px) 55vw, 100vw"
+            loading="eager"
+            fetchpriority="high"
+            class="hero__image"
+          />
+        </div>
+      </div>
+    </PageContainer>
+  </Section>
+
+  <!-- 2. VERIFIED PROOF -->
+  <Section as="div" surface="heritage-ivory">
+    <PageContainer>
+      <p class="text-body-large proof-band">
+        Established 2014
+        <span aria-hidden="true">&middot;</span> 14 WMC-owned vehicles
+        <span aria-hidden="true">&middot;</span> Cars, Minibuses &amp; Coaches
+        <span aria-hidden="true">&middot;</span> Driver-operated transport
+      </p>
+    </PageContainer>
+  </Section>
+
+  <!-- 3. JOURNEY PROBLEM -->
+  <Section as="div" surface="warm-white">
+    <PageContainer>
+      <div class="problem">
+        <h2 class="problem__heading">A journey involves more than choosing a vehicle.</h2>
+        <ul class="problem__list text-h5">
+          <li>Passengers</li>
+          <li>Luggage</li>
+          <li>Timing</li>
+          <li>Stops</li>
+          <li>Appropriate transport</li>
+        </ul>
+        <p class="text-lead problem__statement">WMC organises the journey, not just the vehicle.</p>
+      </div>
+    </PageContainer>
+  </Section>
+
+  <!-- 4. REAL WMC FLEET -->
+  <Section as="div" surface="heritage-ivory">
+    <PageContainer>
+      <h2 class="section-title">Find the transport that fits the journey.</h2>
+      <div class="fleet-grid">
+        <a class="fleet-panel fleet-panel--wide" href="/fleet/#coaches">
+          <Image src={coachPanel.image} alt={coachPanel.alt} widths={[480, 800, 1200]} sizes="100vw" loading="lazy" class="fleet-panel__image" />
+          <span class="fleet-panel__label text-h4">Coaches</span>
+          <p class="text-body fleet-panel__copy">Larger-group passenger transport.</p>
+        </a>
+        <a class="fleet-panel" href="/fleet/#cars">
+          <Image src={carPanel.image} alt={carPanel.alt} widths={[400, 640, 900]} sizes="(min-width: 768px) 50vw, 100vw" loading="lazy" class="fleet-panel__image" />
+          <span class="fleet-panel__label text-h4">Cars</span>
+          <p class="text-body fleet-panel__copy">Chauffeur-driven transport for individual and smaller-party requirements.</p>
+        </a>
+        <a class="fleet-panel" href="/fleet/#minibuses">
+          <Image src={minibusPanel.image} alt={minibusPanel.alt} widths={[400, 640, 900]} sizes="(min-width: 768px) 50vw, 100vw" loading="lazy" class="fleet-panel__image" />
+          <span class="fleet-panel__label text-h4">Minibuses</span>
+          <p class="text-body fleet-panel__copy">Group transport for journeys that require more passenger capacity.</p>
+        </a>
+      </div>
+    </PageContainer>
+  </Section>
+
+  <!-- 5. SERVICE DISCOVERY -->
+  <Section as="div" surface="night-graphite">
+    <PageContainer>
+      <h2 class="section-title section-title--dark">What are you organising?</h2>
+      <ul class="service-list">
+        <li><a class="text-h5 service-list__link" href="/services/#airport-transfers">Airport Transfers</a></li>
+        <li><a class="text-h5 service-list__link" href="/services/#corporate-transport">Corporate Transport</a></li>
+        <li><a class="text-h5 service-list__link" href="/services/#private-group-transport">Private Group Transport</a></li>
+        <li><a class="text-h5 service-list__link" href="/services/#wedding-transport">Wedding Transport</a></li>
+        <li><a class="text-h5 service-list__link" href="/services/#schools-education">Schools &amp; Education</a></li>
+        <li><a class="text-h5 service-list__link" href="/services/#day-trips-excursions">Day Trips &amp; Excursions</a></li>
+      </ul>
+    </PageContainer>
+  </Section>
+
+  <!-- 6. HOW WMC ORGANISES IT -->
+  <Section as="div" surface="warm-white">
+    <PageContainer>
+      <h2 class="section-title">How WMC organises it.</h2>
+      <div class="organise-grid">
+        <div class="organise-item">
+          <p class="text-small organise-item__index">01</p>
+          <h3 class="text-h5">Appropriate transport</h3>
+          <p class="text-body">The vehicle is matched to passenger numbers, luggage and the nature of the journey.</p>
+        </div>
+        <div class="organise-item">
+          <p class="text-small organise-item__index">02</p>
+          <h3 class="text-h5">Proper organisation</h3>
+          <p class="text-body">Route, timing and stops are considered as part of preparing the journey, not left to chance.</p>
+        </div>
+        <div class="organise-item">
+          <p class="text-small organise-item__index">03</p>
+          <h3 class="text-h5">Clear quotation</h3>
+          <p class="text-body">A bespoke quotation is prepared around the specific details of the journey.</p>
+        </div>
+      </div>
+    </PageContainer>
+  </Section>
+
+  <!-- 7. FEATURED FLEET EXPERIENCE -->
+  <Section as="div" surface="heritage-ivory">
+    <PageContainer>
+      <h2 class="section-title">The WMC fleet.</h2>
+      <FeaturedFleet client:idle items={featuredItems} />
+    </PageContainer>
+  </Section>
+
+  <!-- 8. QUOTE PROCESS -->
+  <Section as="div" surface="obsidian">
+    <PageContainer>
+      <h2 class="section-title section-title--dark">From journey details to quotation.</h2>
+      <div class="quote-steps">
+        <Reveal client:idle duration={0.4}>
+          <div class="quote-step">
+            <p class="text-h3 quote-step__index">01</p>
+            <h3 class="text-h5 quote-step__heading">Tell us about the journey</h3>
+            <p class="text-body quote-step__copy">Where, when and who is travelling.</p>
+          </div>
+        </Reveal>
+        <Reveal client:idle duration={0.4} delay={0.08}>
+          <div class="quote-step">
+            <p class="text-h3 quote-step__index">02</p>
+            <h3 class="text-h5 quote-step__heading">Tell us what you need</h3>
+            <p class="text-body quote-step__copy">Passengers, luggage and vehicle preference.</p>
+          </div>
+        </Reveal>
+        <Reveal client:idle duration={0.4} delay={0.16}>
+          <div class="quote-step">
+            <p class="text-h3 quote-step__index">03</p>
+            <h3 class="text-h5 quote-step__heading">WMC reviews the request</h3>
+            <p class="text-body quote-step__copy">The information is used to prepare a bespoke quotation.</p>
+          </div>
+        </Reveal>
+      </div>
+    </PageContainer>
+  </Section>
+
+  <!-- 10. FAQ -->
+  <Section as="div" surface="warm-white">
+    <PageContainer>
+      <h2 class="section-title">Questions about organising your journey.</h2>
+      <FaqAccordion items={faqItems} />
+    </PageContainer>
+  </Section>
+
+  <!-- 11. FINAL CTA -->
+  <Section as="div" surface="obsidian">
+    <PageContainer>
+      <div class="final-cta">
+        <h2 class="text-h2 final-cta__heading">Tell us about your journey.</h2>
+        <p class="text-lead final-cta__copy">
+          Provide the route, passengers and requirements and WMC can prepare a quotation around the journey.
+        </p>
+        <div class="final-cta__actions">
+          <Button href="/request-a-quote/" variant="primary" tone="dark">Request a Quote</Button>
+          <Button href={contact.phoneHref} variant="secondary" tone="dark">Call {contact.phoneDisplay}</Button>
+          <Button href={contact.whatsappHref} variant="secondary" tone="dark">WhatsApp</Button>
+        </div>
+      </div>
+    </PageContainer>
+  </Section>
+</BaseLayout>
+
+<style>
+  .hero {
+    display: grid;
+    gap: var(--space-6);
+    padding-block: var(--space-7);
+    color: var(--color-warm-white);
+  }
+
+  .hero h1 {
+    color: var(--color-warm-white);
+    margin-block-end: var(--space-3);
+  }
+
+  .hero__lead {
+    color: var(--color-mist-taupe);
+    margin: 0 0 var(--space-5);
+    max-inline-size: 46ch;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .hero__media :global(.hero__image) {
+    inline-size: 100%;
+    block-size: auto;
+    border-radius: var(--radius-media);
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  @media (min-width: 1024px) {
+    .hero {
+      grid-template-columns: 5fr 7fr;
+      align-items: center;
+      padding-block: var(--space-9);
+    }
+
+    .hero__media :global(.hero__image) {
+      aspect-ratio: 16 / 11;
+    }
+  }
+
+  .proof-band {
+    text-align: center;
+    color: var(--color-ink);
+    margin: 0;
+  }
+
+  .proof-band span {
+    color: var(--color-champagne-gold);
+    margin-inline: var(--space-2);
+  }
+
+  .problem__heading {
+    max-inline-size: 30ch;
+    margin-block-end: var(--space-5);
+  }
+
+  .problem__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-5);
+    color: var(--color-slate-taupe);
+  }
+
+  .problem__list li:not(:last-child)::after {
+    content: '\2013';
+    margin-inline-start: var(--space-4);
+    color: var(--color-linen-border);
+  }
+
+  .problem__statement {
+    color: var(--color-obsidian);
+    font-weight: var(--font-weight-semibold);
+    max-inline-size: 40ch;
+  }
+
+  .section-title {
+    margin-block-end: var(--space-5);
+    max-inline-size: 30ch;
+  }
+
+  .section-title--dark {
+    color: var(--color-warm-white);
+  }
+
+  .fleet-grid {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .fleet-panel {
+    display: block;
+    text-decoration: none;
+    color: var(--color-ink);
+    border-radius: var(--radius-panel);
+    overflow: hidden;
+    background-color: var(--color-warm-white);
+  }
+
+  .fleet-panel :global(img) {
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .fleet-panel--wide :global(img) {
+    aspect-ratio: 16 / 9;
+  }
+
+  .fleet-panel__label {
+    display: block;
+    margin-block-start: var(--space-2);
+  }
+
+  .fleet-panel__copy {
+    color: var(--color-slate-taupe);
+    margin-block-start: var(--space-1);
+  }
+
+  @media (min-width: 768px) {
+    .fleet-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .fleet-panel--wide {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .service-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0;
+    border-block-start: var(--border-width-hairline) solid var(--color-charcoal-border);
+  }
+
+  .service-list li {
+    border-block-end: var(--border-width-hairline) solid var(--color-charcoal-border);
+  }
+
+  .service-list__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-block-size: 64px;
+    color: var(--color-warm-white);
+    text-decoration: none;
+  }
+
+  .service-list__link::after {
+    content: '\2192';
+    color: var(--color-champagne-gold);
+  }
+
+  @media (min-width: 768px) {
+    .service-list {
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: var(--space-5);
+    }
+
+    .service-list li:nth-child(odd) {
+      border-inline-end: var(--border-width-hairline) solid var(--color-charcoal-border);
+      padding-inline-end: var(--space-4);
+    }
+  }
+
+  .organise-grid {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .organise-item__index {
+    color: var(--color-champagne-gold);
+    font-weight: var(--font-weight-semibold);
+    margin-block-end: var(--space-1);
+  }
+
+  @media (min-width: 768px) {
+    .organise-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .quote-steps {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .quote-step__index {
+    color: var(--color-champagne-gold);
+    margin: 0;
+  }
+
+  .quote-step__heading {
+    color: var(--color-warm-white);
+    margin-block: var(--space-1);
+  }
+
+  .quote-step__copy {
+    color: var(--color-mist-taupe);
+    margin: 0;
+  }
+
+  @media (min-width: 768px) {
+    .quote-steps {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .final-cta {
+    text-align: center;
+    max-inline-size: 48rem;
+    margin-inline: auto;
+    padding-block: var(--space-6);
+  }
+
+  .final-cta__heading {
+    color: var(--color-warm-white);
+    margin-block-end: var(--space-3);
+  }
+
+  .final-cta__copy {
+    color: var(--color-mist-taupe);
+    margin-block-end: var(--space-5);
+  }
+
+  .final-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2);
+  }
+</style>

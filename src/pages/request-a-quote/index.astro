@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageContainer from '../../components/ui/PageContainer.astro';
+import Section from '../../components/ui/Section.astro';
+import Button from '../../components/ui/Button.astro';
+import { contact } from '../../data/navigation';
+---
+
+<BaseLayout
+  title="Request a Quote | West Midlands Coaches"
+  description="Request a bespoke transport quotation from West Midlands Coaches by phone or WhatsApp."
+  path="/request-a-quote/"
+>
+  <Section as="div" surface="warm-white">
+    <PageContainer>
+      <h1>Request a Quote.</h1>
+      <p class="text-lead intro">
+        WMC prepares a bespoke quotation for every journey. Get in touch with the route, passengers
+        and requirements and WMC will respond with a quotation.
+      </p>
+
+      <div class="quote-info">
+        <p class="text-body-large">
+          To request a quote today, call or message WMC directly:
+        </p>
+        <div class="quote-actions">
+          <Button href={contact.phoneHref} variant="primary">Call {contact.phoneDisplay}</Button>
+          <Button href={contact.whatsappHref} variant="secondary">WhatsApp</Button>
+        </div>
+      </div>
+    </PageContainer>
+  </Section>
+</BaseLayout>
+
+<style>
+  .intro {
+    color: var(--color-slate-taupe);
+    max-inline-size: 55ch;
+    margin-block-end: var(--space-5);
+  }
+
+  .quote-info {
+    max-inline-size: 50ch;
+  }
+
+  .quote-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-block-start: var(--space-3);
+  }
+</style>
