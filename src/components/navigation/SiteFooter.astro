@@ -1,6 +1,8 @@
 ---
+import { Image } from 'astro:assets';
 import PageContainer from '../ui/PageContainer.astro';
 import { contact } from '../../data/navigation';
+import wmcLogoDark from '../../assets/brand/wmc-logo-dark-use.webp';
 
 const links = [
   { label: 'Fleet', href: '/fleet/' },
@@ -15,7 +17,14 @@ const links = [
   <PageContainer>
     <div class="site-footer__grid">
       <div>
-        <p class="site-footer__brand">{contact.companyName}</p>
+        <Image
+          src={wmcLogoDark}
+          alt="West Midlands Coaches"
+          widths={[220, 320, 440]}
+          sizes="220px"
+          loading="lazy"
+          class="site-footer__logo"
+        />
         <p class="text-small site-footer__address">{contact.address}</p>
       </div>
 
@@ -60,11 +69,11 @@ const links = [
     }
   }
 
-  .site-footer__brand {
-    color: var(--color-warm-white);
-    font-weight: var(--font-weight-semibold);
-    font-size: 1.125rem;
-    margin: 0 0 var(--space-2);
+  /* Approved Gold/Silver logo, dark-use variant, on the obsidian footer. */
+  .site-footer__logo {
+    inline-size: 220px;
+    block-size: auto;
+    margin-block-end: var(--space-3);
   }
 
   .site-footer__address {
@@ -78,12 +87,15 @@ const links = [
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
   }
 
   .site-footer__links a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--touch-target-min);
     color: var(--color-mist-taupe);
     text-decoration: none;
+    transition: color var(--motion-hover) var(--motion-easing-premium);
   }
 
   .site-footer__links a:hover {
@@ -91,6 +103,9 @@ const links = [
   }
 
   .site-footer__contact a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--touch-target-min);
     color: var(--color-warm-white);
     text-decoration: none;
   }

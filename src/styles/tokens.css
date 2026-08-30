@@ -70,13 +70,29 @@
   /* Shadows — restrained, low-depth only */
   --shadow-low: 0 1px 2px rgb(11 10 9 / 0.06), 0 1px 1px rgb(11 10 9 / 0.04);
   --shadow-medium: 0 4px 12px rgb(11 10 9 / 0.08);
+  --shadow-raised: 0 10px 28px rgb(11 10 9 / 0.10), 0 2px 6px rgb(11 10 9 / 0.06);
+  --shadow-raised-dark: 0 12px 32px rgb(0 0 0 / 0.44);
 
   /* Motion durations */
   --motion-fast: 140ms;
   --motion-standard: 200ms;
+  --motion-hover: 220ms;
   --motion-reveal-medium: 380ms;
   --motion-reveal-editorial: 550ms;
   --motion-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-easing-premium: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* Gold accent alphas — for rules, hairlines and micro-detail */
+  --gold-rule: rgb(194 156 89 / 0.55);
+  --gold-rule-strong: rgb(194 156 89 / 0.9);
+  --gold-wash: rgb(194 156 89 / 0.08);
+
+  /* Surface tints used to layer light sections without new hues */
+  --surface-tint-light: rgb(11 10 9 / 0.02);
+  --surface-tint-dark: rgb(251 249 244 / 0.03);
+
+  /* Interactive card lift */
+  --lift-card: -4px;
 
   /* Touch targets */
   --touch-target-min: 44px;

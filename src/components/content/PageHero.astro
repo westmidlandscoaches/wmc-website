@@ -1,0 +1,286 @@
+---
+import { Image } from 'astro:assets';
+import PageContainer from '../ui/PageContainer.astro';
+import Button from '../ui/Button.astro';
+
+export interface HeroAction {
+  label: string;
+  href: string;
+}
+
+export interface Props {
+  eyebrow?: string;
+  breadcrumb?: { label: string; href?: string }[];
+  title: string;
+  lead?: string;
+  primaryCta?: HeroAction;
+  secondaryCta?: HeroAction;
+  tertiaryCta?: HeroAction;
+  image: ImageMetadata;
+  imageAlt: string;
+  /** CSS object-position for the hero photograph, e.g. "50% 40%". */
+  focal?: string;
+  /** Small overline shown on the photograph. */
+  caption?: string;
+  /** Short factual detail points shown under the actions. */
+  detail?: string[];
+  /** "home" runs taller and leads with the media. */
+  size?: 'page' | 'home';
+  /** Set on the LCP hero only. */
+  priority?: boolean;
+}
+
+const {
+  eyebrow,
+  breadcrumb,
+  title,
+  lead,
+  primaryCta,
+  secondaryCta,
+  tertiaryCta,
+  image,
+  imageAlt,
+  focal = '50% 50%',
+  caption,
+  detail,
+  size = 'page',
+  priority = false,
+} = Astro.props;
+
+const hasActions = Boolean(primaryCta || secondaryCta || tertiaryCta);
+---
+
+<section class="page-hero" data-size={size}>
+  <PageContainer>
+    <div class="page-hero__grid">
+      <div class="page-hero__copy">
+        {breadcrumb && breadcrumb.length > 0 && (
+          <nav class="page-hero__breadcrumb" aria-label="Breadcrumb">
+            <ol>
+              {breadcrumb.map((crumb, index) => (
+                <li>
+                  {crumb.href ? <a href={crumb.href}>{crumb.label}</a> : <span aria-current="page">{crumb.label}</span>}
+                  {index < breadcrumb.length - 1 && <span class="page-hero__crumb-sep" aria-hidden="true">/</span>}
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
+
+        {eyebrow && <p class="eyebrow eyebrow--dark page-hero__eyebrow">{eyebrow}</p>}
+
+        <h1 class="page-hero__title">{title}</h1>
+
+        {lead && <p class="text-lead page-hero__lead">{lead}</p>}
+
+        {hasActions && (
+          <div class="page-hero__actions">
+            {primaryCta && (
+              <Button href={primaryCta.href} variant="primary" tone="dark">{primaryCta.label}</Button>
+            )}
+            {secondaryCta && (
+              <Button href={secondaryCta.href} variant="secondary" tone="dark">{secondaryCta.label}</Button>
+            )}
+            {tertiaryCta && (
+              <Button href={tertiaryCta.href} variant="secondary" tone="dark">{tertiaryCta.label}</Button>
+            )}
+          </div>
+        )}
+
+        {detail && detail.length > 0 && (
+          <ul class="page-hero__detail">
+            {detail.map((item) => <li class="text-small">{item}</li>)}
+          </ul>
+        )}
+      </div>
+
+      <figure class="page-hero__media">
+        <Image
+          src={image}
+          alt={imageAlt}
+          widths={[640, 960, 1200, 1600, 2000]}
+          sizes={size === 'home' ? '(min-width: 1024px) 58vw, 100vw' : '(min-width: 1024px) 50vw, 100vw'}
+          loading={priority ? 'eager' : 'lazy'}
+          fetchpriority={priority ? 'high' : 'auto'}
+          class="page-hero__image"
+          style={`object-position:${focal}`}
+        />
+        {caption && <figcaption class="page-hero__caption text-small">{caption}</figcaption>}
+      </figure>
+    </div>
+  </PageContainer>
+</section>
+
+<style>
+  .page-hero {
+    position: relative;
+    background-color: var(--color-obsidian);
+    color: var(--color-warm-white);
+    overflow: hidden;
+  }
+
+  /* Barely-there tonal lift behind the copy column. */
+  .page-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(90% 70% at 12% 30%, rgb(251 249 244 / 0.06), transparent 60%);
+    pointer-events: none;
+  }
+
+  .page-hero__grid {
+    position: relative;
+    display: grid;
+    gap: var(--space-5);
+    padding-block: var(--space-7) var(--space-8);
+  }
+
+  .page-hero__breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1);
+    list-style: none;
+    margin: 0 0 var(--space-3);
+    padding: 0;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    color: var(--color-mist-taupe);
+  }
+
+  .page-hero__breadcrumb li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .page-hero__breadcrumb a {
+    color: var(--color-mist-taupe);
+    text-decoration: none;
+  }
+
+  .page-hero__breadcrumb a:hover {
+    color: var(--color-warm-white);
+  }
+
+  .page-hero__crumb-sep {
+    color: var(--color-charcoal-border);
+  }
+
+  .page-hero__eyebrow {
+    margin-block-end: var(--space-3);
+  }
+
+  .page-hero__title {
+    color: var(--color-warm-white);
+    margin-block: 0 var(--space-3);
+    text-wrap: balance;
+  }
+
+  .page-hero__lead {
+    color: var(--color-mist-taupe);
+    margin: 0 0 var(--space-5);
+    max-inline-size: 46ch;
+  }
+
+  .page-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .page-hero__detail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: var(--space-3) 0 0;
+    border-block-start: var(--border-width-hairline) solid var(--color-charcoal-border);
+    color: var(--color-mist-taupe);
+  }
+
+  .page-hero__detail li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .page-hero__detail li::before {
+    content: '';
+    inline-size: 14px;
+    block-size: 1px;
+    background-color: var(--color-champagne-gold);
+    flex-shrink: 0;
+  }
+
+  .page-hero__media {
+    position: relative;
+    margin: 0;
+    border-radius: var(--radius-media);
+    overflow: hidden;
+    border: var(--border-width-hairline) solid var(--color-charcoal-border);
+  }
+
+  .page-hero__media :global(.page-hero__image) {
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  /* Keeps the caption legible over the lower edge of the photograph. */
+  .page-hero__media::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    block-size: 38%;
+    background: linear-gradient(to top, rgb(11 10 9 / 0.7), transparent);
+    pointer-events: none;
+  }
+
+  .page-hero__caption {
+    position: absolute;
+    inset-block-end: var(--space-2);
+    inset-inline-start: var(--space-3);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    color: var(--color-warm-white);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .page-hero__caption::before {
+    content: '';
+    inline-size: 22px;
+    block-size: 1px;
+    background-color: var(--color-champagne-gold);
+  }
+
+  @media (min-width: 1024px) {
+    .page-hero__grid {
+      grid-template-columns: 5fr 6fr;
+      align-items: center;
+      gap: var(--space-7);
+      padding-block: var(--space-8) var(--space-9);
+    }
+
+    .page-hero__media :global(.page-hero__image) {
+      aspect-ratio: 3 / 2;
+    }
+
+    .page-hero[data-size='home'] .page-hero__grid {
+      grid-template-columns: 5fr 7fr;
+      padding-block: var(--space-9) var(--space-10);
+    }
+
+    .page-hero[data-size='home'] .page-hero__media :global(.page-hero__image) {
+      aspect-ratio: 16 / 11;
+    }
+  }
+</style>

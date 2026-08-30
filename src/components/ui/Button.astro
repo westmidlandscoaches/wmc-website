@@ -5,9 +5,10 @@ export interface Props {
   /** Use 'dark' when the button sits on an obsidian/night-graphite surface. */
   tone?: 'light' | 'dark';
   type?: 'button' | 'submit' | 'reset';
+  [key: string]: unknown;
 }
 
-const { href, variant = 'primary', tone = 'light', type = 'button' } = Astro.props;
+const { href, variant = 'primary', tone = 'light', type = 'button', ...rest } = Astro.props;
 const Tag = href ? 'a' : 'button';
 ---
 
@@ -17,6 +18,7 @@ const Tag = href ? 'a' : 'button';
   data-tone={tone}
   href={href}
   type={href ? undefined : type}
+  {...rest}
 >
   <slot />
 </Tag>
@@ -33,9 +35,17 @@ const Tag = href ? 'a' : 'button';
     border: var(--border-width-hairline) solid transparent;
     text-decoration: none;
     cursor: pointer;
-    transition: background-color var(--motion-fast) var(--motion-easing-standard),
-      border-color var(--motion-fast) var(--motion-easing-standard),
-      color var(--motion-fast) var(--motion-easing-standard);
+    letter-spacing: 0.01em;
+    transition: background-color var(--motion-hover) var(--motion-easing-premium),
+      border-color var(--motion-hover) var(--motion-easing-premium),
+      color var(--motion-hover) var(--motion-easing-premium),
+      transform var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .wmc-button:hover {
+      transform: translateY(-1px);
+    }
   }
 
   .wmc-button[data-variant='primary'][data-tone='light'] {

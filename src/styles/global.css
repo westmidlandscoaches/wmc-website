@@ -81,6 +81,164 @@ button {
   margin: -1px;
 }
 
+/* ---------------------------------------------------------------
+   Card language. Shared DNA; each variant styles its own context.
+   --------------------------------------------------------------- */
+.card {
+  position: relative;
+  border: var(--border-width-hairline) solid var(--color-linen-border);
+  border-radius: var(--radius-panel);
+  background-color: var(--color-warm-white);
+  transition: transform var(--motion-hover) var(--motion-easing-premium),
+    border-color var(--motion-hover) var(--motion-easing-premium),
+    box-shadow var(--motion-hover) var(--motion-easing-premium),
+    background-color var(--motion-hover) var(--motion-easing-premium);
+}
+
+.card--dark {
+  background-color: var(--color-graphite-surface);
+  border-color: var(--color-charcoal-border);
+}
+
+.card--media {
+  border-radius: var(--radius-media);
+  overflow: hidden;
+  background-color: var(--color-warm-white);
+}
+
+/* Only pointer devices get lift; touch never hides information behind it. */
+@media (hover: hover) and (pointer: fine) {
+  a.card:hover,
+  .card--interactive:hover {
+    transform: translateY(var(--lift-card));
+    border-color: var(--color-mist-taupe);
+    box-shadow: var(--shadow-raised);
+  }
+
+  a.card--dark:hover,
+  .card--dark.card--interactive:hover {
+    border-color: var(--gold-rule);
+    box-shadow: var(--shadow-raised-dark);
+  }
+
+  a.card:hover .card__media img,
+  .card--interactive:hover .card__media img {
+    transform: scale(1.035);
+  }
+
+  a.card:hover .arrow-link::after,
+  .card--interactive:hover .arrow-link::after {
+    transform: translateX(4px);
+  }
+}
+
+.card__media {
+  overflow: hidden;
+  background-color: var(--color-graphite-surface);
+}
+
+.card__media img {
+  inline-size: 100%;
+  block-size: auto;
+  object-fit: cover;
+  transition: transform var(--motion-reveal-medium) var(--motion-easing-premium);
+}
+
+.card__body {
+  padding: var(--space-3);
+}
+
+/* Eyebrow label — small gold-marked section signal. */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-small);
+  line-height: var(--leading-small);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-slate-taupe);
+  margin: 0 0 var(--space-3);
+}
+
+.eyebrow::before {
+  content: '';
+  inline-size: 28px;
+  block-size: 1px;
+  background-color: var(--gold-rule-strong);
+  flex-shrink: 0;
+}
+
+.eyebrow--dark {
+  color: var(--color-mist-taupe);
+}
+
+/* Directional text link. */
+.arrow-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-button);
+  line-height: var(--leading-button);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  color: var(--color-obsidian);
+}
+
+.arrow-link::after {
+  content: '\2192';
+  color: var(--color-champagne-gold);
+  transition: transform var(--motion-hover) var(--motion-easing-premium);
+}
+
+.arrow-link--dark {
+  color: var(--color-warm-white);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .arrow-link:hover::after {
+    transform: translateX(4px);
+  }
+}
+
+/* ---------------------------------------------------------------
+   Scroll reveal. Content is visible by default; the hidden start
+   state only applies once JS has confirmed it can reveal again.
+   --------------------------------------------------------------- */
+.js-reveal [data-reveal] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity var(--motion-reveal-editorial) var(--motion-easing-premium),
+    transform var(--motion-reveal-editorial) var(--motion-easing-premium);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.js-reveal [data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* Journey line — decorative rule that draws itself in. */
+.journey-line {
+  display: block;
+  inline-size: 100%;
+  block-size: 1px;
+  border: 0;
+  margin: 0;
+  background-color: var(--gold-rule);
+  transform-origin: left center;
+}
+
+.js-reveal [data-journey-line] {
+  transform: scaleX(0);
+  transition: transform 760ms var(--motion-easing-premium);
+}
+
+.js-reveal [data-journey-line].is-revealed {
+  transform: scaleX(1);
+}
+
 /* Reduced motion — honoured globally */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -90,5 +248,12 @@ button {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Reveals resolve to their finished state instead of animating. */
+  .js-reveal [data-reveal],
+  .js-reveal [data-journey-line] {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

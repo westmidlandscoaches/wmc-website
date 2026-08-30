@@ -1,12 +1,21 @@
 ---
+import { Image } from 'astro:assets';
 import Button from '../ui/Button.astro';
 import { primaryNav, primaryCta } from '../../data/navigation';
+import wmcLogoDark from '../../assets/brand/wmc-logo-dark-use.webp';
 ---
 
-<header class="site-header">
+<header class="site-header" data-scrolled="false" id="site-header">
   <div class="site-header__inner">
     <a class="site-header__brand" href="/">
-      <span class="site-header__wordmark">West Midlands Coaches</span>
+      <Image
+        src={wmcLogoDark}
+        alt="West Midlands Coaches"
+        widths={[180, 260, 360]}
+        sizes="180px"
+        loading="eager"
+        class="site-header__logo"
+      />
     </a>
 
     <nav class="site-header__nav" aria-label="Primary">
@@ -20,7 +29,7 @@ import { primaryNav, primaryCta } from '../../data/navigation';
     </nav>
 
     <div class="site-header__cta">
-      <Button href={primaryCta.href} variant="primary">{primaryCta.label}</Button>
+      <Button href={primaryCta.href} variant="primary" tone="dark">{primaryCta.label}</Button>
     </div>
 
     <details class="site-header__toggle">
@@ -40,7 +49,7 @@ import { primaryNav, primaryCta } from '../../data/navigation';
           </ul>
         </nav>
         <div class="site-header__mobile-cta">
-          <Button href={primaryCta.href} variant="primary">{primaryCta.label}</Button>
+          <Button href={primaryCta.href} variant="primary" tone="dark">{primaryCta.label}</Button>
         </div>
       </div>
     </details>
@@ -52,8 +61,17 @@ import { primaryNav, primaryCta } from '../../data/navigation';
     position: sticky;
     inset-block-start: 0;
     z-index: 100;
-    background-color: var(--color-warm-white);
-    border-block-end: var(--border-width-hairline) solid var(--color-linen-border);
+    /* Obsidian surface: the approved logo is the dark-use variant, so the
+       header is built around it rather than recolouring the artwork. */
+    background-color: var(--color-obsidian);
+    border-block-end: var(--border-width-hairline) solid transparent;
+    transition: border-color var(--motion-hover) var(--motion-easing-premium),
+      box-shadow var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  .site-header[data-scrolled='true'] {
+    border-block-end-color: var(--color-charcoal-border);
+    box-shadow: 0 6px 20px rgb(0 0 0 / 0.35);
   }
 
   .site-header__inner {
@@ -74,16 +92,22 @@ import { primaryNav, primaryCta } from '../../data/navigation';
   }
 
   .site-header__brand {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--touch-target-min);
     text-decoration: none;
-    color: var(--color-obsidian);
     margin-inline-end: auto;
   }
 
-  .site-header__wordmark {
-    font-size: 1.25rem;
-    font-weight: var(--font-weight-bold);
-    letter-spacing: 0.01em;
-    white-space: nowrap;
+  .site-header__logo {
+    inline-size: 112px;
+    block-size: auto;
+  }
+
+  @media (min-width: 768px) {
+    .site-header__logo {
+      inline-size: 140px;
+    }
   }
 
   .site-header__nav {
@@ -100,13 +124,34 @@ import { primaryNav, primaryCta } from '../../data/navigation';
   }
 
   .site-header__nav-link {
+    position: relative;
+    display: block;
     text-decoration: none;
-    color: var(--color-ink);
+    color: var(--color-mist-taupe);
     padding-block: var(--space-1);
+    transition: color var(--motion-hover) var(--motion-easing-premium);
   }
 
-  .site-header__nav-link:hover {
-    color: var(--color-obsidian);
+  .site-header__nav-link:hover,
+  .site-header__nav-link:focus-visible {
+    color: var(--color-warm-white);
+  }
+
+  .site-header__nav-link::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    block-size: 1px;
+    background-color: var(--color-champagne-gold);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 190ms var(--motion-easing-premium);
+  }
+
+  .site-header__nav-link:hover::after,
+  .site-header__nav-link:focus-visible::after {
+    transform: scaleX(1);
   }
 
   .site-header__cta {
@@ -120,7 +165,7 @@ import { primaryNav, primaryCta } from '../../data/navigation';
     inline-size: var(--touch-target-min);
     block-size: var(--touch-target-min);
     background: transparent;
-    border: var(--border-width-hairline) solid var(--color-linen-border);
+    border: var(--border-width-hairline) solid var(--color-charcoal-border);
     border-radius: var(--radius-control);
     cursor: pointer;
     list-style: none;
@@ -136,7 +181,7 @@ import { primaryNav, primaryCta } from '../../data/navigation';
     display: block;
     inline-size: 20px;
     block-size: 2px;
-    background-color: var(--color-obsidian);
+    background-color: var(--color-warm-white);
     position: relative;
   }
 
@@ -159,26 +204,47 @@ import { primaryNav, primaryCta } from '../../data/navigation';
     position: absolute;
     inset-inline: 0;
     inset-block-start: 100%;
-    border-block-start: var(--border-width-hairline) solid var(--color-linen-border);
-    background-color: var(--color-warm-white);
-    padding: var(--space-3);
+    border-block-start: var(--border-width-hairline) solid var(--color-charcoal-border);
+    background-color: var(--color-obsidian);
+    padding: var(--space-4) var(--space-3) var(--space-5);
+    box-shadow: 0 14px 32px rgb(0 0 0 / 0.5);
+    animation: mobile-nav-in 200ms var(--motion-easing-premium);
+  }
+
+  @keyframes mobile-nav-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
   }
 
   .site-header__mobile-list {
     list-style: none;
-    margin: 0 0 var(--space-3);
+    margin: 0 0 var(--space-4);
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    border-block-start: var(--border-width-hairline) solid var(--color-charcoal-border);
+  }
+
+  .site-header__mobile-list li {
+    border-block-end: var(--border-width-hairline) solid var(--color-charcoal-border);
   }
 
   .site-header__mobile-link {
+    position: relative;
     text-decoration: none;
-    color: var(--color-ink);
-    display: block;
+    color: var(--color-warm-white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding-block: var(--space-2);
     min-block-size: var(--touch-target-min);
+  }
+
+  .site-header__mobile-link::after {
+    content: '\2192';
+    color: var(--color-champagne-gold);
   }
 
   .site-header__mobile-cta :global(.wmc-button) {
@@ -200,3 +266,16 @@ import { primaryNav, primaryCta } from '../../data/navigation';
   }
 </style>
 
+
+<script>
+  const header = document.getElementById('site-header');
+
+  if (header) {
+    const sync = () => {
+      header.dataset.scrolled = String(window.scrollY > 8);
+    };
+
+    sync();
+    window.addEventListener('scroll', sync, { passive: true });
+  }
+</script>

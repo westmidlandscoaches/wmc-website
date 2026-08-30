@@ -2,6 +2,10 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageContainer from '../../components/ui/PageContainer.astro';
 import Section from '../../components/ui/Section.astro';
+import PageHero from '../../components/content/PageHero.astro';
+import { getFleetVisuals } from '../../data/fleetVisuals';
+
+const heroVisual = getFleetVisuals('coach', 'exterior').find((v) => v.id === 'coach-02-exterior-02')!;
 ---
 
 <BaseLayout
@@ -9,40 +13,66 @@ import Section from '../../components/ui/Section.astro';
   description="West Midlands Coaches organises private passenger transport across Birmingham and the West Midlands with a company-owned fleet of Cars, Minibuses and Coaches."
   path="/about/"
 >
+  <PageHero
+    priority
+    eyebrow="Established 2014"
+    breadcrumb={[{ label: 'Home', href: '/' }, { label: 'About' }]}
+    title="About West Midlands Coaches."
+    lead="Established in 2014, WMC organises private passenger transport from Birmingham and the West Midlands using a company-owned fleet across Cars, Minibuses and Coaches."
+    primaryCta={{ label: 'Request a Quote', href: '/request-a-quote/' }}
+    secondaryCta={{ label: 'View Fleet', href: '/fleet/' }}
+    image={heroVisual.image}
+    imageAlt={heroVisual.alt}
+    caption="WMC-owned fleet"
+  />
+
   <Section as="div" surface="warm-white">
     <PageContainer>
-      <h1>About West Midlands Coaches.</h1>
-      <p class="text-lead intro">
-        West Midlands Coaches organises private passenger transport across Birmingham and the West
-        Midlands, established in 2014.
-      </p>
-      <div class="about-body">
-        <p class="text-body-large">
-          WMC operates a company-owned fleet of 14 vehicles across Cars, Minibuses and Coaches, all
-          driver-operated. Rather than simply supplying a vehicle, WMC organises the journey itself
-          &mdash; matching appropriate transport to the people, route and requirements involved, and
-          preparing a bespoke quotation around those details.
-        </p>
-        <p class="text-body-large">
-          WMC's primary market is Birmingham and the wider West Midlands.
-        </p>
+      <div class="about">
+        <div class="about__aside">
+          <p class="eyebrow">How WMC works</p>
+          <hr class="journey-line about__line" data-journey-line aria-hidden="true" />
+        </div>
+
+        <div class="about__body">
+          <p class="text-body-large">
+            WMC operates a company-owned fleet of 14 vehicles across Cars, Minibuses and Coaches, all
+            driver-operated. Rather than simply supplying a vehicle, WMC organises the journey itself
+            &mdash; matching appropriate transport to the people, route and requirements involved, and
+            preparing a bespoke quotation around those details.
+          </p>
+          <p class="text-body-large">
+            WMC's primary market is Birmingham and the wider West Midlands.
+          </p>
+        </div>
       </div>
     </PageContainer>
   </Section>
 </BaseLayout>
 
 <style>
-  .intro {
-    color: var(--color-slate-taupe);
-    max-inline-size: 55ch;
-    margin-block-end: var(--space-5);
+  .about {
+    display: grid;
+    gap: var(--space-4);
   }
 
-  .about-body {
+  .about__line {
+    max-inline-size: 140px;
+  }
+
+  .about__body {
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
-    max-inline-size: 65ch;
+    max-inline-size: 62ch;
     color: var(--color-ink);
+  }
+
+  @media (min-width: 1024px) {
+    .about {
+      grid-template-columns: 3fr 8fr;
+      gap: var(--space-7);
+      align-items: start;
+    }
   }
 </style>

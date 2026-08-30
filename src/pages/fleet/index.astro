@@ -3,7 +3,10 @@ import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageContainer from '../../components/ui/PageContainer.astro';
 import Section from '../../components/ui/Section.astro';
+import PageHero from '../../components/content/PageHero.astro';
 import { getFleetVisuals } from '../../data/fleetVisuals';
+
+const heroVisual = getFleetVisuals('coach', 'exterior').find((v) => v.id === 'coach-02-exterior-01')!;
 
 const categories = [
   {
@@ -32,14 +35,18 @@ const categories = [
   description="Cars, Minibuses and Coaches in the WMC-owned fleet, serving Birmingham and the West Midlands."
   path="/fleet/"
 >
-  <Section as="div" surface="warm-white">
-    <PageContainer>
-      <h1>The WMC fleet.</h1>
-      <p class="text-lead intro">
-        14 WMC-owned vehicles across Cars, Minibuses and Coaches, each driver-operated.
-      </p>
-    </PageContainer>
-  </Section>
+  <PageHero
+    priority
+    eyebrow="The fleet"
+    breadcrumb={[{ label: 'Home', href: '/' }, { label: 'Fleet' }]}
+    title="Explore the WMC fleet."
+    lead="14 WMC-owned vehicles across Cars, Minibuses and Coaches, with transport organised around the requirements of each journey."
+    primaryCta={{ label: 'Tell Us About Your Journey', href: '/request-a-quote/' }}
+    image={heroVisual.image}
+    imageAlt={heroVisual.alt}
+    caption="WMC-owned fleet"
+    detail={['Cars', 'Minibuses', 'Coaches', 'Driver-operated']}
+  />
 
   {categories.map((category, index) => (
     <Section as="div" surface={index % 2 === 0 ? 'heritage-ivory' : 'warm-white'}>
@@ -66,11 +73,6 @@ const categories = [
 </BaseLayout>
 
 <style>
-  .intro {
-    color: var(--color-slate-taupe);
-    max-inline-size: 50ch;
-  }
-
   .category {
     scroll-margin-block-start: 110px;
   }

@@ -1,0 +1,322 @@
+---
+import { contact } from '../../data/navigation';
+---
+
+<div class="fab" data-open="false" data-floating-contact>
+  <ul class="fab__actions" id="floating-contact-actions">
+    <li class="fab__item" data-index="0">
+      <span class="fab__label" aria-hidden="true">WhatsApp</span>
+      <a
+        class="fab__action fab__action--whatsapp"
+        href={contact.whatsappHref}
+        aria-label="Message WMC on WhatsApp"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path
+            fill="currentColor"
+            d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.83 2.41a8.19 8.19 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.5.11-.11.25-.29.37-.44.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.44-.06-.12-.56-1.35-.77-1.84-.2-.49-.41-.42-.56-.43h-.48c-.16 0-.43.06-.65.31-.22.25-.85.83-.85 2.03s.87 2.35.99 2.51c.12.16 1.71 2.61 4.15 3.66.58.25 1.03.4 1.39.51.58.19 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29Z"
+          />
+        </svg>
+      </a>
+    </li>
+
+    <li class="fab__item" data-index="1">
+      <span class="fab__label" aria-hidden="true">Call WMC</span>
+      <a
+        class="fab__action fab__action--call"
+        href={contact.phoneHref}
+        aria-label={`Call WMC on ${contact.phoneDisplay}`}
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path
+            fill="currentColor"
+            d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2Z"
+          />
+        </svg>
+      </a>
+    </li>
+  </ul>
+
+  <button
+    type="button"
+    class="fab__launcher"
+    aria-expanded="false"
+    aria-controls="floating-contact-actions"
+    data-floating-contact-toggle
+  >
+    <span class="visually-hidden fab__launcher-label">Contact WMC</span>
+    <svg class="fab__icon fab__icon--open" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+      <path
+        fill="currentColor"
+        d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2Z"
+      />
+    </svg>
+    <svg class="fab__icon fab__icon--close" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+      <path
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        d="M6 6l12 12M18 6L6 18"
+      />
+    </svg>
+  </button>
+</div>
+
+<style>
+  .fab {
+    position: fixed;
+    inset-inline-end: 16px;
+    /* Pages with dense interactive content can raise the control by setting
+       --fab-offset-block-end on :root. */
+    inset-block-end: calc(16px + env(safe-area-inset-bottom, 0px) + var(--fab-offset-block-end, 0px));
+    /* Above page content, below the sticky header and the skip link. */
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-2);
+  }
+
+  @media (min-width: 768px) {
+    .fab {
+      inset-inline-end: 28px;
+      inset-block-end: calc(28px + env(safe-area-inset-bottom, 0px) + var(--fab-offset-block-end, 0px));
+    }
+  }
+
+  .fab__actions {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-2);
+  }
+
+  .fab__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .fab__action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 48px;
+    block-size: 48px;
+    border-radius: 50%;
+    background-color: var(--color-graphite-surface);
+    border: var(--border-width-hairline) solid var(--color-charcoal-border);
+    color: var(--color-warm-white);
+    box-shadow: var(--shadow-medium);
+    transition: transform var(--motion-hover) var(--motion-easing-premium),
+      border-color var(--motion-hover) var(--motion-easing-premium),
+      background-color var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  @media (min-width: 768px) {
+    .fab__action {
+      inline-size: 52px;
+      block-size: 52px;
+    }
+  }
+
+  /* Label sits beside the action and never carries meaning on its own. */
+  .fab__label {
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.04em;
+    color: var(--color-warm-white);
+    background-color: var(--color-obsidian);
+    border: var(--border-width-hairline) solid var(--color-charcoal-border);
+    border-radius: var(--radius-control);
+    padding: 6px var(--space-2);
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(6px);
+    transition: opacity var(--motion-hover) var(--motion-easing-premium),
+      transform var(--motion-hover) var(--motion-easing-premium);
+    pointer-events: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .fab__action:hover,
+    .fab__action:focus-visible {
+      transform: translateY(-2px);
+      border-color: var(--gold-rule);
+      background-color: var(--color-night-graphite);
+    }
+
+    .fab__item:hover .fab__label,
+    .fab__item:focus-within .fab__label {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Touch and narrow viewports never show the hover label. */
+  @media (hover: none), (max-width: 767px) {
+    .fab__label {
+      display: none;
+    }
+  }
+
+  .fab__launcher {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    inline-size: 54px;
+    block-size: 54px;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: var(--color-obsidian);
+    border: var(--border-width-hairline) solid var(--gold-rule);
+    color: var(--color-champagne-gold);
+    box-shadow: var(--shadow-raised-dark);
+    transition: transform var(--motion-hover) var(--motion-easing-premium),
+      border-color var(--motion-hover) var(--motion-easing-premium),
+      box-shadow var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  @media (min-width: 768px) {
+    .fab__launcher {
+      inline-size: 58px;
+      block-size: 58px;
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .fab__launcher:hover {
+      transform: translateY(-2px);
+      border-color: var(--gold-rule-strong);
+    }
+  }
+
+  .fab__icon {
+    position: absolute;
+    transition: opacity 180ms var(--motion-easing-premium),
+      transform 180ms var(--motion-easing-premium);
+  }
+
+  .fab__icon--close {
+    opacity: 0;
+    transform: rotate(-45deg);
+  }
+
+  .fab[data-open='true'] .fab__icon--open {
+    opacity: 0;
+    transform: rotate(45deg);
+  }
+
+  .fab[data-open='true'] .fab__icon--close {
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+
+  /*
+   * Without JS the launcher is meaningless, so the actions stay visible and
+   * the launcher is removed. The `js-fab` class is only set once the toggle
+   * script has run.
+   */
+  .fab__launcher {
+    display: none;
+  }
+
+  :global(.js-fab) .fab__launcher {
+    display: inline-flex;
+  }
+
+  :global(.js-fab) .fab__item {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+    visibility: hidden;
+    transition: opacity 200ms var(--motion-easing-premium),
+      transform 200ms var(--motion-easing-premium),
+      visibility 200ms linear;
+  }
+
+  :global(.js-fab) .fab[data-open='true'] .fab__item {
+    opacity: 1;
+    transform: none;
+    visibility: visible;
+  }
+
+  /* Nearest action leads on the way out and follows on the way in. */
+  :global(.js-fab) .fab[data-open='true'] .fab__item[data-index='0'] {
+    transition-delay: 50ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js-fab) .fab__item {
+      transform: none;
+      transition: opacity 1ms linear, visibility 1ms linear;
+    }
+
+    :global(.js-fab) .fab[data-open='true'] .fab__item[data-index='0'] {
+      transition-delay: 0ms;
+    }
+
+    .fab__icon {
+      transition: opacity 1ms linear;
+    }
+
+    .fab__icon--close,
+    .fab[data-open='true'] .fab__icon--open {
+      transform: none;
+    }
+  }
+</style>
+
+<script is:inline>
+  // Marks that the toggle is available, which is what switches the actions
+  // from always-visible (no JS) to collapsed-by-default.
+  document.documentElement.classList.add('js-fab');
+</script>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-floating-contact]');
+  const toggle = document.querySelector<HTMLButtonElement>('[data-floating-contact-toggle]');
+
+  if (root && toggle) {
+    const label = toggle.querySelector('.fab__launcher-label');
+
+    const setOpen = (open: boolean) => {
+      root.dataset.open = String(open);
+      toggle.setAttribute('aria-expanded', String(open));
+      if (label) label.textContent = open ? 'Close contact options' : 'Contact WMC';
+    };
+
+    setOpen(false);
+
+    toggle.addEventListener('click', () => {
+      setOpen(root.dataset.open !== 'true');
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || root.dataset.open !== 'true') return;
+      setOpen(false);
+      toggle.focus();
+    });
+
+    document.addEventListener('pointerdown', (event) => {
+      if (root.dataset.open !== 'true') return;
+      if (event.target instanceof Node && root.contains(event.target)) return;
+      setOpen(false);
+    });
+
+    // Closing on blur keeps keyboard flow logical without trapping focus.
+    root.addEventListener('focusout', (event) => {
+      if (root.dataset.open !== 'true') return;
+      const next = event.relatedTarget;
+      if (next instanceof Node && root.contains(next)) return;
+      setOpen(false);
+    });
+  }
+</script>

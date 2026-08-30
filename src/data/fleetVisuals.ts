@@ -5,8 +5,8 @@
  * verified and belong in a future W9B fleet data model once confirmed.
  */
 
-import carAudiA7 from '../assets/images/fleet/cars/wmc-car-01-exterior.webp';
-import carVClass from '../assets/images/fleet/cars/wmc-car-02-exterior.webp';
+import car01Exterior from '../assets/images/fleet/cars/wmc-car-01-exterior.webp';
+import car02Exterior from '../assets/images/fleet/cars/wmc-car-02-exterior.webp';
 
 import minibus01Exterior from '../assets/images/fleet/minibuses/wmc-minibus-01-exterior.webp';
 import minibus01Interior from '../assets/images/fleet/interiors/wmc-minibus-01-interior-01.webp';
@@ -46,7 +46,7 @@ export const fleetVisuals: FleetVisual[] = [
     id: 'car-01-exterior',
     category: 'car',
     view: 'exterior',
-    image: carAudiA7,
+    image: car01Exterior,
     alt: 'WMC chauffeur car photographed from the front three-quarter view',
     homepageFeatured: true,
   },
@@ -54,8 +54,8 @@ export const fleetVisuals: FleetVisual[] = [
     id: 'car-02-exterior',
     category: 'car',
     view: 'exterior',
-    image: carVClass,
-    alt: 'WMC chauffeur MPV photographed from the front three-quarter view',
+    image: car02Exterior,
+    alt: 'WMC chauffeur vehicle photographed from the front three-quarter view',
   },
 
   {

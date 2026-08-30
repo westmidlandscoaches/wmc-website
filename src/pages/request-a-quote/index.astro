@@ -3,25 +3,46 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageContainer from '../../components/ui/PageContainer.astro';
 import Section from '../../components/ui/Section.astro';
 import Button from '../../components/ui/Button.astro';
+import PageHero from '../../components/content/PageHero.astro';
+import QuoteRequestForm from '../../components/forms/QuoteRequestForm.astro';
 import { contact } from '../../data/navigation';
+import { getFleetVisuals } from '../../data/fleetVisuals';
+
+const heroVisual = getFleetVisuals('minibus', 'exterior').find((v) => v.id === 'minibus-01-exterior')!;
 ---
 
 <BaseLayout
   title="Request a Quote | West Midlands Coaches"
-  description="Request a bespoke transport quotation from West Midlands Coaches by phone or WhatsApp."
+  description="Share the route, timing, passenger numbers and requirements so West Midlands Coaches can prepare a bespoke quotation."
   path="/request-a-quote/"
 >
+  <PageHero
+    priority
+    eyebrow="Bespoke quotation"
+    breadcrumb={[{ label: 'Home', href: '/' }, { label: 'Request a Quote' }]}
+    title="Tell us about your journey."
+    lead="Share the route, timing, passenger numbers and requirements so WMC can prepare a bespoke quotation."
+    primaryCta={{ label: `Call ${contact.phoneDisplay}`, href: contact.phoneHref }}
+    secondaryCta={{ label: 'WhatsApp', href: contact.whatsappHref }}
+    image={heroVisual.image}
+    imageAlt={heroVisual.alt}
+    caption="WMC-owned fleet"
+    detail={['Driver-operated', 'Cars, Minibuses & Coaches', 'Birmingham & the West Midlands']}
+  />
+
+  <Section as="div" surface="heritage-ivory">
+    <PageContainer>
+      <QuoteRequestForm />
+    </PageContainer>
+  </Section>
+
   <Section as="div" surface="warm-white">
     <PageContainer>
-      <h1>Request a Quote.</h1>
-      <p class="text-lead intro">
-        WMC prepares a bespoke quotation for every journey. Get in touch with the route, passengers
-        and requirements and WMC will respond with a quotation.
-      </p>
-
-      <div class="quote-info">
-        <p class="text-body-large">
-          To request a quote today, call or message WMC directly:
+      <div class="quote-intro">
+        <p class="eyebrow">Prefer to speak to someone</p>
+        <p class="text-body-large quote-intro__copy">
+          WMC reviews the journey details and prepares a quotation around them. To start the
+          conversation today, call or message WMC directly.
         </p>
         <div class="quote-actions">
           <Button href={contact.phoneHref} variant="primary">Call {contact.phoneDisplay}</Button>
@@ -32,21 +53,30 @@ import { contact } from '../../data/navigation';
   </Section>
 </BaseLayout>
 
+<style is:global>
+  /* Keeps the floating contact control clear of the form's step buttons on
+     narrow screens, without removing it from this page. */
+  @media (max-width: 767px) {
+    :root {
+      --fab-offset-block-end: 56px;
+    }
+  }
+</style>
+
 <style>
-  .intro {
-    color: var(--color-slate-taupe);
-    max-inline-size: 55ch;
-    margin-block-end: var(--space-5);
+  .quote-intro {
+    max-inline-size: 56ch;
   }
 
-  .quote-info {
-    max-inline-size: 50ch;
+  .quote-intro__copy {
+    color: var(--color-ink);
+    margin: 0;
   }
 
   .quote-actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
-    margin-block-start: var(--space-3);
+    margin-block-start: var(--space-4);
   }
 </style>

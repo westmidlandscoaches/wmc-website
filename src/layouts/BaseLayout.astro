@@ -3,12 +3,16 @@ import Seo from '../components/layout/Seo.astro';
 import SkipLink from '../components/layout/SkipLink.astro';
 import SiteHeader from '../components/navigation/SiteHeader.astro';
 import SiteFooter from '../components/navigation/SiteFooter.astro';
+import FloatingContact from '../components/navigation/FloatingContact.astro';
 import type { SeoProps } from '../lib/seo';
 import '../styles/global.css';
 
-type Props = SeoProps;
+type Props = SeoProps & {
+  /** Lets a future page (e.g. the quote form) suppress the floating control. */
+  floatingContact?: boolean;
+};
 
-const { title, description, path, ogImage, noindex } = Astro.props;
+const { title, description, path, ogImage, noindex, floatingContact = true } = Astro.props;
 ---
 
 <html lang="en-GB">
@@ -19,6 +23,14 @@ const { title, description, path, ogImage, noindex } = Astro.props;
     <Seo title={title} description={description} path={path} ogImage={ogImage} noindex={noindex}>
       <slot name="structured-data" />
     </Seo>
+    <script is:inline>
+      // Opt into reveal start-states only when we can guarantee the reveal
+      // runs. Without JS (or without IntersectionObserver) the class is never
+      // added and every element stays visible.
+      if ('IntersectionObserver' in window) {
+        document.documentElement.classList.add('js-reveal');
+      }
+    </script>
   </head>
   <body>
     <SkipLink />
@@ -27,5 +39,33 @@ const { title, description, path, ogImage, noindex } = Astro.props;
       <slot />
     </main>
     <SiteFooter />
+    {floatingContact && <FloatingContact />}
+
+    <script>
+      const targets = document.querySelectorAll('[data-reveal], [data-journey-line]');
+
+      if (targets.length && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue;
+              entry.target.classList.add('is-revealed');
+              observer.unobserve(entry.target);
+            }
+          },
+          { rootMargin: '0px 0px -10% 0px', threshold: 0.1 },
+        );
+
+        for (const target of targets) observer.observe(target);
+
+        // Safety net: anything still hidden after load is revealed anyway, so
+        // a missed observer callback can never leave content invisible.
+        window.addEventListener('load', () => {
+          window.setTimeout(() => {
+            for (const target of targets) target.classList.add('is-revealed');
+          }, 1200);
+        });
+      }
+    </script>
   </body>
 </html>

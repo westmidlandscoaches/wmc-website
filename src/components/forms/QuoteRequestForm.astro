@@ -1,0 +1,1846 @@
+---
+import Button from '../ui/Button.astro';
+import {
+  serviceLevels,
+  vehicleCategories,
+  approvedVehicles,
+  journeyPurposes,
+  referralSources,
+  luggageOptions,
+  contactMethods,
+  steps,
+} from '../../data/quoteForm';
+import { contact } from '../../data/navigation';
+
+const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? '';
+
+const vehicleCopy: Record<string, string> = {
+  recommend: 'WMC reviews the journey and recommends a category.',
+  car: 'Chauffeur-driven transport.',
+  minibus: 'Group transport.',
+  coach: 'Larger-group transport.',
+};
+---
+
+<div class="quote-form" data-quote-form>
+  <header class="quote-form__head">
+    <p class="eyebrow">Your journey details</p>
+    <h2 class="text-h3 quote-form__title">Request a quotation</h2>
+    <p class="text-body quote-form__intro">
+      Complete the details below and WMC will review your journey requirements.
+    </p>
+
+    <!-- Progress. Hidden from JS-less users, who get one linear form instead. -->
+    <ol class="progress" data-progress>
+      {steps.map((step) => (
+        <li class="progress__item" data-step-indicator={step.id}>
+          <span class="progress__bar" aria-hidden="true"></span>
+          <span class="progress__index">{`0${step.id}`}</span>
+          <span class="progress__label">{step.label}</span>
+        </li>
+      ))}
+    </ol>
+    <p class="progress__status" data-step-status role="status" hidden></p>
+  </header>
+
+  <form class="quote-form__form" data-form novalidate data-access-key={accessKey}>
+    <!-- Web3Forms honeypot. Real people never see or fill this. -->
+    <label class="visually-hidden" aria-hidden="true">
+      Leave this field empty
+      <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" />
+    </label>
+
+    <!-- STEP 1 -->
+    <section class="quote-form__step" data-step="1">
+      <div class="error-summary" data-error-summary tabindex="-1" hidden>
+        <h3 class="error-summary__title">Check these details</h3>
+        <ul data-error-list></ul>
+      </div>
+
+      <fieldset class="quote-form__fieldset">
+        <legend class="quote-form__legend">
+          <span class="quote-form__step-label">Step 1</span>
+          <span class="quote-form__step-title text-h4">Journey</span>
+          <span class="quote-form__step-intro">Where the journey starts, where it goes and when.</span>
+        </legend>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field__label" for="pickup">Pickup <span aria-hidden="true">*</span></label>
+            <input class="field__input" id="pickup" name="pickup" type="text" required
+              placeholder="Address, postcode, airport or venue" autocomplete="off" />
+            <p class="field__error" data-error-for="pickup" hidden></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="destination">Destination <span aria-hidden="true">*</span></label>
+            <input class="field__input" id="destination" name="destination" type="text" required
+              placeholder="Address, postcode, airport or venue" autocomplete="off" />
+            <p class="field__error" data-error-for="destination" hidden></p>
+          </div>
+        </div>
+
+        <div class="quote-form__stops" data-stops>
+          <ol class="quote-form__stop-list" data-stop-list></ol>
+          <button type="button" class="link-action" data-add-stop>
+            <span aria-hidden="true">+</span> Add a Stop
+          </button>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field__label" for="pickup_date">Pickup Date <span aria-hidden="true">*</span></label>
+            <input class="field__input" id="pickup_date" name="pickup_date" type="date" required />
+            <p class="field__error" data-error-for="pickup_date" hidden></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="pickup_time">Pickup Time <span aria-hidden="true">*</span></label>
+            <input class="field__input" id="pickup_time" name="pickup_time" type="time" required />
+            <p class="field__error" data-error-for="pickup_time" hidden></p>
+          </div>
+        </div>
+
+        <fieldset class="choice-group">
+          <legend class="field__label">Return Journey? <span aria-hidden="true">*</span></legend>
+          <div class="choice-grid choice-grid--compact">
+            <label class="choice">
+              <input type="radio" name="return_journey" value="yes" required />
+              <span class="choice__label">Yes</span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="return_journey" value="no" required checked />
+              <span class="choice__label">No</span>
+            </label>
+          </div>
+          <p class="field__error" data-error-for="return_journey" hidden></p>
+        </fieldset>
+
+        <div class="conditional" data-conditional="return">
+          <div class="field-row">
+            <div class="field">
+              <label class="field__label" for="return_date">Return Date <span aria-hidden="true">*</span></label>
+              <input class="field__input" id="return_date" name="return_date" type="date" />
+              <p class="field__error" data-error-for="return_date" hidden></p>
+            </div>
+            <div class="field">
+              <label class="field__label" for="return_time">Return Time <span aria-hidden="true">*</span></label>
+              <input class="field__input" id="return_time" name="return_time" type="time" />
+              <p class="field__error" data-error-for="return_time" hidden></p>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="action-bar" data-actions>
+        <div class="action-bar__note"></div>
+        <div class="action-bar__buttons">
+          <Button type="button" variant="primary" data-next>Continue</Button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="quote-form__step" data-step="2">
+      <div class="error-summary" data-error-summary tabindex="-1" hidden>
+        <h3 class="error-summary__title">Check these details</h3>
+        <ul data-error-list></ul>
+      </div>
+
+      <fieldset class="quote-form__fieldset">
+        <legend class="quote-form__legend">
+          <span class="quote-form__step-label">Step 2</span>
+          <span class="quote-form__step-title text-h4">Passengers &amp; contact</span>
+          <span class="quote-form__step-intro">Who is travelling, and how WMC should reach you.</span>
+        </legend>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field__label" for="full_name">Full Name <span aria-hidden="true">*</span></label>
+            <input class="field__input" id="full_name" name="full_name" type="text" required autocomplete="name" />
+            <p class="field__error" data-error-for="full_name" hidden></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="organisation">Organisation / Company</label>
+            <input class="field__input" id="organisation" name="organisation" type="text" autocomplete="organization" />
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field__label" for="email">Email <span aria-hidden="true">*</span></label>
+            <input class="field__input" id="email" name="email" type="email" required autocomplete="email" inputmode="email" />
+            <p class="field__error" data-error-for="email" hidden></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="contact_number">Contact Number <span aria-hidden="true">*</span></label>
+            <input class="field__input" id="contact_number" name="contact_number" type="tel" required autocomplete="tel" inputmode="tel" />
+            <p class="field__error" data-error-for="contact_number" hidden></p>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field__label" for="passengers">Number of Passengers <span aria-hidden="true">*</span></label>
+            <input class="field__input" id="passengers" name="passengers" type="number" min="1" step="1" required inputmode="numeric" />
+            <p class="field__error" data-error-for="passengers" hidden></p>
+          </div>
+          <div class="field">
+            <fieldset class="choice-group choice-group--inline">
+              <legend class="field__label">Luggage <span aria-hidden="true">*</span></legend>
+              <div class="choice-grid choice-grid--compact">
+                {luggageOptions.map((option) => (
+                  <label class="choice">
+                    <input type="radio" name="luggage" value={option.value} required />
+                    <span class="choice__label">{option.label}</span>
+                  </label>
+                ))}
+              </div>
+              <p class="field__error" data-error-for="luggage" hidden></p>
+            </fieldset>
+          </div>
+        </div>
+
+        <div class="conditional" data-conditional="luggage">
+          <div class="field-row">
+            <div class="field">
+              <label class="field__label" for="luggage_cases">Approximate number of large cases</label>
+              <input class="field__input" id="luggage_cases" name="luggage_cases" type="number" min="0" step="1" inputmode="numeric" />
+            </div>
+            <div class="field">
+              <label class="field__label" for="luggage_other">Other / bulky luggage</label>
+              <input class="field__input" id="luggage_other" name="luggage_other" type="text" />
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="action-bar" data-actions>
+        <div class="action-bar__note"></div>
+        <div class="action-bar__buttons">
+          <Button type="button" variant="secondary" data-back>Back</Button>
+          <Button type="button" variant="primary" data-next>Continue</Button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="quote-form__step" data-step="3">
+      <div class="error-summary" data-error-summary tabindex="-1" hidden>
+        <h3 class="error-summary__title">Check these details</h3>
+        <ul data-error-list></ul>
+      </div>
+
+      <fieldset class="quote-form__fieldset">
+        <legend class="quote-form__legend">
+          <span class="quote-form__step-label">Step 3</span>
+          <span class="quote-form__step-title text-h4">Vehicle &amp; requirements</span>
+          <span class="quote-form__step-intro">
+            Choose your preferred service level and tell WMC what type of transport you have in mind.
+          </span>
+        </legend>
+
+        <!-- A. SERVICE LEVEL -->
+        <fieldset class="choice-group section-block">
+          <legend class="section-block__title">Service level <span aria-hidden="true">*</span></legend>
+          <div class="choice-grid choice-grid--three">
+            {serviceLevels.map((option) => (
+              <label class="option-card">
+                <input type="radio" name="service_level" value={option.value} required />
+                <span class="option-card__body">
+                  <span class="option-card__name">{option.label}</span>
+                  <span class="option-card__copy">{option.description}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+          <p class="field__error" data-error-for="service_level" hidden></p>
+        </fieldset>
+
+        <!-- B. VEHICLE PREFERENCE -->
+        <fieldset class="choice-group section-block">
+          <legend class="section-block__title">Vehicle preference <span aria-hidden="true">*</span></legend>
+          <div class="choice-grid choice-grid--four">
+            {vehicleCategories.map((option) => (
+              <label class="option-card option-card--compact">
+                <input type="radio" name="vehicle_category" value={option.value} required
+                  checked={option.value === 'recommend'} />
+                <span class="option-card__body">
+                  <span class="option-card__name">{option.label}</span>
+                  <span class="option-card__copy">{vehicleCopy[option.value]}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+          <p class="field__error" data-error-for="vehicle_category" hidden></p>
+        </fieldset>
+
+        <!-- C. JOURNEY CONTEXT -->
+        <div class="section-block">
+          <p class="section-block__title">Journey context</p>
+          <div class="field-row">
+            <div class="field">
+              <label class="field__label" for="journey_purpose">Journey purpose</label>
+              <div class="select-wrap">
+                <select class="field__input" id="journey_purpose" name="journey_purpose">
+                  <option value="">Select a purpose</option>
+                  {journeyPurposes.map((option) => (
+                    <option value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label class="field__label" for="preferred_vehicle">
+                Preferred WMC Vehicle <span class="field__optional">Optional</span>
+              </label>
+              <div class="select-wrap">
+                <select class="field__input" id="preferred_vehicle" name="preferred_vehicle">
+                  <option value="">No specific vehicle preference</option>
+                  {approvedVehicles.map((option) => (
+                    <option value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+              </div>
+              <p class="field__help">
+                A specific vehicle can be requested as a preference; availability is confirmed separately.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- D. ADDITIONAL DETAILS -->
+        <div class="section-block">
+          <p class="section-block__title">Additional details</p>
+          <div class="field">
+            <label class="field__label" for="additional_info">Additional information</label>
+            <textarea class="field__input field__textarea" id="additional_info" name="additional_info" rows="5"
+              placeholder="Tell us about any additional journey, accessibility or transport requirements."></textarea>
+          </div>
+          <div class="field field--half">
+            <label class="field__label" for="referral_source">
+              Where did you find us? <span class="field__optional">Optional</span>
+            </label>
+            <div class="select-wrap">
+              <select class="field__input" id="referral_source" name="referral_source">
+                <option value="">Prefer not to say</option>
+                {referralSources.map((option) => (
+                  <option value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- E. CONTACT PREFERENCE -->
+        <fieldset class="choice-group section-block">
+          <legend class="section-block__title">Preferred contact method <span aria-hidden="true">*</span></legend>
+          <div class="choice-grid choice-grid--two">
+            {contactMethods.map((option) => (
+              <label class="option-card option-card--compact">
+                <input type="radio" name="preferred_contact_method" value={option.value} required />
+                <span class="option-card__body">
+                  <span class="option-card__name">{option.label}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+          <p class="field__help">WMC will use the email address or number you provided in step 2.</p>
+          <p class="field__error" data-error-for="preferred_contact_method" hidden></p>
+        </fieldset>
+      </fieldset>
+
+      <!-- REVIEW -->
+      <section class="review" data-review hidden aria-live="polite">
+        <h3 class="review__title text-h5">Review your request</h3>
+        <div class="review__grid" data-review-body></div>
+      </section>
+
+      <div class="action-bar action-bar--submit" data-actions>
+        <p class="action-bar__note">
+          Submitting this form sends a quotation request. It does not confirm a booking or guarantee
+          vehicle availability.
+        </p>
+        <div class="action-bar__buttons">
+          <Button type="button" variant="secondary" data-back>Back</Button>
+          <Button type="submit" variant="primary">Send Quote Request</Button>
+        </div>
+      </div>
+    </section>
+  </form>
+
+  <!-- Result panels. Shown only after Web3Forms confirms an outcome. -->
+  <section class="result result--success" data-result-success role="status" tabindex="-1" hidden>
+    <p class="eyebrow">Quotation request</p>
+    <h3 class="text-h4 result__title">Quote request received.</h3>
+    <p class="text-body result__copy">
+      Thank you. WMC has received your journey details and will review the request before responding
+      through your preferred contact method.
+    </p>
+    <div class="result__actions" data-success-actions hidden>
+      <Button href={contact.whatsappHref} variant="secondary">Continue on WhatsApp</Button>
+    </div>
+  </section>
+
+  <section class="result result--error" data-result-error role="alert" tabindex="-1" hidden>
+    <h3 class="text-h4 result__title">We couldn't send your quote request.</h3>
+    <p class="text-body result__copy">
+      Your details have been kept. Please try again, or contact WMC by phone or WhatsApp.
+    </p>
+    <div class="result__actions">
+      <Button type="button" variant="primary" data-retry>Try Again</Button>
+      <Button href={contact.phoneHref} variant="secondary">Call {contact.phoneDisplay}</Button>
+      <Button href={contact.whatsappHref} variant="secondary">WhatsApp</Button>
+    </div>
+  </section>
+</div>
+
+<template data-stop-template>
+  <li class="quote-form__stop">
+    <div class="field">
+      <label class="field__label">Stop</label>
+      <input class="field__input" type="text" placeholder="Address, postcode, airport or venue" />
+    </div>
+    <button type="button" class="quote-form__remove-stop" data-remove-stop>
+      <span class="visually-hidden">Remove stop</span>
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </li>
+</template>
+
+<style>
+  /* ---------------------------------------------------------------
+     Shell
+     --------------------------------------------------------------- */
+  .quote-form {
+    max-inline-size: 1120px;
+    margin-inline: auto;
+    border: var(--border-width-hairline) solid var(--color-linen-border);
+    border-radius: var(--radius-media);
+    background-color: var(--color-warm-white);
+    box-shadow: var(--shadow-low);
+    overflow: hidden;
+  }
+
+  .quote-form__head {
+    padding: var(--space-4) var(--space-3);
+    border-block-end: var(--border-width-hairline) solid var(--color-linen-border);
+    background-color: var(--color-heritage-ivory);
+  }
+
+  .quote-form__form {
+    padding: var(--space-4) var(--space-3) var(--space-5);
+  }
+
+  @media (min-width: 768px) {
+    .quote-form__head {
+      padding: var(--space-5) var(--space-4);
+    }
+
+    .quote-form__form {
+      padding: var(--space-4) var(--space-4) var(--space-5);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .quote-form__head {
+      padding: var(--space-6) var(--space-6) var(--space-5);
+    }
+
+    .quote-form__form {
+      padding: var(--space-6);
+    }
+  }
+
+  .quote-form__title {
+    margin: 0 0 var(--space-1);
+  }
+
+  .quote-form__intro {
+    color: var(--color-slate-taupe);
+    margin: 0;
+    max-inline-size: 64ch;
+  }
+
+  /* ---------------------------------------------------------------
+     Progress
+     --------------------------------------------------------------- */
+  .progress {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+  }
+
+  .progress__item {
+    display: grid;
+    gap: 2px;
+    color: var(--color-slate-taupe);
+  }
+
+  .progress__bar {
+    display: block;
+    block-size: 3px;
+    border-radius: 2px;
+    background-color: var(--color-linen-border);
+    margin-block-end: var(--space-2);
+    transition: background-color var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  .progress__item[data-state='current'] .progress__bar,
+  .progress__item[data-state='done'] .progress__bar {
+    background-color: var(--color-champagne-gold);
+  }
+
+  .progress__index {
+    font-size: var(--text-small);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.12em;
+  }
+
+  .progress__item[data-state='current'] .progress__index,
+  .progress__item[data-state='current'] .progress__label {
+    color: var(--color-obsidian);
+  }
+
+  /* Completed steps carry a tick as well as colour. */
+  .progress__item[data-state='done'] .progress__index::after {
+    content: ' \2713';
+    color: var(--color-success-light);
+  }
+
+  .progress__label {
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  @media (max-width: 767px) {
+    .progress__index,
+    .progress__label {
+      display: none;
+    }
+
+    .progress {
+      gap: var(--space-1);
+    }
+  }
+
+  .progress__status {
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-obsidian);
+    margin: var(--space-2) 0 0;
+  }
+
+  /* ---------------------------------------------------------------
+     Step scaffolding
+     --------------------------------------------------------------- */
+  .quote-form__fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .quote-form__legend {
+    display: grid;
+    gap: 2px;
+    padding: 0;
+    margin-block-end: var(--space-4);
+  }
+
+  .quote-form__step-label {
+    font-size: var(--text-small);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-champagne-gold);
+  }
+
+  .quote-form__step-title {
+    color: var(--color-obsidian);
+  }
+
+  .quote-form__step-intro {
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    color: var(--color-slate-taupe);
+    max-inline-size: 62ch;
+  }
+
+  /* Without JS every step is simply a section of one long form. */
+  .quote-form__step + .quote-form__step {
+    margin-block-start: var(--space-6);
+    padding-block-start: var(--space-5);
+    border-block-start: var(--border-width-hairline) solid var(--color-linen-border);
+  }
+
+  .section-block {
+    border: 0;
+    margin: 0 0 var(--space-5);
+    padding: 0 0 var(--space-5);
+    border-block-end: var(--border-width-hairline) solid var(--color-linen-border);
+  }
+
+  .section-block:last-of-type {
+    border-block-end: 0;
+    padding-block-end: 0;
+    margin-block-end: var(--space-3);
+  }
+
+  .section-block__title {
+    display: block;
+    padding: 0;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-slate-taupe);
+    margin: 0 0 var(--space-3);
+  }
+
+  .section-block__title span {
+    color: var(--color-champagne-gold);
+  }
+
+  /* ---------------------------------------------------------------
+     Fields
+     --------------------------------------------------------------- */
+  .field {
+    margin-block-end: var(--space-4);
+  }
+
+  .field--half {
+    max-inline-size: 420px;
+  }
+
+  .field__label {
+    display: block;
+    font-size: var(--text-form-label);
+    line-height: var(--leading-form-label);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink);
+    margin-block-end: var(--space-1);
+    padding: 0;
+  }
+
+  .field__label > span[aria-hidden] {
+    color: var(--color-champagne-gold);
+  }
+
+  .field__optional {
+    font-weight: var(--font-weight-regular);
+    color: var(--color-slate-taupe);
+    letter-spacing: 0.04em;
+    font-size: var(--text-small);
+  }
+
+  .field__input {
+    inline-size: 100%;
+    min-block-size: 54px;
+    padding-inline: var(--space-2);
+    padding-block: 0;
+    font-size: var(--text-form-input);
+    line-height: var(--leading-form-input);
+    color: var(--color-ink);
+    background-color: var(--color-warm-white);
+    border: var(--border-width-hairline) solid var(--color-linen-border);
+    border-radius: 6px;
+    transition: border-color var(--motion-hover) var(--motion-easing-premium),
+      box-shadow var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  .field__input:hover {
+    border-color: var(--color-mist-taupe);
+  }
+
+  .field__input:focus-visible {
+    outline: none;
+    border-color: var(--color-champagne-gold);
+    box-shadow: 0 0 0 3px var(--gold-wash);
+  }
+
+  .field__textarea {
+    min-block-size: 140px;
+    padding-block: var(--space-2);
+    resize: vertical;
+    font-family: inherit;
+  }
+
+  .field__help {
+    color: var(--color-slate-taupe);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    margin: var(--space-1) 0 0;
+  }
+
+  .field-row {
+    display: grid;
+    gap: 0 var(--space-4);
+  }
+
+  @media (min-width: 720px) {
+    .field-row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* Native select, styled: keeps the accessible control, loses the chrome. */
+  .select-wrap {
+    position: relative;
+  }
+
+  .select-wrap select {
+    appearance: none;
+    padding-inline-end: var(--space-6);
+  }
+
+  .select-wrap::after {
+    content: '';
+    position: absolute;
+    inset-inline-end: var(--space-3);
+    inset-block-start: 50%;
+    inline-size: 9px;
+    block-size: 9px;
+    margin-block-start: -6px;
+    border-inline-end: 2px solid var(--color-slate-taupe);
+    border-block-end: 2px solid var(--color-slate-taupe);
+    transform: rotate(45deg);
+    pointer-events: none;
+  }
+
+  /* `display: flex` would otherwise beat the UA rule for [hidden]. */
+  .field__error[hidden] {
+    display: none;
+  }
+
+  .field__error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-1);
+    color: var(--color-error-light);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    font-weight: var(--font-weight-semibold);
+    margin: var(--space-1) 0 0;
+  }
+
+  /* Errors are never signalled by colour alone. */
+  .field__error::before {
+    content: '!';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 16px;
+    block-size: 16px;
+    flex-shrink: 0;
+    margin-block-start: 2px;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    font-size: 11px;
+  }
+
+  .field__input[aria-invalid='true'] {
+    border-color: var(--color-error-light);
+    border-inline-start-width: 3px;
+  }
+
+  /* ---------------------------------------------------------------
+     Choices
+     --------------------------------------------------------------- */
+  .choice-group {
+    border: 0;
+    margin: 0 0 var(--space-4);
+    padding: 0;
+  }
+
+  .choice-group--inline {
+    margin: 0;
+  }
+
+  .choice-grid {
+    display: grid;
+    gap: var(--space-2);
+    margin-block-start: var(--space-1);
+  }
+
+  .choice-grid--compact {
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+  }
+
+  @media (min-width: 600px) {
+    .choice-grid--two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .choice-grid--four {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 900px) {
+    .choice-grid--three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .choice-grid--four {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .choice {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-block-size: var(--touch-target-min);
+    padding: var(--space-1) var(--space-3);
+    border: var(--border-width-hairline) solid var(--color-linen-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color var(--motion-hover) var(--motion-easing-premium),
+      background-color var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  .choice__label {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink);
+  }
+
+  .choice:hover,
+  .option-card:hover {
+    border-color: var(--color-mist-taupe);
+  }
+
+  .choice:has(input:checked),
+  .option-card:has(input:checked) {
+    border-color: var(--color-champagne-gold);
+    background-color: var(--gold-wash);
+  }
+
+  .choice:has(input:focus-visible),
+  .option-card:has(input:focus-visible) {
+    outline: 2px solid var(--color-champagne-gold);
+    outline-offset: 2px;
+  }
+
+  .choice input,
+  .option-card input {
+    inline-size: 18px;
+    block-size: 18px;
+    accent-color: var(--color-champagne-gold);
+    flex-shrink: 0;
+  }
+
+  /* Selectable cards — real radios, styled surfaces. */
+  .option-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    min-block-size: var(--touch-target-min);
+    padding: var(--space-3);
+    border: var(--border-width-hairline) solid var(--color-linen-border);
+    border-radius: var(--radius-panel);
+    background-color: var(--color-warm-white);
+    cursor: pointer;
+    transition: border-color var(--motion-hover) var(--motion-easing-premium),
+      background-color var(--motion-hover) var(--motion-easing-premium),
+      transform var(--motion-hover) var(--motion-easing-premium),
+      box-shadow var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .option-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-low);
+    }
+  }
+
+  .option-card input {
+    margin-block-start: 3px;
+  }
+
+  .option-card__body {
+    display: grid;
+    gap: 2px;
+  }
+
+  .option-card__name {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink);
+  }
+
+  .option-card__copy {
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    color: var(--color-slate-taupe);
+  }
+
+  .option-card--compact {
+    align-items: center;
+  }
+
+  .option-card--compact input {
+    margin-block-start: 0;
+  }
+
+  /* ---------------------------------------------------------------
+     Stops
+     --------------------------------------------------------------- */
+  .quote-form__stops {
+    margin-block-end: var(--space-4);
+  }
+
+  .quote-form__stop-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .quote-form__stop {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-2);
+  }
+
+  .quote-form__stop .field {
+    flex: 1;
+  }
+
+  .quote-form__remove-stop {
+    inline-size: var(--touch-target-min);
+    block-size: 54px;
+    margin-block-end: var(--space-4);
+    background: transparent;
+    border: var(--border-width-hairline) solid var(--color-linen-border);
+    border-radius: 6px;
+    color: var(--color-slate-taupe);
+    font-size: 1.25rem;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .quote-form__remove-stop:hover {
+    border-color: var(--color-error-light);
+    color: var(--color-error-light);
+  }
+
+  .link-action {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-block-size: var(--touch-target-min);
+    padding-inline: 0;
+    background: transparent;
+    border: 0;
+    color: var(--color-obsidian);
+    font-size: var(--text-button);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: var(--gold-rule);
+    text-underline-offset: 4px;
+  }
+
+  .link-action span {
+    color: var(--color-champagne-gold);
+    font-size: 1.1rem;
+  }
+
+  .conditional {
+    display: none;
+  }
+
+  .conditional[data-visible='true'] {
+    display: block;
+  }
+
+  /* ---------------------------------------------------------------
+     Error summary
+     --------------------------------------------------------------- */
+  .error-summary {
+    border: var(--border-width-hairline) solid var(--color-error-light);
+    border-inline-start-width: 3px;
+    border-radius: 6px;
+    padding: var(--space-3);
+    margin-block-end: var(--space-4);
+    background-color: rgb(183 75 75 / 0.05);
+  }
+
+  .error-summary__title {
+    margin: 0 0 var(--space-1);
+    font-size: var(--text-h6);
+    line-height: var(--leading-h6);
+    color: var(--color-error-light);
+  }
+
+  .error-summary ul {
+    margin: 0;
+    padding-inline-start: var(--space-3);
+    color: var(--color-ink);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+
+  .error-summary a {
+    color: var(--color-ink);
+  }
+
+  /* ---------------------------------------------------------------
+     Review
+     --------------------------------------------------------------- */
+  .review {
+    margin-block-start: var(--space-5);
+    padding-block-start: var(--space-5);
+    border-block-start: var(--border-width-hairline) solid var(--color-linen-border);
+  }
+
+  .review__title {
+    margin: 0 0 var(--space-3);
+  }
+
+  .review__grid {
+    display: grid;
+    gap: var(--space-3);
+    align-items: start;
+  }
+
+  @media (min-width: 800px) {
+    .review__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .review__grid :global(.review__block--wide) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /*
+   * The review blocks are injected with innerHTML, so they never carry the
+   * scoped-style attribute. These rules are scoped by the container instead.
+   */
+  .review__grid :global(.review__block) {
+    border: var(--border-width-hairline) solid var(--color-linen-border);
+    border-radius: var(--radius-panel);
+    background-color: var(--color-heritage-ivory);
+    padding: var(--space-3);
+  }
+
+  .review__grid :global(.review__head) {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin-block-end: var(--space-2);
+    padding-block-end: var(--space-1);
+    border-block-end: var(--border-width-hairline) solid var(--color-linen-border);
+  }
+
+  .review__grid :global(.review__head h4) {
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-slate-taupe);
+  }
+
+  .review__grid :global(.review__edit) {
+    background: none;
+    border: 0;
+    padding: var(--space-1) 0;
+    color: var(--color-obsidian);
+    font-size: var(--text-small);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: var(--gold-rule);
+    text-underline-offset: 4px;
+  }
+
+  .review__grid :global(.review__block dl) {
+    display: grid;
+    grid-template-columns: minmax(90px, auto) 1fr;
+    align-content: start;
+    gap: 4px var(--space-3);
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+
+  .review__grid :global(.review__block dt) {
+    color: var(--color-slate-taupe);
+  }
+
+  .review__grid :global(.review__block dd) {
+    margin: 0;
+    color: var(--color-ink);
+    font-weight: var(--font-weight-semibold);
+    overflow-wrap: anywhere;
+  }
+
+  /* ---------------------------------------------------------------
+     Action bar
+     --------------------------------------------------------------- */
+  .action-bar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-block-start: var(--space-5);
+    padding-block-start: var(--space-4);
+    border-block-start: var(--border-width-hairline) solid var(--color-linen-border);
+  }
+
+  .action-bar__note {
+    color: var(--color-slate-taupe);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    margin: 0;
+    max-inline-size: 54ch;
+  }
+
+  .action-bar__note:empty {
+    display: none;
+  }
+
+  .action-bar__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .action-bar__buttons :global(.wmc-button) {
+    min-block-size: 54px;
+    padding-inline: var(--space-4);
+  }
+
+  @media (max-width: 599px) {
+    .action-bar__buttons {
+      flex-direction: column-reverse;
+    }
+
+    .action-bar__buttons :global(.wmc-button) {
+      inline-size: 100%;
+    }
+  }
+
+  @media (min-width: 600px) {
+    .action-bar {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .action-bar__buttons {
+      margin-inline-start: auto;
+    }
+  }
+
+  /* ---------------------------------------------------------------
+     Result panels
+     --------------------------------------------------------------- */
+  .result {
+    padding: var(--space-5) var(--space-3);
+    animation: result-in 220ms var(--motion-easing-premium);
+  }
+
+  @media (min-width: 1024px) {
+    .result {
+      padding: var(--space-6);
+    }
+  }
+
+  .result--success {
+    border-block-start: 3px solid var(--color-success-light);
+    background-color: var(--color-heritage-ivory);
+  }
+
+  .result--error {
+    border-block-start: 3px solid var(--color-error-light);
+  }
+
+  .result__title {
+    margin: 0 0 var(--space-2);
+  }
+
+  .result--error .result__title {
+    color: var(--color-error-light);
+  }
+
+  .result__copy {
+    color: var(--color-slate-taupe);
+    margin: 0;
+    max-inline-size: 62ch;
+  }
+
+  .result__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-block-start: var(--space-4);
+  }
+
+  .result__actions[hidden] {
+    display: none;
+  }
+
+  @keyframes result-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .result {
+      animation: none;
+    }
+  }
+
+  /* ---------------------------------------------------------------
+     JS-enhanced wizard
+     --------------------------------------------------------------- */
+  :global(.js-quote-form) .quote-form__step {
+    display: none;
+  }
+
+  :global(.js-quote-form) .quote-form__step[data-active='true'] {
+    display: block;
+    animation: step-in 220ms var(--motion-easing-premium);
+  }
+
+  :global(.js-quote-form) .quote-form__step + .quote-form__step {
+    margin-block-start: 0;
+    padding-block-start: 0;
+    border-block-start: 0;
+  }
+
+  @keyframes step-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js-quote-form) .quote-form__step[data-active='true'] {
+      animation: none;
+    }
+  }
+</style>
+
+<script is:inline>
+  document.documentElement.classList.add('js-quote-form');
+</script>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-quote-form]');
+  const form = root?.querySelector<HTMLFormElement>('[data-form]');
+
+  if (root && form) {
+    const stepEls = Array.from(root.querySelectorAll<HTMLElement>('[data-step]'));
+    const indicators = Array.from(root.querySelectorAll<HTMLElement>('[data-step-indicator]'));
+    const status = root.querySelector<HTMLElement>('[data-step-status]');
+    const review = root.querySelector<HTMLElement>('[data-review]');
+    const reviewBody = root.querySelector<HTMLElement>('[data-review-body]');
+    const stopList = root.querySelector<HTMLElement>('[data-stop-list]');
+    const stopTemplate = document.querySelector<HTMLTemplateElement>('[data-stop-template]');
+    const STORAGE_KEY = 'wmc-quote-draft';
+
+    const stepLabels = ['Journey', 'Passengers & Contact', 'Vehicle & Requirements'];
+    let current = 1;
+
+    const field = (name: string) =>
+      form.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(`[name="${name}"]`);
+    const value = (name: string) => {
+      const radios = form.querySelectorAll<HTMLInputElement>(`input[type="radio"][name="${name}"]`);
+      if (radios.length) {
+        const checked = Array.from(radios).find((r) => r.checked);
+        return checked ? checked.value : '';
+      }
+      return field(name)?.value.trim() ?? '';
+    };
+    const labelFor = (name: string) => {
+      const radios = form.querySelectorAll<HTMLInputElement>(`input[type="radio"][name="${name}"]`);
+      if (radios.length) {
+        const checked = Array.from(radios).find((r) => r.checked);
+        return (
+          checked?.parentElement?.querySelector('.choice__label, .option-card__name')?.textContent?.trim() ?? ''
+        );
+      }
+      const el = field(name);
+      if (el instanceof HTMLSelectElement) return el.selectedOptions[0]?.textContent?.trim() ?? '';
+      return el?.value.trim() ?? '';
+    };
+
+    // --- draft persistence (session only) ---
+    const saveDraft = () => {
+      try {
+        const data: Record<string, string> = {};
+        new FormData(form).forEach((v, k) => {
+          if (typeof v === 'string') data[k] = v;
+        });
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch {
+        /* storage unavailable — the form still works, it just will not persist */
+      }
+    };
+
+    // --- step display ---
+    const showStep = (step: number, focus = true) => {
+      current = Math.min(3, Math.max(1, step));
+      stepEls.forEach((el) => {
+        el.dataset.active = String(Number(el.dataset.step) === current);
+      });
+      indicators.forEach((el) => {
+        const id = Number(el.dataset.stepIndicator);
+        el.dataset.state = id === current ? 'current' : id < current ? 'done' : 'todo';
+      });
+      if (status) {
+        status.hidden = false;
+        status.textContent = `Step ${current} of 3 — ${stepLabels[current - 1]}`;
+      }
+      if (review) review.hidden = current !== 3;
+      if (current === 3) renderReview();
+      if (focus) {
+        const heading = stepEls[current - 1]?.querySelector<HTMLElement>('.quote-form__legend');
+        heading?.setAttribute('tabindex', '-1');
+        heading?.focus();
+      }
+    };
+
+    // --- conditionals ---
+    const syncConditionals = () => {
+      const ret = root.querySelector<HTMLElement>('[data-conditional="return"]');
+      const showReturn = value('return_journey') === 'yes';
+      if (ret) ret.dataset.visible = String(showReturn);
+      ['return_date', 'return_time'].forEach((n) => {
+        const el = field(n);
+        if (el instanceof HTMLInputElement) el.required = showReturn;
+      });
+
+      const lug = root.querySelector<HTMLElement>('[data-conditional="luggage"]');
+      if (lug) lug.dataset.visible = String(value('luggage') === 'yes');
+    };
+
+    form.addEventListener('change', (event) => {
+      const target = event.target as HTMLElement;
+      if (target instanceof HTMLInputElement && (target.name === 'return_journey' || target.name === 'luggage')) {
+        syncConditionals();
+      }
+      saveDraft();
+    });
+    form.addEventListener('input', saveDraft);
+
+    // --- stops ---
+    const renumberStops = () => {
+      if (!stopList) return;
+      Array.from(stopList.children).forEach((li, index) => {
+        const input = li.querySelector<HTMLInputElement>('input');
+        const label = li.querySelector<HTMLLabelElement>('label');
+        const id = `stop_${index + 1}`;
+        if (input) {
+          input.name = `stop_${index + 1}`;
+          input.id = id;
+        }
+        if (label) {
+          label.setAttribute('for', id);
+          label.textContent = `Stop ${index + 1}`;
+        }
+      });
+    };
+
+    root.querySelector('[data-add-stop]')?.addEventListener('click', () => {
+      if (!stopList || !stopTemplate) return;
+      const node = stopTemplate.content.cloneNode(true) as DocumentFragment;
+      stopList.appendChild(node);
+      renumberStops();
+      const inputs = stopList.querySelectorAll<HTMLInputElement>('input');
+      inputs[inputs.length - 1]?.focus();
+      saveDraft();
+    });
+
+    stopList?.addEventListener('click', (event) => {
+      const button = (event.target as HTMLElement).closest('[data-remove-stop]');
+      if (!button) return;
+      button.closest('li')?.remove();
+      renumberStops();
+      saveDraft();
+    });
+
+    // --- validation ---
+    const setError = (name: string, message: string) => {
+      const el = field(name);
+      const holder = form.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
+      if (holder) {
+        holder.textContent = message;
+        holder.hidden = false;
+        holder.id = holder.id || `error-${name}`;
+      }
+      if (el) {
+        el.setAttribute('aria-invalid', 'true');
+        if (holder) el.setAttribute('aria-describedby', holder.id);
+      }
+    };
+
+    const clearError = (name: string) => {
+      const el = field(name);
+      const holder = form.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
+      if (holder) {
+        holder.hidden = true;
+        holder.textContent = '';
+      }
+      el?.removeAttribute('aria-invalid');
+      el?.removeAttribute('aria-describedby');
+    };
+
+    const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    const hasDigits = (v: string) => (v.match(/\d/g) ?? []).length >= 7;
+
+    const validateStep = (step: number) => {
+      const errors: { name: string; message: string }[] = [];
+      const require = (name: string, message: string) => {
+        if (!value(name)) errors.push({ name, message });
+      };
+
+      if (step === 1) {
+        require('pickup', 'Enter a pickup location.');
+        require('destination', 'Enter a destination.');
+        require('pickup_date', 'Enter the pickup date.');
+        require('pickup_time', 'Enter the pickup time.');
+        require('return_journey', 'Choose whether a return journey is needed.');
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const pickupDate = value('pickup_date');
+        if (pickupDate && new Date(`${pickupDate}T00:00`) < today) {
+          errors.push({ name: 'pickup_date', message: 'The pickup date cannot be in the past.' });
+        }
+
+        if (value('return_journey') === 'yes') {
+          require('return_date', 'Enter the return date.');
+          require('return_time', 'Enter the return time.');
+          const rd = value('return_date');
+          const rt = value('return_time');
+          const pt = value('pickup_time');
+          if (pickupDate && rd) {
+            const out = new Date(`${pickupDate}T${pt || '00:00'}`);
+            const back = new Date(`${rd}T${rt || '00:00'}`);
+            if (back < out) {
+              errors.push({ name: 'return_date', message: 'The return cannot be before the outbound journey.' });
+            }
+          }
+        }
+      }
+
+      if (step === 2) {
+        require('full_name', 'Enter your full name.');
+        require('email', 'Enter your email address.');
+        require('contact_number', 'Enter a contact number.');
+        require('passengers', 'Enter the number of passengers.');
+        require('luggage', 'Choose a luggage option.');
+
+        const email = value('email');
+        if (email && !isEmail(email)) {
+          errors.push({ name: 'email', message: 'Enter a valid email address.' });
+        }
+        const passengers = Number(value('passengers'));
+        if (value('passengers') && (!Number.isFinite(passengers) || passengers < 1)) {
+          errors.push({ name: 'passengers', message: 'Enter at least one passenger.' });
+        }
+      }
+
+      if (step === 3) {
+        require('service_level', 'Choose a service level.');
+        require('vehicle_category', 'Choose a vehicle preference.');
+        require('preferred_contact_method', 'Choose a preferred contact method.');
+
+        const method = value('preferred_contact_method');
+        if (method === 'email' && !isEmail(value('email'))) {
+          errors.push({ name: 'preferred_contact_method', message: 'A valid email address is needed for email contact. Check step 2.' });
+        }
+        if (method === 'whatsapp' && !hasDigits(value('contact_number'))) {
+          errors.push({ name: 'preferred_contact_method', message: 'A usable contact number is needed for WhatsApp. Check step 2.' });
+        }
+      }
+
+      return errors;
+    };
+
+    /** Clears every step's errors so a summary can never outlive its step. */
+    const clearAllErrors = () => {
+      form.querySelectorAll<HTMLElement>('[data-error-for]').forEach((el) => {
+        clearError(el.dataset.errorFor as string);
+      });
+      form.querySelectorAll<HTMLElement>('[data-error-summary]').forEach((el) => {
+        el.hidden = true;
+      });
+      form.querySelectorAll<HTMLElement>('[data-error-list]').forEach((el) => {
+        el.innerHTML = '';
+      });
+    };
+
+    const showErrors = (step: number, errors: { name: string; message: string }[]) => {
+      const stepEl = stepEls[step - 1];
+      const summary = stepEl.querySelector<HTMLElement>('[data-error-summary]');
+      const list = stepEl.querySelector<HTMLElement>('[data-error-list]');
+
+      stepEl.querySelectorAll<HTMLElement>('[data-error-for]').forEach((el) => {
+        clearError(el.dataset.errorFor as string);
+      });
+
+      if (!errors.length) {
+        if (summary) summary.hidden = true;
+        return;
+      }
+
+      errors.forEach((error) => setError(error.name, error.message));
+
+      if (list) {
+        list.innerHTML = '';
+        errors.forEach((error) => {
+          const li = document.createElement('li');
+          const link = document.createElement('a');
+          link.href = `#${field(error.name)?.id || ''}`;
+          link.textContent = error.message;
+          link.addEventListener('click', (event) => {
+            event.preventDefault();
+            field(error.name)?.focus();
+          });
+          li.appendChild(link);
+          list.appendChild(li);
+        });
+      }
+      if (summary) {
+        summary.hidden = false;
+        summary.focus();
+      }
+    };
+
+    // --- review ---
+    const escape = (v: string) =>
+      v.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+
+    const renderReview = () => {
+      if (!reviewBody) return;
+      const stops = stopList
+        ? Array.from(stopList.querySelectorAll<HTMLInputElement>('input'))
+            .map((i) => i.value.trim())
+            .filter(Boolean)
+        : [];
+
+      const groups: { title: string; step: number; wide?: boolean; rows: [string, string][] }[] = [
+        {
+          title: 'Journey',
+          step: 1,
+          rows: [
+            ['Pickup', value('pickup')],
+            ['Destination', value('destination')],
+            ['Stops', stops.length ? stops.join(' → ') : '—'],
+            ['Outbound', [value('pickup_date'), value('pickup_time')].filter(Boolean).join(' at ')],
+            [
+              'Return',
+              value('return_journey') === 'yes'
+                ? [value('return_date'), value('return_time')].filter(Boolean).join(' at ')
+                : 'No return journey',
+            ],
+          ],
+        },
+        {
+          title: 'Passengers',
+          step: 2,
+          rows: [
+            ['Passengers', value('passengers')],
+            [
+              'Luggage',
+              [labelFor('luggage'), value('luggage_cases') ? `${value('luggage_cases')} large cases` : '', value('luggage_other')]
+                .filter(Boolean)
+                .join(' · '),
+            ],
+          ],
+        },
+        {
+          title: 'Vehicle',
+          step: 3,
+          rows: [
+            ['Service level', labelFor('service_level')],
+            ['Vehicle preference', labelFor('vehicle_category')],
+            ['Preferred vehicle', value('preferred_vehicle') ? labelFor('preferred_vehicle') : 'No specific preference'],
+            ['Journey purpose', value('journey_purpose') ? labelFor('journey_purpose') : '—'],
+          ],
+        },
+        {
+          title: 'Contact',
+          step: 2,
+          rows: [
+            ['Name', value('full_name')],
+            ['Organisation', value('organisation') || '—'],
+            ['Email', value('email')],
+            ['Number', value('contact_number')],
+            ['Preferred contact', labelFor('preferred_contact_method')],
+          ],
+        },
+        {
+          title: 'Additional information',
+          step: 3,
+          wide: true,
+          rows: [
+            ['Notes', value('additional_info') || '—'],
+            ['Found us via', value('referral_source') ? labelFor('referral_source') : '—'],
+          ],
+        },
+      ];
+
+      reviewBody.innerHTML = groups
+        .map(
+          (group) => `
+          <div class="review__block${group.wide ? ' review__block--wide' : ''}">
+            <div class="review__head">
+              <h4>${escape(group.title)}</h4>
+              <button type="button" class="review__edit" data-edit-step="${group.step}">Edit</button>
+            </div>
+            <dl>
+              ${group.rows
+                .map(([label, val]) => `<dt>${escape(label)}</dt><dd>${escape(val || '—')}</dd>`)
+                .join('')}
+            </dl>
+          </div>`,
+        )
+        .join('');
+    };
+
+    reviewBody?.addEventListener('click', (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLElement>('[data-edit-step]');
+      if (!button) return;
+      showStep(Number(button.dataset.editStep));
+    });
+
+    // --- navigation ---
+    root.querySelectorAll('[data-next]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const errors = validateStep(current);
+        showErrors(current, errors);
+        if (errors.length) return;
+        showStep(current + 1);
+        root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    root.querySelectorAll('[data-back]').forEach((button) => {
+      button.addEventListener('click', () => {
+        showStep(current - 1);
+        root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    // --- submission ---
+    const successPanel = root.querySelector<HTMLElement>('[data-result-success]');
+    const errorPanel = root.querySelector<HTMLElement>('[data-result-error]');
+    const successActions = root.querySelector<HTMLElement>('[data-success-actions]');
+    const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const getAccessKey = () => (form.dataset.accessKey ?? '').trim();
+    let sending = false;
+
+    /**
+     * Human-readable labels so the WMC inbox receives a scannable email rather
+     * than raw field keys.
+     */
+    const buildPayload = () => {
+      const data = new FormData();
+      const stops = stopList
+        ? Array.from(stopList.querySelectorAll<HTMLInputElement>('input'))
+            .map((i) => i.value.trim())
+            .filter(Boolean)
+        : [];
+
+      const add = (label: string, val: string) => {
+        if (val) data.append(label, val);
+      };
+
+      data.append('access_key', getAccessKey());
+      data.append('subject', 'New WMC Quote Request');
+      data.append('from_name', 'West Midlands Coaches Website');
+      const honeypot = form.querySelector<HTMLInputElement>('input[name="botcheck"]');
+      data.append('botcheck', honeypot?.checked ? 'true' : '');
+      // Web3Forms uses the field named `email` as the reply-to address.
+      data.append('email', value('email'));
+
+      add('Quote Type', 'Journey / Quote Request');
+
+      add('Pickup', value('pickup'));
+      add('Destination', value('destination'));
+      add('Pickup Date', value('pickup_date'));
+      add('Pickup Time', value('pickup_time'));
+
+      const isReturn = value('return_journey') === 'yes';
+      add('Return Journey', isReturn ? 'Yes' : 'No');
+      if (isReturn) {
+        add('Return Date', value('return_date'));
+        add('Return Time', value('return_time'));
+      }
+
+      if (stops.length) {
+        add('Additional Stops', stops.map((s, i) => `${i + 1}. ${s}`).join('\n'));
+      }
+
+      add('Full Name', value('full_name'));
+      add('Contact Number', value('contact_number'));
+      add('Email Address', value('email'));
+      add('Organisation', value('organisation'));
+      add('Passengers', value('passengers'));
+
+      add('Luggage', labelFor('luggage'));
+      add('Approximate Large Cases', value('luggage_cases'));
+      add('Other / Bulky Luggage', value('luggage_other'));
+
+      add('Service Level', labelFor('service_level'));
+      add('Vehicle Preference', labelFor('vehicle_category'));
+      if (value('preferred_vehicle')) add('Preferred WMC Vehicle', labelFor('preferred_vehicle'));
+      if (value('journey_purpose')) add('Journey Purpose', labelFor('journey_purpose'));
+
+      add('Additional Information', value('additional_info'));
+      if (value('referral_source')) add('Referral Source', labelFor('referral_source'));
+      add('Preferred Contact Method', labelFor('preferred_contact_method'));
+      add('Source Page', window.location.pathname);
+
+      return data;
+    };
+
+    const setSending = (state: boolean) => {
+      sending = state;
+      if (!submitButton) return;
+      submitButton.disabled = state;
+      submitButton.setAttribute('aria-busy', String(state));
+      submitButton.textContent = state ? 'Sending…' : 'Send Quote Request';
+    };
+
+    const showResult = (panel: HTMLElement | null, other: HTMLElement | null) => {
+      if (other) other.hidden = true;
+      if (!panel) return;
+      panel.hidden = false;
+      panel.focus();
+      panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
+    root.querySelector('[data-retry]')?.addEventListener('click', () => {
+      if (errorPanel) errorPanel.hidden = true;
+      showStep(3);
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (sending) return;
+
+      clearAllErrors();
+      const all = [1, 2, 3].flatMap((step) => validateStep(step).map((e) => ({ ...e, step })));
+      if (all.length) {
+        const first = all[0].step;
+        showStep(first);
+        showErrors(first, all.filter((e) => e.step === first));
+        return;
+      }
+
+      if (!getAccessKey()) {
+        // Without a key nothing can be delivered, so never claim success.
+        showResult(errorPanel, successPanel);
+        return;
+      }
+
+      setSending(true);
+
+      try {
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          body: buildPayload(),
+        });
+        const result = await response.json().catch(() => null);
+        const delivered = response.ok && result?.success === true;
+
+        if (!delivered) {
+          showResult(errorPanel, successPanel);
+          return;
+        }
+
+        // Only now is it safe to retire the draft and close the form.
+        try {
+          sessionStorage.removeItem(STORAGE_KEY);
+        } catch {
+          /* storage unavailable */
+        }
+
+        // Offered, never opened automatically, and only when it was asked for.
+        if (successActions) {
+          successActions.hidden = value('preferred_contact_method') !== 'whatsapp';
+        }
+
+        form.hidden = true;
+        showResult(successPanel, errorPanel);
+      } catch {
+        showResult(errorPanel, successPanel);
+      } finally {
+        if (!form.hidden) setSending(false);
+        else sending = false;
+      }
+    });
+
+    const restoreDraft = () => {
+      try {
+        const raw = sessionStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw) as Record<string, string>;
+        const stopKeys = Object.keys(data).filter((k) => /^stop_\d+$/.test(k));
+        stopKeys.forEach(() => root.querySelector<HTMLButtonElement>('[data-add-stop]')?.click());
+        Object.entries(data).forEach(([name, val]) => {
+          const radios = form.querySelectorAll<HTMLInputElement>(`input[type="radio"][name="${name}"]`);
+          if (radios.length) {
+            radios.forEach((r) => (r.checked = r.value === val));
+            return;
+          }
+          const el = field(name);
+          if (el) el.value = val;
+        });
+      } catch {
+        /* ignore malformed drafts */
+      }
+    };
+
+    // --- URL context ---
+    const applyUrlContext = () => {
+      const params = new URLSearchParams(window.location.search);
+      const fleet = params.get('fleet');
+      const allowedFleet = ['car', 'minibus', 'coach'];
+      if (fleet && allowedFleet.includes(fleet)) {
+        const radio = form.querySelector<HTMLInputElement>(
+          `input[name="vehicle_category"][value="${fleet}"]`,
+        );
+        if (radio) {
+          form
+            .querySelectorAll<HTMLInputElement>('input[name="vehicle_category"]')
+            .forEach((r) => (r.checked = false));
+          radio.checked = true;
+        }
+      }
+
+      const service = params.get('service');
+      const purpose = field('journey_purpose');
+      if (service && purpose instanceof HTMLSelectElement) {
+        const match = Array.from(purpose.options).find((o) => o.value === service);
+        if (match) purpose.value = match.value;
+      }
+
+      const vehicle = params.get('vehicle');
+      const preferred = field('preferred_vehicle');
+      if (vehicle && preferred instanceof HTMLSelectElement) {
+        const match = Array.from(preferred.options).find((o) => o.value === vehicle);
+        if (match) preferred.value = match.value;
+      }
+    };
+
+    restoreDraft();
+    applyUrlContext();
+    syncConditionals();
+    showStep(1, false);
+  }
+</script>

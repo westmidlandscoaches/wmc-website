@@ -3,6 +3,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageContainer from '../../components/ui/PageContainer.astro';
 import Section from '../../components/ui/Section.astro';
 import Button from '../../components/ui/Button.astro';
+import PageHero from '../../components/content/PageHero.astro';
+import { getFleetVisuals } from '../../data/fleetVisuals';
+
+const heroVisual = getFleetVisuals('minibus', 'exterior').find((v) => v.id === 'minibus-05-exterior-01')!;
 
 const services = [
   {
@@ -43,14 +47,17 @@ const services = [
   description="Airport transfers, corporate transport, private group transport, wedding transport, schools and education, and day trips organised by West Midlands Coaches."
   path="/services/"
 >
-  <Section as="div" surface="warm-white">
-    <PageContainer>
-      <h1>What are you organising?</h1>
-      <p class="text-lead intro">
-        WMC organises private passenger transport around the people, route and requirements of the journey.
-      </p>
-    </PageContainer>
-  </Section>
+  <PageHero
+    priority
+    eyebrow="Services"
+    breadcrumb={[{ label: 'Home', href: '/' }, { label: 'Services' }]}
+    title="Transport organised around the journey."
+    lead="WMC provides driver-operated Cars, Minibuses and Coaches for airport, corporate, private group and other verified passenger-transport requirements."
+    primaryCta={{ label: 'Request a Quote', href: '/request-a-quote/' }}
+    image={heroVisual.image}
+    imageAlt={heroVisual.alt}
+    caption="WMC-owned fleet"
+  />
 
   <Section as="div" surface="heritage-ivory">
     <PageContainer>
@@ -68,11 +75,6 @@ const services = [
 </BaseLayout>
 
 <style>
-  .intro {
-    color: var(--color-slate-taupe);
-    max-inline-size: 50ch;
-  }
-
   .services {
     display: grid;
     gap: var(--space-6);

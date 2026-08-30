@@ -14,7 +14,10 @@ const { items } = Astro.props;
 <div class="faq-accordion">
   {items.map((item) => (
     <details class="faq-accordion__item">
-      <summary class="text-h5 faq-accordion__question">{item.question}</summary>
+      <summary class="text-h5 faq-accordion__question">
+        <span>{item.question}</span>
+        <span class="faq-accordion__icon" aria-hidden="true"></span>
+      </summary>
       <p class="text-body faq-accordion__answer">{item.answer}</p>
     </details>
   ))}
@@ -30,6 +33,8 @@ const { items } = Astro.props;
   .faq-accordion__item {
     border-block-end: var(--border-width-hairline) solid var(--color-linen-border);
     padding-block: var(--space-3);
+    padding-inline: var(--space-2);
+    transition: background-color var(--motion-hover) var(--motion-easing-premium);
   }
 
   .faq-accordion__question {
@@ -41,26 +46,65 @@ const { items } = Astro.props;
     gap: var(--space-3);
     min-block-size: var(--touch-target-min);
     color: var(--color-ink);
+    transition: color var(--motion-hover) var(--motion-easing-premium);
   }
 
   .faq-accordion__question::-webkit-details-marker {
     display: none;
   }
 
-  .faq-accordion__question::after {
-    content: '+';
-    font-weight: var(--font-weight-regular);
-    color: var(--color-slate-taupe);
+  /* Plus / minus built from two rules so the two states share one centre. */
+  .faq-accordion__icon {
+    position: relative;
+    inline-size: 16px;
+    block-size: 16px;
     flex-shrink: 0;
   }
 
-  .faq-accordion__item[open] .faq-accordion__question::after {
-    content: '\2212';
+  .faq-accordion__icon::before,
+  .faq-accordion__icon::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 0;
+    inline-size: 100%;
+    block-size: 1.5px;
+    background-color: var(--color-champagne-gold);
+    transition: transform var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  .faq-accordion__icon::after {
+    transform: rotate(90deg);
+  }
+
+  .faq-accordion__item[open] .faq-accordion__icon::after {
+    transform: rotate(0deg);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .faq-accordion__item:hover {
+      background-color: var(--surface-tint-light);
+    }
+
+    .faq-accordion__item:hover .faq-accordion__question {
+      color: var(--color-obsidian);
+    }
   }
 
   .faq-accordion__answer {
     color: var(--color-slate-taupe);
     max-inline-size: 68ch;
     margin-block: var(--space-2) 0;
+  }
+
+  .faq-accordion__item[open] .faq-accordion__answer {
+    animation: faq-answer-in 220ms var(--motion-easing-premium);
+  }
+
+  @keyframes faq-answer-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
   }
 </style>

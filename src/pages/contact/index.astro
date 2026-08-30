@@ -3,7 +3,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageContainer from '../../components/ui/PageContainer.astro';
 import Section from '../../components/ui/Section.astro';
 import Button from '../../components/ui/Button.astro';
+import PageHero from '../../components/content/PageHero.astro';
 import { contact } from '../../data/navigation';
+import { getFleetVisuals } from '../../data/fleetVisuals';
+
+const heroVisual = getFleetVisuals('car', 'exterior').find((v) => v.id === 'car-02-exterior')!;
 ---
 
 <BaseLayout
@@ -11,13 +15,22 @@ import { contact } from '../../data/navigation';
   description="Contact West Midlands Coaches by phone or WhatsApp to discuss a journey, or request a quotation."
   path="/contact/"
 >
+  <PageHero
+    priority
+    eyebrow="Contact"
+    breadcrumb={[{ label: 'Home', href: '/' }, { label: 'Contact' }]}
+    title="Talk to WMC about your journey."
+    lead="Speak directly with West Midlands Coaches about a journey, transport requirement or quotation."
+    primaryCta={{ label: `Call ${contact.phoneDisplay}`, href: contact.phoneHref }}
+    secondaryCta={{ label: 'WhatsApp', href: contact.whatsappHref }}
+    tertiaryCta={{ label: 'Request a Quote', href: '/request-a-quote/' }}
+    image={heroVisual.image}
+    imageAlt={heroVisual.alt}
+    caption="WMC-owned fleet"
+  />
+
   <Section as="div" surface="warm-white">
     <PageContainer>
-      <h1>Contact West Midlands Coaches.</h1>
-      <p class="text-lead intro">
-        Speak to WMC directly about a journey, or request a quotation online.
-      </p>
-
       <div class="contact-details">
         <div>
           <h2 class="text-h5">Phone</h2>
@@ -42,12 +55,6 @@ import { contact } from '../../data/navigation';
 </BaseLayout>
 
 <style>
-  .intro {
-    color: var(--color-slate-taupe);
-    max-inline-size: 55ch;
-    margin-block-end: var(--space-5);
-  }
-
   .contact-details {
     display: grid;
     gap: var(--space-4);
