@@ -4,6 +4,7 @@ import PageContainer from '../../components/ui/PageContainer.astro';
 import Section from '../../components/ui/Section.astro';
 import Button from '../../components/ui/Button.astro';
 import PageHero from '../../components/content/PageHero.astro';
+import ContactForm from '../../components/forms/ContactForm.astro';
 import { contact } from '../../data/navigation';
 import { getFleetVisuals } from '../../data/fleetVisuals';
 
@@ -31,54 +32,159 @@ const heroVisual = getFleetVisuals('car', 'exterior').find((v) => v.id === 'car-
 
   <Section as="div" surface="warm-white">
     <PageContainer>
-      <div class="contact-details">
-        <div>
-          <h2 class="text-h5">Phone</h2>
-          <a class="text-body-large" href={contact.phoneHref}>{contact.phoneDisplay}</a>
-        </div>
-        <div>
-          <h2 class="text-h5">WhatsApp</h2>
-          <a class="text-body-large" href={contact.whatsappHref}>Message WMC on WhatsApp</a>
-        </div>
-        <div>
-          <h2 class="text-h5">Address</h2>
-          <p class="text-body-large">{contact.address}</p>
-        </div>
-      </div>
+      <div class="contact-layout">
+        <div class="contact-direct">
+          <p class="eyebrow">Direct contact</p>
+          <h2 class="text-h4 contact-direct__title">West Midlands Coaches Ltd</h2>
 
-      <div class="contact-actions">
-        <Button href="/request-a-quote/" variant="primary">Request a Quote</Button>
-        <Button href={contact.phoneHref} variant="secondary">Call {contact.phoneDisplay}</Button>
+          <dl class="contact-direct__list">
+            <div class="contact-direct__item">
+              <dt class="contact-direct__label">Phone</dt>
+              <dd>
+                <a class="text-body-large contact-direct__link" href={contact.phoneHref}>
+                  {contact.phoneDisplay}
+                </a>
+              </dd>
+            </div>
+            <div class="contact-direct__item">
+              <dt class="contact-direct__label">WhatsApp</dt>
+              <dd>
+                <a
+                  class="text-body-large contact-direct__link"
+                  href={contact.whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Message WMC on WhatsApp
+                </a>
+              </dd>
+            </div>
+            <div class="contact-direct__item">
+              <dt class="contact-direct__label">Address</dt>
+              <dd>
+                <address class="text-body contact-direct__address">
+                  429 Meadway<br />Birmingham<br />B33 0DZ<br />United Kingdom
+                </address>
+              </dd>
+            </div>
+          </dl>
+
+          <div class="contact-direct__actions">
+            <Button href={contact.phoneHref} variant="primary">Call WMC</Button>
+            <Button href={contact.whatsappHref} variant="secondary" target="_blank" rel="noopener noreferrer">
+              WhatsApp
+            </Button>
+          </div>
+
+          <aside class="contact-quote">
+            <h3 class="text-h6 contact-quote__title">Planning a journey?</h3>
+            <p class="text-small contact-quote__copy">
+              For vehicle, passenger, date and route requirements, use the WMC quotation form.
+            </p>
+            <a class="arrow-link" href="/request-a-quote/">Request a Quote</a>
+          </aside>
+        </div>
+
+        <div class="contact-form-column">
+          <ContactForm />
+        </div>
       </div>
     </PageContainer>
   </Section>
 </BaseLayout>
 
 <style>
-  .contact-details {
+  .contact-layout {
     display: grid;
-    gap: var(--space-4);
-    margin-block-end: var(--space-6);
+    gap: var(--space-6);
   }
 
-  .contact-details a {
-    text-decoration: none;
-    color: var(--color-obsidian);
+  @media (min-width: 1024px) {
+    .contact-layout {
+      grid-template-columns: 5fr 7fr;
+      gap: var(--space-7);
+      align-items: start;
+    }
   }
 
-  .contact-details p {
+  .contact-direct__title {
+    margin: 0 0 var(--space-4);
+  }
+
+  .contact-direct__list {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0 0 var(--space-4);
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-width-hairline) solid var(--color-linen-border);
+  }
+
+  .contact-direct__item {
+    display: grid;
+    gap: 2px;
+    padding-block-end: var(--space-3);
+    border-block-end: var(--border-width-hairline) solid var(--color-linen-border);
+  }
+
+  .contact-direct__item:last-child {
+    padding-block-end: 0;
+    border-block-end: 0;
+  }
+
+  .contact-direct__label {
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-slate-taupe);
+  }
+
+  .contact-direct__item dd {
     margin: 0;
   }
 
-  .contact-actions {
+  .contact-direct__link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--touch-target-min);
+    color: var(--color-obsidian);
+    font-weight: var(--font-weight-semibold);
+    text-decoration: none;
+    border-block-end: 1px solid var(--gold-rule);
+  }
+
+  .contact-direct__link:hover {
+    border-block-end-color: var(--color-champagne-gold);
+  }
+
+  .contact-direct__address {
+    font-style: normal;
+    color: var(--color-ink);
+    margin: var(--space-1) 0 0;
+  }
+
+  .contact-direct__actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
   }
 
-  @media (min-width: 768px) {
-    .contact-details {
-      grid-template-columns: repeat(3, 1fr);
-    }
+  .contact-quote {
+    margin-block-start: var(--space-5);
+    padding: var(--space-3);
+    border: var(--border-width-hairline) solid var(--color-linen-border);
+    border-radius: var(--radius-panel);
+    background-color: var(--color-heritage-ivory);
+  }
+
+  .contact-quote__title {
+    margin: 0 0 var(--space-1);
+  }
+
+  .contact-quote__copy {
+    color: var(--color-slate-taupe);
+    margin: 0 0 var(--space-2);
+    max-inline-size: 44ch;
   }
 </style>
