@@ -143,19 +143,19 @@ const isCurrent = (href: string) => !href.includes('#') && path === href;
     max-inline-size: var(--content-max-width);
     margin-inline: auto;
     padding-inline: var(--space-3);
-    block-size: 66px;
+    block-size: 58px;
   }
 
   @media (min-width: 768px) {
     .site-header__inner {
       padding-inline: var(--space-4);
-      block-size: 72px;
+      block-size: 64px;
     }
   }
 
   @media (min-width: 1024px) {
     .site-header__inner {
-      block-size: 78px;
+      block-size: 70px;
     }
   }
 
@@ -174,7 +174,7 @@ const isCurrent = (href: string) => !href.includes('#') && path === href;
    * so --mark-height is the height the monogram actually renders at.
    */
   .site-header__mark {
-    --mark-height: 42px;
+    --mark-height: 34px;
     display: block;
     block-size: var(--mark-height);
     inline-size: calc(var(--mark-height) * 3.561);
@@ -194,13 +194,13 @@ const isCurrent = (href: string) => !href.includes('#') && path === href;
 
   @media (min-width: 768px) {
     .site-header__mark {
-      --mark-height: 46px;
+      --mark-height: 38px;
     }
   }
 
   @media (min-width: 1024px) {
     .site-header__mark {
-      --mark-height: 50px;
+      --mark-height: 42px;
     }
   }
 
@@ -405,12 +405,12 @@ const isCurrent = (href: string) => !href.includes('#') && path === href;
     justify-content: space-between;
     gap: var(--space-3);
     padding: var(--space-3);
-    block-size: 66px;
+    block-size: 58px;
     border-block-end: var(--border-width-hairline) solid var(--color-charcoal-border);
   }
 
   .site-menu__mark {
-    --mark-height: 42px;
+    --mark-height: 34px;
     display: block;
     block-size: var(--mark-height);
     inline-size: calc(var(--mark-height) * 3.561);

@@ -45,7 +45,8 @@ const columns = [
         </span>
         <p class="site-footer__name">{contact.companyName}</p>
         <p class="site-footer__tagline">
-          Private Passenger Transport<br />Transport, Properly Organised.
+          Private Passenger Transport<span class="site-footer__tagline-break"> · </span>Transport,
+          Properly Organised.
         </p>
       </div>
 
@@ -94,9 +95,8 @@ const columns = [
           aria-label="View West Midlands Coaches on Google Maps"
         >
           <address>
-            {contact.addressLines.map((line) => (
-              <span class="site-footer__address-line">{line}</span>
-            ))}
+            <span class="site-footer__address-line">429 Meadway, Birmingham</span>
+            <span class="site-footer__address-line">B33 0DZ, United Kingdom</span>
           </address>
           <span class="site-footer__address-action" aria-hidden="true">View on Google Maps &#8599;</span>
         </a>
@@ -119,10 +119,10 @@ const columns = [
     position: relative;
     background-color: var(--color-obsidian);
     color: var(--color-mist-taupe);
-    padding-block: var(--space-7) var(--space-5);
-    /* Clears the floating contact launcher (58px control + its own offset)
-       so the legal row is never sitting underneath it. */
-    padding-block-end: calc(var(--space-11) + env(safe-area-inset-bottom, 0px));
+    padding-block: var(--space-5);
+    /* The legal row reserves the launcher's column horizontally, so only a
+       modest bottom clearance is needed. */
+    padding-block-end: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
   }
 
   .site-footer__edge {
@@ -140,24 +140,123 @@ const columns = [
 
   .site-footer__grid {
     display: grid;
-    gap: var(--space-5);
+    gap: var(--space-4);
   }
 
-  @media (min-width: 600px) {
+  /* Small screens: brand row stays compact and the two link columns sit
+     side by side instead of running the footer twice as long. */
+  @media (max-width: 599px) {
     .site-footer__grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-5) var(--space-4);
+      gap: var(--space-3);
+    }
+
+    .site-footer__brand,
+    .site-footer__grid > .site-footer__column:last-child {
+      grid-column: 1 / -1;
+    }
+
+    .site-footer__brand {
+      display: grid;
+      gap: var(--space-1);
+    }
+
+    .site-footer__mark {
+      margin-block-end: var(--space-1);
+    }
+
+    /* Mark above the name reads cleaner than a side-by-side row once the
+       company name has to wrap. */
+    .site-footer__name {
+      margin-block-start: var(--space-1);
+    }
+
+    .site-footer__name {
+      margin: 0;
+      align-self: end;
+    }
+
+    .site-footer__tagline {
+      align-self: start;
+    }
+
+    .site-footer .site-footer__link {
+      min-block-size: 38px;
+    }
+
+    .site-footer__heading {
+      margin-block-end: var(--space-1);
+      padding-block-end: var(--space-1);
+    }
+
+    /* Contact block runs as compact rows rather than a tall stack. */
+    .site-footer__grid > .site-footer__column:last-child .site-footer__links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      align-items: baseline;
+    }
+
+    .site-footer__address {
+      margin-block-start: var(--space-1);
+      padding-block-start: var(--space-2);
+    }
+
+    .site-footer .site-footer__address-action {
+      min-block-size: 36px;
+    }
+
+    .site-footer .site-footer__link {
+      min-block-size: 36px;
+    }
+
+    .site-footer .site-footer__legal {
+      margin-block-start: var(--space-3);
+      padding-block-start: var(--space-2);
+    }
+
+    .site-footer .site-footer__tagline {
+      font-size: var(--text-small);
+    }
+
+    .site-footer__tagline {
+      max-inline-size: none;
+    }
+  }
+
+  @media (min-width: 600px) and (max-width: 1023px) {
+    .site-footer__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-4) var(--space-3);
     }
 
     .site-footer__brand {
       grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+
+    .site-footer__mark {
+      margin-block-end: 0;
+    }
+
+    .site-footer__link {
+      min-block-size: 40px;
     }
   }
+
+
 
   @media (min-width: 1024px) {
     .site-footer__grid {
       grid-template-columns: 1.4fr 1fr 1fr 1.3fr;
       gap: var(--space-5);
+    }
+
+    .site-footer__link {
+      min-block-size: var(--touch-target-min);
     }
 
     .site-footer__brand {
@@ -169,7 +268,7 @@ const columns = [
   /* Same framing approach as the header: the supplied square canvas is left
      untouched and only its glyph band is shown. */
   .site-footer__mark {
-    --mark-height: 50px;
+    --mark-height: 38px;
     display: block;
     block-size: var(--mark-height);
     inline-size: calc(var(--mark-height) * 3.561);
@@ -190,13 +289,13 @@ const columns = [
 
   @media (min-width: 768px) {
     .site-footer__mark {
-      --mark-height: 54px;
+      --mark-height: 42px;
     }
   }
 
   @media (min-width: 1024px) {
     .site-footer__mark {
-      --mark-height: 58px;
+      --mark-height: 46px;
     }
   }
 
@@ -273,8 +372,8 @@ const columns = [
   /* --- address --- */
   .site-footer__address {
     display: block;
-    margin-block-start: var(--space-3);
-    padding-block-start: var(--space-3);
+    margin-block-start: var(--space-2);
+    padding-block-start: var(--space-2);
     border-block-start: var(--border-width-hairline) solid var(--color-charcoal-border);
     text-decoration: none;
     color: var(--color-mist-taupe);
@@ -286,6 +385,10 @@ const columns = [
     display: grid;
     font-size: var(--text-small);
     line-height: var(--leading-small);
+  }
+
+  .site-footer__address-action {
+    margin-block-start: 2px;
   }
 
   .site-footer__address-action {
@@ -310,10 +413,26 @@ const columns = [
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: var(--space-2) var(--space-4);
-    margin-block-start: var(--space-6);
+    gap: var(--space-1) var(--space-4);
+    margin-block-start: var(--space-4);
     padding-block-start: var(--space-3);
     border-block-start: var(--border-width-hairline) solid var(--color-charcoal-border);
+  }
+
+  .site-footer__tagline-break {
+    display: none;
+  }
+
+  @media (max-width: 599px) {
+    .site-footer__tagline-break {
+      display: inline;
+    }
+  }
+
+  @media (min-width: 600px) {
+    .site-footer__tagline {
+      display: block;
+    }
   }
 
   .site-footer__legal-line {
