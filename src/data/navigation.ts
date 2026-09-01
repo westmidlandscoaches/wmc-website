@@ -19,6 +19,9 @@ export const contact = {
   phoneHref: 'tel:+441216618560',
   whatsappHref: 'https://wa.me/441216618560',
   address: '429 Meadway, Birmingham, B33 0DZ, United Kingdom',
+  addressLines: ['429 Meadway', 'Birmingham', 'B33 0DZ', 'United Kingdom'],
+  /** Client-supplied Google Maps destination. Do not alter this URL. */
+  mapsHref: 'https://maps.app.goo.gl/aLFbEQ5DdB2ef1Wi7?g_st=ic',
   companyName: 'West Midlands Coaches Ltd',
   registeredName: 'WEST MIDLANDS COACHES LIMITED',
   companyNumber: '14835736',

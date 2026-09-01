@@ -62,9 +62,20 @@ const heroVisual = getFleetVisuals('car', 'exterior').find((v) => v.id === 'car-
             <div class="contact-direct__item">
               <dt class="contact-direct__label">Address</dt>
               <dd>
-                <address class="text-body contact-direct__address">
-                  429 Meadway<br />Birmingham<br />B33 0DZ<br />United Kingdom
-                </address>
+                <a
+                  class="contact-direct__address-link"
+                  href={contact.mapsHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="View West Midlands Coaches on Google Maps"
+                >
+                  <address class="text-body contact-direct__address">
+                    {contact.addressLines.map((line) => <span>{line}</span>)}
+                  </address>
+                  <span class="contact-direct__address-action" aria-hidden="true">
+                    View on Google Maps &#8599;
+                  </span>
+                </a>
               </dd>
             </div>
           </dl>
@@ -158,10 +169,36 @@ const heroVisual = getFleetVisuals('car', 'exterior').find((v) => v.id === 'car-
     border-block-end-color: var(--color-champagne-gold);
   }
 
+  .contact-direct__address-link {
+    display: block;
+    text-decoration: none;
+    color: var(--color-ink);
+    transition: color 190ms var(--motion-easing-premium);
+  }
+
   .contact-direct__address {
     font-style: normal;
-    color: var(--color-ink);
+    display: grid;
+    color: inherit;
     margin: var(--space-1) 0 0;
+  }
+
+  .contact-direct__address-action {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--touch-target-min);
+    font-size: var(--text-small);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-slate-taupe);
+    border-block-end: 1px solid var(--gold-rule);
+    transition: color 190ms var(--motion-easing-premium),
+      border-color 190ms var(--motion-easing-premium);
+  }
+
+  .contact-direct__address-link:hover .contact-direct__address-action,
+  .contact-direct__address-link:focus-visible .contact-direct__address-action {
+    color: var(--color-champagne-gold);
+    border-block-end-color: var(--color-champagne-gold);
   }
 
   .contact-direct__actions {

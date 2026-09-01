@@ -46,6 +46,18 @@ const Tag = href ? 'a' : 'button';
     .wmc-button:hover {
       transform: translateY(-1px);
     }
+
+    /* Settle back under the cursor while pressing, so the target never
+       slides out from under a click. */
+    .wmc-button:active {
+      transform: none;
+    }
+  }
+
+  /* Decorative content inside a button never takes the pointer. */
+  .wmc-button > :global(svg),
+  .wmc-button > :global([aria-hidden='true']) {
+    pointer-events: none;
   }
 
   .wmc-button[data-variant='primary'][data-tone='light'] {

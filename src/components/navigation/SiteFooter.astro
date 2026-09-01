@@ -2,48 +2,113 @@
 import { Image } from 'astro:assets';
 import PageContainer from '../ui/PageContainer.astro';
 import { contact } from '../../data/navigation';
-import wmcLogoDark from '../../assets/brand/wmc-logo-dark-use.webp';
+import wmcCompactMark from '../../assets/brand/WMC_Compact_Mark_Premium.webp';
 
-const links = [
-  { label: 'Fleet', href: '/fleet/' },
-  { label: 'Services', href: '/services/' },
-  { label: 'About', href: '/about/' },
-  { label: 'Contact', href: '/contact/' },
-  { label: 'Request a Quote', href: '/request-a-quote/' },
+const year = new Date().getFullYear();
+
+const columns = [
+  {
+    title: 'Explore',
+    links: [
+      { label: 'Home', href: '/' },
+      { label: 'Fleet', href: '/fleet/' },
+      { label: 'Services', href: '/services/' },
+      { label: 'About', href: '/about/' },
+    ],
+  },
+  {
+    title: 'Journey',
+    links: [
+      { label: 'Airport Transfers', href: '/services/#airport-transfers' },
+      { label: 'Request a Quote', href: '/request-a-quote/' },
+      { label: 'Contact', href: '/contact/' },
+    ],
+  },
 ];
 ---
 
 <footer class="site-footer">
+  <div class="site-footer__edge" aria-hidden="true"></div>
+
   <PageContainer>
     <div class="site-footer__grid">
-      <div>
-        <Image
-          src={wmcLogoDark}
-          alt="West Midlands Coaches"
-          widths={[220, 320, 440]}
-          sizes="220px"
-          loading="lazy"
-          class="site-footer__logo"
-        />
-        <p class="text-small site-footer__address">{contact.address}</p>
+      <div class="site-footer__brand">
+        <span class="site-footer__mark">
+          <Image
+            src={wmcCompactMark}
+            alt="West Midlands Coaches"
+            widths={[420, 620]}
+            sizes="420px"
+            loading="lazy"
+            class="site-footer__mark-image"
+          />
+        </span>
+        <p class="site-footer__name">{contact.companyName}</p>
+        <p class="site-footer__tagline">
+          Private Passenger Transport<br />Transport, Properly Organised.
+        </p>
       </div>
 
-      <nav aria-label="Footer">
-        <ul class="site-footer__links">
-          {links.map((link) => (
-            <li><a href={link.href}>{link.label}</a></li>
-          ))}
-        </ul>
-      </nav>
+      {columns.map((column) => (
+        <nav class="site-footer__column" aria-label={column.title}>
+          <h2 class="site-footer__heading">{column.title}</h2>
+          <ul class="site-footer__links">
+            {column.links.map((link) => (
+              <li>
+                <a class="site-footer__link" href={link.href}>
+                  <span>{link.label}</span>
+                  <span class="site-footer__arrow" aria-hidden="true">&#8594;</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ))}
 
-      <div class="site-footer__contact">
-        <a class="text-body-large" href={`tel:${contact.phoneHref.replace('tel:', '')}`}>{contact.phoneDisplay}</a>
+      <div class="site-footer__column">
+        <h2 class="site-footer__heading">Contact</h2>
+        <ul class="site-footer__links">
+          <li>
+            <a class="site-footer__link site-footer__link--strong" href={contact.phoneHref}>
+              <span>{contact.phoneDisplay}</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="site-footer__link"
+              href={contact.whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span>WhatsApp</span>
+              <span class="site-footer__arrow" aria-hidden="true">&#8594;</span>
+            </a>
+          </li>
+        </ul>
+
+        <a
+          class="site-footer__address"
+          href={contact.mapsHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="View West Midlands Coaches on Google Maps"
+        >
+          <address>
+            {contact.addressLines.map((line) => (
+              <span class="site-footer__address-line">{line}</span>
+            ))}
+          </address>
+          <span class="site-footer__address-action" aria-hidden="true">View on Google Maps &#8599;</span>
+        </a>
       </div>
     </div>
 
     <div class="site-footer__legal">
-      <p class="text-small">
+      <p class="site-footer__legal-line">
         {contact.registeredName} &middot; Company No. {contact.companyNumber}
+      </p>
+      <p class="site-footer__legal-line">
+        &copy; {year} {contact.companyName}
       </p>
     </div>
   </PageContainer>
@@ -51,70 +116,217 @@ const links = [
 
 <style>
   .site-footer {
+    position: relative;
     background-color: var(--color-obsidian);
     color: var(--color-mist-taupe);
-    padding-block: var(--space-7);
+    padding-block: var(--space-7) var(--space-5);
+    /* Clears the floating contact launcher (58px control + its own offset)
+       so the legal row is never sitting underneath it. */
+    padding-block-end: calc(var(--space-11) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .site-footer__edge {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    block-size: 1px;
+    background: linear-gradient(
+      to right,
+      var(--color-champagne-gold),
+      rgb(194 156 89 / 0.2) 42%,
+      transparent 78%
+    );
   }
 
   .site-footer__grid {
     display: grid;
     gap: var(--space-5);
-    padding-block-end: var(--space-5);
-    border-block-end: var(--border-width-hairline) solid var(--color-charcoal-border);
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 600px) {
     .site-footer__grid {
-      grid-template-columns: 1.4fr 1fr 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-5) var(--space-4);
+    }
+
+    .site-footer__brand {
+      grid-column: 1 / -1;
     }
   }
 
-  /* Approved Gold/Silver logo, dark-use variant, on the obsidian footer. */
-  .site-footer__logo {
-    inline-size: clamp(150px, 14vw, 180px);
-    block-size: auto;
+  @media (min-width: 1024px) {
+    .site-footer__grid {
+      grid-template-columns: 1.4fr 1fr 1fr 1.3fr;
+      gap: var(--space-5);
+    }
+
+    .site-footer__brand {
+      grid-column: auto;
+    }
+  }
+
+  /* --- brand --- */
+  /* Same framing approach as the header: the supplied square canvas is left
+     untouched and only its glyph band is shown. */
+  .site-footer__mark {
+    --mark-height: 50px;
+    display: block;
+    block-size: var(--mark-height);
+    inline-size: calc(var(--mark-height) * 3.561);
+    overflow: hidden;
+    position: relative;
     margin-block-end: var(--space-3);
   }
 
-  .site-footer__address {
+  .site-footer__mark-image {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    transform: translate(-50%, -50%);
+    inline-size: calc(var(--mark-height) / 0.2134);
+    max-inline-size: none;
+    block-size: auto;
+  }
+
+  @media (min-width: 768px) {
+    .site-footer__mark {
+      --mark-height: 54px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .site-footer__mark {
+      --mark-height: 58px;
+    }
+  }
+
+  .site-footer__name {
+    margin: 0 0 var(--space-1);
+    color: var(--color-warm-white);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--text-body-large);
+  }
+
+  .site-footer__tagline {
     margin: 0;
-    max-inline-size: 32ch;
+    max-inline-size: 34ch;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    color: var(--color-mist-taupe);
+  }
+
+  /* --- columns --- */
+  .site-footer__heading {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-slate-taupe);
+    padding-block-end: var(--space-2);
+    border-block-end: var(--border-width-hairline) solid var(--color-charcoal-border);
   }
 
   .site-footer__links {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
   }
 
-  .site-footer__links a {
+  .site-footer__link {
     display: inline-flex;
     align-items: center;
+    gap: var(--space-1);
     min-block-size: var(--touch-target-min);
     color: var(--color-mist-taupe);
     text-decoration: none;
-    transition: color var(--motion-hover) var(--motion-easing-premium);
+    transition: color 190ms var(--motion-easing-premium),
+      transform 190ms var(--motion-easing-premium);
   }
 
-  .site-footer__links a:hover {
+  .site-footer__link--strong {
     color: var(--color-warm-white);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--text-body-large);
   }
 
-  .site-footer__contact a {
+  .site-footer__arrow {
+    opacity: 0;
+    color: var(--color-champagne-gold);
+    transition: opacity 190ms var(--motion-easing-premium),
+      transform 190ms var(--motion-easing-premium);
+  }
+
+  .site-footer__link:hover,
+  .site-footer__link:focus-visible {
+    color: var(--color-warm-white);
+    transform: translateX(3px);
+  }
+
+  .site-footer__link:hover .site-footer__arrow,
+  .site-footer__link:focus-visible .site-footer__arrow {
+    opacity: 1;
+    transform: translateX(2px);
+  }
+
+  /* --- address --- */
+  .site-footer__address {
+    display: block;
+    margin-block-start: var(--space-3);
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-width-hairline) solid var(--color-charcoal-border);
+    text-decoration: none;
+    color: var(--color-mist-taupe);
+    transition: color 190ms var(--motion-easing-premium);
+  }
+
+  .site-footer__address address {
+    font-style: normal;
+    display: grid;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+
+  .site-footer__address-action {
     display: inline-flex;
     align-items: center;
     min-block-size: var(--touch-target-min);
+    font-size: var(--text-small);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-champagne-gold);
+  }
+
+  .site-footer__address:hover,
+  .site-footer__address:focus-visible {
     color: var(--color-warm-white);
-    text-decoration: none;
   }
 
+  /* --- legal --- */
   .site-footer__legal {
-    padding-block-start: var(--space-4);
+    /* Reserves the bottom-right column the floating launcher occupies, so
+       legal text never sits underneath it. */
+    padding-inline-end: 76px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+    margin-block-start: var(--space-6);
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-width-hairline) solid var(--color-charcoal-border);
   }
 
-  .site-footer__legal p {
+  .site-footer__legal-line {
     margin: 0;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    color: var(--color-slate-taupe);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-footer__link,
+    .site-footer__arrow {
+      transition: none;
+    }
   }
 </style>

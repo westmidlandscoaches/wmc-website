@@ -180,12 +180,11 @@ const vehicle = getCutout('car-01')!;
     );
   }
 
-  /* --- tablet: copy leads, vehicle stays large beneath without
-     pushing the hero past a screenful --- */
-  @media (min-width: 640px) and (max-width: 1023px) {
+  /* --- 640–767: car tucks straight under the CTAs --- */
+  @media (min-width: 640px) and (max-width: 767px) {
     .home-hero__inner {
       padding-block: var(--space-6) var(--space-3);
-      gap: var(--space-2);
+      gap: var(--space-3);
     }
 
     .home-hero__copy {
@@ -194,15 +193,102 @@ const vehicle = getCutout('car-01')!;
 
     .home-hero__stage {
       justify-content: flex-end;
+      margin-inline-end: calc(var(--space-3) * -1);
     }
 
     .home-hero__stage :global(.home-hero__vehicle) {
-      inline-size: min(100%, 620px);
+      inline-size: min(104%, 620px);
+    }
+  }
+
+  /*
+   * Tablet portrait (768–1023, and 1024 portrait such as iPad Pro):
+   * a deliberate stacked composition — the car starts just under the CTAs
+   * rather than being pushed to the bottom of a tall hero. Height is driven
+   * by content, never by a viewport fraction.
+   */
+  @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+    .home-hero__inner {
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+      padding-block: var(--space-7) var(--space-5);
+    }
+
+    .home-hero__copy {
+      max-inline-size: 40rem;
+    }
+
+    .home-hero__lead {
+      max-inline-size: 52ch;
+      margin-block-end: var(--space-4);
+    }
+
+    .home-hero__stage {
+      justify-content: center;
+    }
+
+    .home-hero__stage :global(.home-hero__vehicle) {
+      inline-size: min(88%, 880px);
+    }
+  }
+
+  /*
+   * Tablet landscape (and any wide-enough short viewport): two columns, so
+   * the car sits beside the copy instead of below it.
+   */
+  @media (min-width: 900px) and (max-width: 1023px) and (orientation: landscape) {
+    .home-hero__inner {
+      grid-template-columns: 44fr 56fr;
+      align-items: center;
+      gap: var(--space-4);
+      padding-block: var(--space-6);
+    }
+
+    .home-hero__copy {
+      max-inline-size: none;
+    }
+
+    .home-hero__lead {
+      max-inline-size: 46ch;
+      margin-block-end: var(--space-4);
+    }
+
+    .home-hero__stage {
+      margin-inline-end: calc(var(--space-4) * -1);
+    }
+
+    .home-hero__stage :global(.home-hero__vehicle) {
+      inline-size: 116%;
+      max-inline-size: none;
+    }
+  }
+
+  /* 768–899 landscape is short and wide: split, but with a calmer car. */
+  @media (min-width: 768px) and (max-width: 899px) and (orientation: landscape) {
+    .home-hero__inner {
+      grid-template-columns: 46fr 54fr;
+      align-items: center;
+      gap: var(--space-3);
+      padding-block: var(--space-5);
+    }
+
+    .home-hero__copy {
+      max-inline-size: none;
+    }
+
+    .home-hero__lead {
+      max-inline-size: 44ch;
+      margin-block-end: var(--space-3);
+    }
+
+    .home-hero__stage :global(.home-hero__vehicle) {
+      inline-size: 108%;
+      max-inline-size: none;
     }
   }
 
   /* --- desktop: two columns, vehicle allowed past the text column --- */
-  @media (min-width: 1024px) {
+  @media (min-width: 1025px), (min-width: 1024px) and (orientation: landscape) {
     .home-hero__inner {
       grid-template-columns: 42fr 58fr;
       align-items: center;

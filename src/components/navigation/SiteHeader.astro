@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import Button from '../ui/Button.astro';
 import { primaryNav, primaryCta, contact } from '../../data/navigation';
-import wmcLogoDark from '../../assets/brand/wmc-logo-dark-use.webp';
+import wmcCompactMark from '../../assets/brand/WMC_Compact_Mark_Premium.webp';
 
 const path = Astro.url.pathname;
 
@@ -12,15 +12,17 @@ const isCurrent = (href: string) => !href.includes('#') && path === href;
 
 <header class="site-header" data-scrolled="false" id="site-header">
   <div class="site-header__inner">
-    <a class="site-header__brand" href="/" aria-label="West Midlands Coaches — home">
-      <Image
-        src={wmcLogoDark}
-        alt="West Midlands Coaches"
-        widths={[140, 200, 280, 400]}
-        sizes="(min-width: 1024px) 170px, (min-width: 768px) 156px, 134px"
-        loading="eager"
-        class="site-header__logo"
-      />
+    <a class="site-header__brand" href="/" aria-label="West Midlands Coaches home">
+      <span class="site-header__mark">
+        <Image
+          src={wmcCompactMark}
+          alt="West Midlands Coaches"
+          widths={[420, 620, 840]}
+          sizes="420px"
+          loading="eager"
+          class="site-header__mark-image"
+        />
+      </span>
     </a>
 
     <nav class="site-header__nav" aria-label="Primary">
@@ -51,7 +53,11 @@ const isCurrent = (href: string) => !href.includes('#') && path === href;
       data-menu-toggle
     >
       <span class="visually-hidden">Open menu</span>
-      <span class="site-header__toggle-bar" aria-hidden="true"></span>
+      <span class="site-header__icon" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
     </button>
   </div>
 </header>
@@ -62,14 +68,16 @@ const isCurrent = (href: string) => !href.includes('#') && path === href;
 
   <div class="site-menu__panel" role="dialog" aria-modal="true" aria-label="Site navigation">
     <div class="site-menu__head">
-      <Image
-        src={wmcLogoDark}
-        alt="West Midlands Coaches"
-        widths={[140, 200, 280]}
-        sizes="132px"
-        loading="lazy"
-        class="site-menu__logo"
-      />
+      <span class="site-menu__mark">
+        <Image
+          src={wmcCompactMark}
+          alt="West Midlands Coaches"
+          widths={[360, 540]}
+          sizes="360px"
+          loading="lazy"
+          class="site-header__mark-image"
+        />
+      </span>
       <button type="button" class="site-menu__close" data-menu-close>
         <span class="visually-hidden">Close menu</span>
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
@@ -135,13 +143,19 @@ const isCurrent = (href: string) => !href.includes('#') && path === href;
     max-inline-size: var(--content-max-width);
     margin-inline: auto;
     padding-inline: var(--space-3);
-    block-size: 76px;
+    block-size: 66px;
   }
 
   @media (min-width: 768px) {
     .site-header__inner {
       padding-inline: var(--space-4);
-      block-size: 96px;
+      block-size: 72px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .site-header__inner {
+      block-size: 78px;
     }
   }
 
@@ -153,20 +167,40 @@ const isCurrent = (href: string) => !href.includes('#') && path === href;
     margin-inline-end: auto;
   }
 
-  .site-header__logo {
-    inline-size: 134px;
+  /*
+   * The approved mark is delivered on a square canvas whose outer area is
+   * empty alpha: the glyph itself is 21% of the canvas height and 3.56:1.
+   * The asset is never altered — the wrapper simply frames the glyph band,
+   * so --mark-height is the height the monogram actually renders at.
+   */
+  .site-header__mark {
+    --mark-height: 42px;
+    display: block;
+    block-size: var(--mark-height);
+    inline-size: calc(var(--mark-height) * 3.561);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .site-header__mark-image {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    transform: translate(-50%, -50%);
+    inline-size: calc(var(--mark-height) / 0.2134);
+    max-inline-size: none;
     block-size: auto;
   }
 
   @media (min-width: 768px) {
-    .site-header__logo {
-      inline-size: 156px;
+    .site-header__mark {
+      --mark-height: 46px;
     }
   }
 
   @media (min-width: 1024px) {
-    .site-header__logo {
-      inline-size: 170px;
+    .site-header__mark {
+      --mark-height: 50px;
     }
   }
 
@@ -240,29 +274,53 @@ const isCurrent = (href: string) => !href.includes('#') && path === href;
     cursor: pointer;
   }
 
-  .site-header__toggle-bar,
-  .site-header__toggle-bar::before,
-  .site-header__toggle-bar::after {
+  /* Hamburger that morphs into an X. Decorative, so it never takes the click. */
+  .site-header__icon {
+    position: relative;
     display: block;
     inline-size: 20px;
+    block-size: 14px;
+    pointer-events: none;
+  }
+
+  .site-header__icon span {
+    position: absolute;
+    inset-inline: 0;
     block-size: 2px;
     background-color: var(--color-warm-white);
-    position: relative;
+    transition: transform 230ms var(--motion-easing-premium),
+      opacity 160ms var(--motion-easing-premium);
   }
 
-  .site-header__toggle-bar::before,
-  .site-header__toggle-bar::after {
-    content: '';
-    position: absolute;
-    inset-inline-start: 0;
+  .site-header__icon span:nth-child(1) {
+    inset-block-start: 0;
   }
 
-  .site-header__toggle-bar::before {
-    inset-block-start: -6px;
-  }
-
-  .site-header__toggle-bar::after {
+  .site-header__icon span:nth-child(2) {
     inset-block-start: 6px;
+  }
+
+  .site-header__icon span:nth-child(3) {
+    inset-block-start: 12px;
+  }
+
+  .site-header__toggle[aria-expanded='true'] .site-header__icon span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+
+  .site-header__toggle[aria-expanded='true'] .site-header__icon span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0.4);
+  }
+
+  .site-header__toggle[aria-expanded='true'] .site-header__icon span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-header__icon span {
+      transition: none;
+    }
   }
 
   @media (min-width: 1024px) {
@@ -292,6 +350,12 @@ const isCurrent = (href: string) => !href.includes('#') && path === href;
     z-index: 150;
   }
 
+  /* While closing (or if hiding is ever delayed) the overlay must not keep
+     swallowing clicks meant for the page. */
+  .site-menu[data-open='false'] {
+    pointer-events: none;
+  }
+
   .site-menu__scrim {
     position: absolute;
     inset: 0;
@@ -302,6 +366,10 @@ const isCurrent = (href: string) => !href.includes('#') && path === href;
 
   .site-menu[data-open='true'] .site-menu__scrim {
     opacity: 1;
+  }
+
+  .site-menu[data-closing='true'] .site-menu__scrim {
+    opacity: 0;
   }
 
   .site-menu__panel {
@@ -325,19 +393,29 @@ const isCurrent = (href: string) => !href.includes('#') && path === href;
     transform: none;
   }
 
+  /* Exit mirrors the entrance instead of vanishing. */
+  .site-menu[data-closing='true'] .site-menu__panel {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+
   .site-menu__head {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
     padding: var(--space-3);
-    block-size: 76px;
+    block-size: 66px;
     border-block-end: var(--border-width-hairline) solid var(--color-charcoal-border);
   }
 
-  .site-menu__logo {
-    inline-size: 132px;
-    block-size: auto;
+  .site-menu__mark {
+    --mark-height: 42px;
+    display: block;
+    block-size: var(--mark-height);
+    inline-size: calc(var(--mark-height) * 3.561);
+    overflow: hidden;
+    position: relative;
   }
 
   .site-menu__close {
@@ -486,13 +564,17 @@ const isCurrent = (href: string) => !href.includes('#') && path === href;
     const FOCUSABLE = 'a[href], button:not([disabled])';
     let open = false;
 
+    let closeTimer = 0;
+
     const setOpen = (next: boolean) => {
       open = next;
       toggle.setAttribute('aria-expanded', String(next));
       toggle.querySelector('.visually-hidden')!.textContent = next ? 'Close menu' : 'Open menu';
       document.body.style.overflow = next ? 'hidden' : '';
+      window.clearTimeout(closeTimer);
 
       if (next) {
+        menu.dataset.closing = 'false';
         menu.hidden = false;
         // Forced reflow rather than rAF: the transition still plays, but the
         // open state can never be left pending if frames are throttled.
@@ -502,13 +584,19 @@ const isCurrent = (href: string) => !href.includes('#') && path === href;
         return;
       }
 
+      // Play the exit first; only hide once it has finished.
+      menu.dataset.closing = 'true';
       menu.dataset.open = 'false';
-      const finish = () => {
-        if (!open) menu.hidden = true;
-      };
-      panel.addEventListener('transitionend', finish, { once: true });
-      window.setTimeout(finish, 320);
       toggle.focus();
+
+      const finish = () => {
+        if (open) return;
+        menu.hidden = true;
+        menu.dataset.closing = 'false';
+      };
+
+      panel.addEventListener('transitionend', finish, { once: true });
+      closeTimer = window.setTimeout(finish, 340);
     };
 
     toggle.addEventListener('click', () => setOpen(!open));

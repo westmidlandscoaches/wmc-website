@@ -3,7 +3,6 @@ import Button from '../ui/Button.astro';
 import {
   serviceLevels,
   vehicleCategories,
-  approvedVehicles,
   journeyPurposes,
   referralSources,
   luggageOptions,
@@ -11,8 +10,11 @@ import {
   steps,
 } from '../../data/quoteForm';
 import { contact } from '../../data/navigation';
+import { fleetBySeatGroup, vehicleLabel } from '../../data/fleet';
 
 const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? '';
+
+const fleetGroups = fleetBySeatGroup();
 
 const vehicleCopy: Record<string, string> = {
   recommend: 'WMC reviews the journey and recommends a category.',
@@ -295,8 +297,12 @@ const vehicleCopy: Record<string, string> = {
               <div class="select-wrap">
                 <select class="field__input" id="preferred_vehicle" name="preferred_vehicle">
                   <option value="">No specific vehicle preference</option>
-                  {approvedVehicles.map((option) => (
-                    <option value={option.value}>{option.label}</option>
+                  {fleetGroups.map((group) => (
+                    <optgroup label={group.seatGroup}>
+                      {group.vehicles.map((vehicle) => (
+                        <option value={vehicle.id}>{vehicleLabel(vehicle)}</option>
+                      ))}
+                    </optgroup>
                   ))}
                 </select>
               </div>
@@ -558,6 +564,10 @@ const vehicleCopy: Record<string, string> = {
     border: 0;
     margin: 0;
     padding: 0;
+  }
+
+  .quote-form__step {
+    scroll-margin-block-start: 112px;
   }
 
   .quote-form__legend {
@@ -1657,6 +1667,16 @@ const vehicleCopy: Record<string, string> = {
       showStep(Number(button.dataset.editStep));
     });
 
+    /**
+     * Brings the newly shown step to the top of the viewport. Scrolling the
+     * whole form instead used to leave the step's own action bar below the
+     * fold, which read as an unclickable button.
+     */
+    const scrollToActiveStep = () => {
+      const step = stepEls[current - 1];
+      (step ?? root).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
     // --- navigation ---
     root.querySelectorAll('[data-next]').forEach((button) => {
       button.addEventListener('click', () => {
@@ -1664,14 +1684,14 @@ const vehicleCopy: Record<string, string> = {
         showErrors(current, errors);
         if (errors.length) return;
         showStep(current + 1);
-        root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        scrollToActiveStep();
       });
     });
 
     root.querySelectorAll('[data-back]').forEach((button) => {
       button.addEventListener('click', () => {
         showStep(current - 1);
-        root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        scrollToActiveStep();
       });
     });
 
