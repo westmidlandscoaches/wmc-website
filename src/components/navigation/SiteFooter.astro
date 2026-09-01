@@ -265,13 +265,14 @@ const columns = [
   }
 
   /* --- brand --- */
-  /* Same framing approach as the header: the supplied square canvas is left
-     untouched and only its glyph band is shown. */
+  /* Same framing approach and measured glyph geometry as the header: the
+     supplied square canvas is left untouched and only its glyph band is shown,
+     so the mark starts on the same gutter as the text beside it. */
   .site-footer__mark {
     --mark-height: 38px;
     display: block;
     block-size: var(--mark-height);
-    inline-size: calc(var(--mark-height) * 3.561);
+    inline-size: calc(var(--mark-height) * 2.2141);
     overflow: hidden;
     position: relative;
     margin-block-end: var(--space-3);
@@ -282,7 +283,7 @@ const columns = [
     inset-block-start: 50%;
     inset-inline-start: 50%;
     transform: translate(-50%, -50%);
-    inline-size: calc(var(--mark-height) / 0.2134);
+    inline-size: calc(var(--mark-height) / 0.2055);
     max-inline-size: none;
     block-size: auto;
   }

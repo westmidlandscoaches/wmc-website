@@ -1,0 +1,389 @@
+---
+/**
+ * Featured fleet browser.
+ *
+ * Deliberately server-rendered: every category's photograph is real HTML in
+ * the page, and CSS decides which one is on stage. The vanilla script only
+ * moves a data attribute, so a script that never runs leaves a working card
+ * with a visible image and category links that still navigate — it can never
+ * leave an empty media block behind.
+ */
+import { Image } from 'astro:assets';
+import type { FleetVisual } from '../../data/fleetVisuals';
+
+export interface FeaturedFleetItem {
+  category: 'car' | 'minibus' | 'coach';
+  label: string;
+  copy: string;
+  href: string;
+  visual?: FleetVisual;
+}
+
+export interface Props {
+  items: FeaturedFleetItem[];
+}
+
+const { items } = Astro.props;
+const active = items[0];
+---
+
+{
+  items.length > 0 && (
+    <div class="featured-fleet" data-featured-fleet data-active-category={active.category}>
+      <div class="featured-fleet__controls" data-featured-tablist aria-label="Fleet category">
+        {items.map((item) => (
+          <a
+            class="featured-fleet__tab"
+            href={item.href}
+            data-category={item.category}
+            data-active={item.category === active.category ? 'true' : 'false'}
+          >
+            <span class="featured-fleet__tab-label">{item.label}</span>
+            <span class="featured-fleet__tab-copy">{item.copy}</span>
+          </a>
+        ))}
+      </div>
+
+      <div class="featured-fleet__stage">
+        {items.map((item) => (
+          <figure
+            class="featured-fleet__figure"
+            data-category={item.category}
+            data-active={item.category === active.category ? 'true' : 'false'}
+          >
+            {item.visual ? (
+              <Image
+                src={item.visual.image}
+                alt={item.visual.alt}
+                widths={[520, 820, 1200, 1600]}
+                sizes="(min-width: 1024px) 62vw, 100vw"
+                loading={item.category === active.category ? 'eager' : 'lazy'}
+                class="featured-fleet__image"
+              />
+            ) : (
+              /* Branded stand-in — never another vehicle's photograph. */
+              <p class="featured-fleet__placeholder">
+                <span class="featured-fleet__placeholder-mark" aria-hidden="true">
+                  WMC
+                </span>
+                Vehicle image being updated
+              </p>
+            )}
+            <figcaption class="featured-fleet__caption">{item.label}</figcaption>
+          </figure>
+        ))}
+      </div>
+
+      <a class="arrow-link featured-fleet__explore" href={active.href} data-featured-explore>
+        Explore {active.label.toLowerCase()}
+      </a>
+    </div>
+  )
+}
+
+<style>
+  .featured-fleet {
+    display: grid;
+    gap: var(--space-4);
+    inline-size: 100%;
+    min-inline-size: 0;
+  }
+
+  /* --------------------------- Category controls --------------------------- */
+  .featured-fleet__controls {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    inline-size: 100%;
+    min-inline-size: 0;
+  }
+
+  .featured-fleet__tab {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-1);
+    inline-size: 100%;
+    min-inline-size: 0;
+    min-block-size: var(--touch-target-min);
+    padding: var(--space-2) var(--space-1);
+    text-align: center;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+    background-color: transparent;
+    border: var(--border-width-hairline) solid var(--color-linen-border);
+    border-radius: var(--radius-panel);
+    transition: border-color 200ms var(--motion-easing-premium),
+      background-color 200ms var(--motion-easing-premium),
+      color 200ms var(--motion-easing-premium);
+  }
+
+  /* Decorative or textual children never swallow the tap. */
+  .featured-fleet__tab > * {
+    pointer-events: none;
+  }
+
+  .featured-fleet__tab-label {
+    font-size: var(--text-h6);
+    line-height: var(--leading-h6);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-slate-taupe);
+    transition: color 200ms var(--motion-easing-premium);
+  }
+
+  /* The supporting sentence has no room in a three-column row; it returns
+     with the stacked desktop layout. */
+  .featured-fleet__tab-copy {
+    display: none;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    color: var(--color-slate-taupe);
+  }
+
+  .featured-fleet__tab[data-active='true'] {
+    border-color: var(--color-champagne-gold);
+    background-color: var(--gold-wash);
+  }
+
+  .featured-fleet__tab[data-active='true'] .featured-fleet__tab-label {
+    color: var(--color-obsidian);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .featured-fleet__tab:hover {
+      border-color: var(--color-mist-taupe);
+    }
+
+    .featured-fleet__tab[data-active='true']:hover {
+      border-color: var(--color-champagne-gold);
+    }
+  }
+
+  /* ------------------------------- Stage ------------------------------- */
+  .featured-fleet__stage {
+    position: relative;
+    display: grid;
+    inline-size: 100%;
+    min-inline-size: 0;
+    border-radius: var(--radius-media);
+    overflow: hidden;
+    border: var(--border-width-hairline) solid var(--color-linen-border);
+    background-color: var(--color-graphite-surface);
+  }
+
+  /* Every figure occupies the same cell, so the stage is always exactly as
+     tall as the photograph on show and never collapses to an empty box.
+     Visibility is switched with display, never with an animated property:
+     a transition that is paused, throttled or unsupported can then never
+     leave the stage empty. The motion below only scales an already-visible
+     image, so any frame of it is a correct picture. */
+  .featured-fleet__figure {
+    grid-area: 1 / 1;
+    display: none;
+    margin: 0;
+    min-inline-size: 0;
+  }
+
+  .featured-fleet__figure[data-active='true'] {
+    display: block;
+  }
+
+  @keyframes featured-fleet-in {
+    from {
+      transform: scale(1.012);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+  .featured-fleet__figure[data-active='true'] .featured-fleet__image {
+    animation: featured-fleet-in 200ms var(--motion-easing-premium) both;
+  }
+
+  .featured-fleet__image {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .featured-fleet__placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin: 0;
+    aspect-ratio: 4 / 3;
+    padding: var(--space-3);
+    text-align: center;
+    color: var(--color-heritage-ivory);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    background-color: var(--color-graphite-surface);
+    background-image: linear-gradient(
+      135deg,
+      rgb(251 249 244 / 0.045) 0%,
+      rgb(251 249 244 / 0) 42%,
+      rgb(0 0 0 / 0.22) 100%
+    );
+  }
+
+  .featured-fleet__placeholder-mark {
+    font-size: var(--text-h4);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.16em;
+    color: var(--color-champagne-gold);
+  }
+
+  .featured-fleet__caption {
+    position: absolute;
+    inset-block-end: var(--space-2);
+    inset-inline-start: var(--space-3);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-warm-white);
+    text-shadow: 0 1px 6px rgb(11 10 9 / 0.7);
+  }
+
+  .featured-fleet__caption::before {
+    content: '';
+    inline-size: 22px;
+    block-size: 1px;
+    background-color: var(--color-champagne-gold);
+  }
+
+  .featured-fleet__explore {
+    justify-self: start;
+    min-block-size: var(--touch-target-min);
+  }
+
+  /* ------------------------------ Desktop ------------------------------ */
+  @media (min-width: 1024px) {
+    .featured-fleet {
+      grid-template-columns: 4fr 8fr;
+      grid-template-rows: auto auto;
+      gap: var(--space-5);
+      align-items: start;
+    }
+
+    .featured-fleet__controls {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-2);
+    }
+
+    .featured-fleet__tab {
+      align-items: flex-start;
+      text-align: start;
+      padding: var(--space-3);
+    }
+
+    .featured-fleet__tab-label {
+      font-size: var(--text-h5);
+      line-height: var(--leading-h5);
+    }
+
+    .featured-fleet__tab-copy {
+      display: block;
+    }
+
+    .featured-fleet__stage {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+    }
+
+    .featured-fleet__image,
+    .featured-fleet__placeholder {
+      aspect-ratio: 16 / 10;
+    }
+
+    .featured-fleet__explore {
+      grid-column: 1;
+      grid-row: 2;
+      align-self: start;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .featured-fleet__tab,
+    .featured-fleet__tab-label {
+      transition-duration: 0.01ms;
+    }
+
+    .featured-fleet__figure[data-active='true'] .featured-fleet__image {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Upgrades the category links into an in-place tablist. Until this runs the
+   * links are ordinary navigation to the matching fleet section, so the
+   * control is never dead and the stage never blank.
+   */
+  const roots = document.querySelectorAll<HTMLElement>('[data-featured-fleet]');
+
+  roots.forEach((root) => {
+    const tablist = root.querySelector<HTMLElement>('[data-featured-tablist]');
+    const tabs = Array.from(root.querySelectorAll<HTMLAnchorElement>('.featured-fleet__tab'));
+    const figures = Array.from(root.querySelectorAll<HTMLElement>('.featured-fleet__figure'));
+    const explore = root.querySelector<HTMLAnchorElement>('[data-featured-explore]');
+    if (!tablist || tabs.length === 0 || figures.length === 0) return;
+
+    tablist.setAttribute('role', 'tablist');
+
+    const select = (category: string, focus: boolean) => {
+      root.dataset.activeCategory = category;
+
+      tabs.forEach((tab) => {
+        const isActive = tab.dataset.category === category;
+        tab.dataset.active = String(isActive);
+        tab.setAttribute('aria-selected', String(isActive));
+        tab.tabIndex = isActive ? 0 : -1;
+        if (isActive) {
+          if (focus) tab.focus();
+          if (explore) {
+            explore.href = tab.href;
+            const label = tab.querySelector('.featured-fleet__tab-label')?.textContent ?? '';
+            explore.textContent = `Explore ${label.toLowerCase()}`;
+          }
+        }
+      });
+
+      figures.forEach((figure) => {
+        figure.dataset.active = String(figure.dataset.category === category);
+      });
+    };
+
+    tabs.forEach((tab, index) => {
+      tab.setAttribute('role', 'tab');
+      tab.setAttribute('aria-selected', tab.dataset.active === 'true' ? 'true' : 'false');
+      tab.tabIndex = tab.dataset.active === 'true' ? 0 : -1;
+
+      tab.addEventListener('click', (event) => {
+        // Modified clicks keep their normal "open the fleet page" behaviour.
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        if (tab.dataset.category) select(tab.dataset.category, false);
+      });
+
+      tab.addEventListener('keydown', (event) => {
+        const step = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1 : 0;
+        if (step === 0) return;
+        event.preventDefault();
+        const next = tabs[(index + step + tabs.length) % tabs.length];
+        if (next?.dataset.category) select(next.dataset.category, true);
+      });
+    });
+  });
+</script>

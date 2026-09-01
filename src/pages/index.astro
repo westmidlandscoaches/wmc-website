@@ -1,12 +1,12 @@
 ---
-import { Image, getImage } from 'astro:assets';
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageContainer from '../components/ui/PageContainer.astro';
 import Section from '../components/ui/Section.astro';
 import Button from '../components/ui/Button.astro';
 import FaqAccordion from '../components/content/FaqAccordion.astro';
 import HomeHero from '../components/content/HomeHero.astro';
-import FeaturedFleet, { type FeaturedFleetItem } from '../components/fleet/FeaturedFleet.tsx';
+import FeaturedFleet, { type FeaturedFleetItem } from '../components/fleet/FeaturedFleet.astro';
 import { getFleetVisuals } from '../data/fleetVisuals';
 import { contact } from '../data/navigation';
 
@@ -92,24 +92,15 @@ const featuredSource: { category: FeaturedFleetItem['category']; label: string; 
   { category: 'coach', label: 'Coaches', copy: 'Larger-group passenger transport.' },
 ];
 
-const featuredItems: FeaturedFleetItem[] = await Promise.all(
-  featuredSource.map(async ({ category, label, copy }) => {
-    const visual =
-      getFleetVisuals(category, 'exterior').find((v) => v.homepageFeatured) ??
-      getFleetVisuals(category, 'exterior')[0];
-    const optimised = await getImage({ src: visual.image, width: 1400 });
-    return {
-      category,
-      label,
-      copy,
-      href: `/fleet/#${category === 'car' ? 'cars' : category === 'minibus' ? 'minibuses' : 'coaches'}`,
-      src: optimised.src,
-      width: optimised.attributes.width as number,
-      height: optimised.attributes.height as number,
-      alt: visual.alt,
-    };
-  }),
-);
+const featuredItems: FeaturedFleetItem[] = featuredSource.map(({ category, label, copy }) => ({
+  category,
+  label,
+  copy,
+  href: `/fleet/#${category === 'car' ? 'cars' : category === 'minibus' ? 'minibuses' : 'coaches'}`,
+  visual:
+    getFleetVisuals(category, 'exterior').find((v) => v.homepageFeatured) ??
+    getFleetVisuals(category, 'exterior')[0],
+}));
 
 const faqItems = [
   {
@@ -299,7 +290,7 @@ const faqItems = [
         <p class="eyebrow">Fleet in detail</p>
         <h2 class="section-head__title">Real vehicles, photographed as they are.</h2>
       </header>
-      <FeaturedFleet client:idle items={featuredItems} />
+      <FeaturedFleet items={featuredItems} />
     </PageContainer>
   </Section>
 
