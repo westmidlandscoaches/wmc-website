@@ -16,6 +16,7 @@ import coach01NoBg from '../assets/images/fleet/coaches/wmc-coach-01-nobg.webp';
 import coach02NoBg from '../assets/images/fleet/coaches/wmc-coach-02-nobg.webp';
 
 export type ServiceLevel = 'Standard' | 'Executive' | 'Luxury';
+
 export type VehicleCategory = 'car' | 'minibus' | 'coach';
 
 export interface FleetVehicle {
@@ -98,12 +99,12 @@ export const fleetVehicles: FleetVehicle[] = [
   },
 
   {
-    id: 'sprinter-16-white-luxury',
+    id: 'sprinter-16-white-standard-01',
     seats: 16,
     seatGroup: '16-Seater',
     makeModel: 'Mercedes-Benz Sprinter',
     colour: 'White',
-    serviceLevel: 'Luxury',
+    serviceLevel: 'Standard',
     category: 'minibus',
     features: [
       'Air Conditioning',
@@ -126,7 +127,7 @@ export const fleetVehicles: FleetVehicle[] = [
     features: ['Air Conditioning', 'Leather Seats', 'Armrests', 'Charging Ports'],
   },
   {
-    id: 'sprinter-16-white-standard',
+    id: 'sprinter-16-white-standard-02',
     seats: 16,
     seatGroup: '16-Seater',
     makeModel: 'Mercedes-Benz Sprinter',

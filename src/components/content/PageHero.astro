@@ -28,6 +28,11 @@ export interface Props {
   size?: 'page' | 'home';
   /** Set on the LCP hero only. */
   priority?: boolean;
+  /**
+   * True when the image is a background-removed cutout, which is staged on a
+   * lit field rather than framed as a photograph.
+   */
+  cutout?: boolean;
 }
 
 const {
@@ -45,12 +50,14 @@ const {
   detail,
   size = 'page',
   priority = false,
+  cutout = false,
 } = Astro.props;
 
 const hasActions = Boolean(primaryCta || secondaryCta || tertiaryCta);
 ---
 
-<section class="page-hero" data-size={size}>
+<section class="page-hero" data-size={size} data-cutout={cutout}>
+  <div class="page-hero__field" aria-hidden="true"></div>
   <PageContainer>
     <div class="page-hero__grid">
       <div class="page-hero__copy">
@@ -95,6 +102,7 @@ const hasActions = Boolean(primaryCta || secondaryCta || tertiaryCta);
       </div>
 
       <figure class="page-hero__media">
+        {cutout && <span class="page-hero__glow" aria-hidden="true"></span>}
         <Image
           src={image}
           alt={imageAlt}
@@ -105,10 +113,12 @@ const hasActions = Boolean(primaryCta || secondaryCta || tertiaryCta);
           class="page-hero__image"
           style={`object-position:${focal}`}
         />
+        {cutout && <span class="page-hero__shadow" aria-hidden="true"></span>}
         {caption && <figcaption class="page-hero__caption text-small">{caption}</figcaption>}
       </figure>
     </div>
   </PageContainer>
+  <div class="page-hero__rule" aria-hidden="true"></div>
 </section>
 
 <style>
@@ -117,6 +127,87 @@ const hasActions = Boolean(primaryCta || secondaryCta || tertiaryCta);
     background-color: var(--color-obsidian);
     color: var(--color-warm-white);
     overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* Same barely-there light field as the homepage stage. */
+  .page-hero__field {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(58% 62% at 68% 46%, rgb(251 249 244 / 0.09), transparent 68%),
+      radial-gradient(46% 50% at 12% 22%, rgb(194 156 89 / 0.06), transparent 70%);
+  }
+
+  .page-hero__rule {
+    position: relative;
+    block-size: 1px;
+    background: linear-gradient(
+      to right,
+      var(--color-champagne-gold),
+      rgb(194 156 89 / 0.18) 38%,
+      transparent 72%
+    );
+  }
+
+  /* --- cutout staging --- */
+  .page-hero[data-cutout='true'] .page-hero__media {
+    border: 0;
+    border-radius: 0;
+    background: none;
+    overflow: visible;
+  }
+
+  .page-hero[data-cutout='true'] .page-hero__media :global(.page-hero__image) {
+    aspect-ratio: auto;
+    object-fit: contain;
+    block-size: auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-hero[data-cutout='true'] .page-hero__media::after {
+    content: none;
+  }
+
+  .page-hero__glow {
+    position: absolute;
+    inset-block: 8%;
+    inset-inline: 4%;
+    z-index: 0;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(251 249 244 / 0.12), transparent 76%);
+  }
+
+  .page-hero__shadow {
+    position: absolute;
+    z-index: 0;
+    inset-block-end: 10%;
+    inset-inline: 16%;
+    block-size: 4%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(0 0 0 / 0.55), transparent 78%);
+  }
+
+  /* Stacked layouts: cap the staged vehicle so the hero cannot run far past
+     a screenful with empty space around the car. */
+  @media (max-width: 1023px) {
+    .page-hero[data-cutout='true'] .page-hero__media :global(.page-hero__image) {
+      max-block-size: 46vh;
+      margin-inline: auto;
+    }
+
+    .page-hero[data-cutout='true'] .page-hero__glow,
+    .page-hero[data-cutout='true'] .page-hero__shadow {
+      inset-inline: 10%;
+    }
+  }
+
+  .page-hero[data-cutout='true'] .page-hero__caption {
+    position: static;
+    margin-block-start: var(--space-2);
+    color: var(--color-mist-taupe);
   }
 
   /* Barely-there tonal lift behind the copy column. */
@@ -187,6 +278,20 @@ const hasActions = Boolean(primaryCta || secondaryCta || tertiaryCta);
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
+  }
+
+  .page-hero__actions :global(.wmc-button) {
+    min-block-size: 48px;
+  }
+
+  @media (max-width: 479px) {
+    .page-hero__actions {
+      gap: 12px;
+    }
+
+    .page-hero__actions :global(.wmc-button) {
+      inline-size: 100%;
+    }
   }
 
   .page-hero__detail {

@@ -3,9 +3,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageContainer from '../../components/ui/PageContainer.astro';
 import Section from '../../components/ui/Section.astro';
 import PageHero from '../../components/content/PageHero.astro';
-import { getFleetVisuals } from '../../data/fleetVisuals';
+import { getCutout } from '../../data/fleetVisuals';
 
-const heroVisual = getFleetVisuals('coach', 'exterior').find((v) => v.id === 'coach-02-exterior-02')!;
+const heroVisual = getCutout('coach-02')!;
 ---
 
 <BaseLayout
@@ -23,7 +23,8 @@ const heroVisual = getFleetVisuals('coach', 'exterior').find((v) => v.id === 'co
     secondaryCta={{ label: 'View Fleet', href: '/fleet/' }}
     image={heroVisual.image}
     imageAlt={heroVisual.alt}
-    caption="WMC-owned fleet"
+    cutout
+    caption="WMC coach fleet"
   />
 
   <Section as="div" surface="warm-white">

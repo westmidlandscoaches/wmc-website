@@ -304,6 +304,7 @@ const vehicleCopy: Record<string, string> = {
                           value={vehicle.id}
                           data-service-level={vehicle.serviceLevel.toLowerCase()}
                           data-category={vehicle.category}
+                          data-seats={vehicle.seatGroup}
                         >
                           {vehicleLabel(vehicle)}
                         </option>
@@ -1226,6 +1227,18 @@ const vehicleCopy: Record<string, string> = {
     display: none;
   }
 
+  @media (max-width: 599px) {
+    .result__actions,
+    .result__whatsapp {
+      gap: 12px;
+    }
+
+    .result__actions :global(.wmc-button),
+    .result__whatsapp :global(.wmc-button) {
+      inline-size: 100%;
+    }
+  }
+
   .result__whatsapp {
     margin-block-start: var(--space-4);
     padding-block-start: var(--space-3);
@@ -1325,6 +1338,19 @@ const vehicleCopy: Record<string, string> = {
       }
       return field(name)?.value.trim() ?? '';
     };
+    /**
+     * Several supplied vehicle labels are identical, so the capacity group is
+     * appended for the inbox and the review. Both values are client-supplied.
+     */
+    const preferredVehicleLabel = () => {
+      const select = form.querySelector<HTMLSelectElement>('[name="preferred_vehicle"]');
+      const option = select?.selectedOptions[0];
+      if (!option || !option.value) return '';
+      const seats = option.dataset.seats;
+      const label = option.textContent?.trim() ?? '';
+      return seats ? `${label} (${seats})` : label;
+    };
+
     const labelFor = (name: string) => {
       const radios = form.querySelectorAll<HTMLInputElement>(`input[type="radio"][name="${name}"]`);
       if (radios.length) {
@@ -1685,7 +1711,10 @@ const vehicleCopy: Record<string, string> = {
           rows: [
             ['Service level', labelFor('service_level')],
             ['Vehicle preference', labelFor('vehicle_category')],
-            ['Preferred vehicle', value('preferred_vehicle') ? labelFor('preferred_vehicle') : 'No specific preference'],
+            [
+              'Preferred vehicle',
+              value('preferred_vehicle') ? preferredVehicleLabel() : 'No specific preference',
+            ],
             ['Journey purpose', value('journey_purpose') ? labelFor('journey_purpose') : '—'],
           ],
         },
@@ -1826,7 +1855,7 @@ const vehicleCopy: Record<string, string> = {
 
       add('Service Level', labelFor('service_level'));
       add('Vehicle Preference', labelFor('vehicle_category'));
-      if (value('preferred_vehicle')) add('Preferred WMC Vehicle', labelFor('preferred_vehicle'));
+      if (value('preferred_vehicle')) add('Preferred WMC Vehicle', preferredVehicleLabel());
       if (value('journey_purpose')) add('Journey Purpose', labelFor('journey_purpose'));
 
       add('Additional Information', value('additional_info'));

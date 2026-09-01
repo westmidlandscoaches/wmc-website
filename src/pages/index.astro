@@ -13,7 +13,9 @@ import { contact } from '../data/navigation';
 const carPanel = getFleetVisuals('car', 'exterior')[0];
 const minibusPanel = getFleetVisuals('minibus', 'exterior').find((v) => v.id === 'minibus-05-exterior-01')!;
 const coachPanel = getFleetVisuals('coach', 'exterior').find((v) => v.id === 'coach-02-exterior-01')!;
-const serviceFeatureImage = getFleetVisuals('minibus', 'exterior').find((v) => v.id === 'minibus-04-exterior')!;
+// Photographed in its real setting — deliberately not the background-removed
+// cutout, which belongs to the hero staging only.
+const serviceFeatureImage = getFleetVisuals('car', 'exterior').find((v) => v.id === 'car-01-exterior')!;
 const ctaImage = getFleetVisuals('minibus', 'exterior').find((v) => v.id === 'minibus-01-exterior')!;
 
 const fleetCards = [
@@ -236,14 +238,18 @@ const faqItems = [
               loading="lazy"
               class="service-feature__image"
             />
+            <span class="service-feature__veil" aria-hidden="true"></span>
           </div>
           <div class="card__body service-feature__body">
-            <span class="service__index">01</span>
+            <p class="service-feature__kicker">
+              <span class="service__index">01</span>
+              <span class="service-feature__kicker-label">Services</span>
+            </p>
             <h3 class="text-h3 service-feature__title">Airport Transfers</h3>
             <p class="text-body service-feature__copy">
               Transport organised around flight times, terminals and passenger numbers.
             </p>
-            <span class="arrow-link arrow-link--dark">Explore</span>
+            <span class="arrow-link arrow-link--dark service-feature__action">Explore</span>
           </div>
         </a>
 
@@ -554,30 +560,103 @@ const faqItems = [
   .service-feature {
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    border-radius: 10px;
+    border-color: var(--color-charcoal-border);
+    background-color: var(--color-obsidian);
     text-decoration: none;
     color: var(--color-warm-white);
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.03) inset;
+  }
+
+  .service-feature__media {
+    position: relative;
+    border-radius: 0;
+    border-block-end: var(--border-width-hairline) solid var(--color-charcoal-border);
   }
 
   .service-feature__media :global(.service-feature__image) {
     aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+
+  /* Grounds the photograph into the card body instead of stopping at a hard
+     edge. Decorative only, so it never intercepts the card's own click. */
+  .service-feature__veil {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      rgb(9 9 8 / 0) 55%,
+      rgb(9 9 8 / 0.55) 100%
+    );
   }
 
   .service-feature__body {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
+    align-items: flex-start;
+    gap: 0;
     padding: var(--space-4);
     flex: 1;
+  }
+
+  .service-feature__kicker {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-2);
+  }
+
+  .service-feature__kicker-label {
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-mist-taupe);
+  }
+
+  .service-feature__kicker-label::before {
+    content: '';
+    display: inline-block;
+    inline-size: 20px;
+    block-size: 1px;
+    margin-inline-end: var(--space-2);
+    vertical-align: middle;
+    background-color: var(--gold-rule-strong);
   }
 
   .service-feature__title {
     margin: 0;
     color: var(--color-warm-white);
+    letter-spacing: -0.015em;
   }
 
   .service-feature__copy {
     color: var(--color-mist-taupe);
-    margin: 0 0 var(--space-3);
+    margin: var(--space-2) 0 var(--space-4);
+    max-inline-size: 46ch;
+  }
+
+  .service-feature__action {
+    margin-block-start: auto;
+    min-block-size: var(--touch-target-min);
+    display: inline-flex;
+    align-items: center;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .service-feature:hover {
+      transform: translateY(-3px);
+      border-color: var(--gold-rule-strong);
+      box-shadow: var(--shadow-raised-dark);
+    }
+
+    .service-feature:hover .service-feature__media :global(.service-feature__image) {
+      transform: scale(1.03);
+    }
   }
 
   .service__index {
@@ -802,6 +881,16 @@ const faqItems = [
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
+  }
+
+  @media (max-width: 479px) {
+    .final-cta__actions {
+      gap: 12px;
+    }
+
+    .final-cta__actions :global(.wmc-button) {
+      inline-size: 100%;
+    }
   }
 
   .final-cta__media {

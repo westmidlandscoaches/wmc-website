@@ -30,7 +30,12 @@ const Tag = href ? 'a' : 'button';
     justify-content: center;
     gap: var(--space-1);
     min-block-size: var(--touch-target-min);
+    max-inline-size: 100%;
+    padding-block: var(--space-1);
     padding-inline: var(--space-3);
+    /* justify-content centres a single line; text-align keeps a wrapped
+       label centred too, which happens on narrow phones. */
+    text-align: center;
     border-radius: var(--radius-control);
     border: var(--border-width-hairline) solid transparent;
     text-decoration: none;
@@ -54,9 +59,12 @@ const Tag = href ? 'a' : 'button';
     }
   }
 
-  /* Decorative content inside a button never takes the pointer. */
-  .wmc-button > :global(svg),
-  .wmc-button > :global([aria-hidden='true']) {
+  /* Decorative content inside a button never takes the pointer, so every
+     pixel of the visible control belongs to the button itself. */
+  .wmc-button :global(svg),
+  .wmc-button :global([aria-hidden='true']),
+  .wmc-button::before,
+  .wmc-button::after {
     pointer-events: none;
   }
 

@@ -6,9 +6,9 @@ import Button from '../../components/ui/Button.astro';
 import PageHero from '../../components/content/PageHero.astro';
 import ContactForm from '../../components/forms/ContactForm.astro';
 import { contact } from '../../data/navigation';
-import { getFleetVisuals } from '../../data/fleetVisuals';
+import { getCutout } from '../../data/fleetVisuals';
 
-const heroVisual = getFleetVisuals('car', 'exterior').find((v) => v.id === 'car-02-exterior')!;
+const heroVisual = getCutout('car-02')!;
 ---
 
 <BaseLayout
@@ -27,7 +27,8 @@ const heroVisual = getFleetVisuals('car', 'exterior').find((v) => v.id === 'car-
     tertiaryCta={{ label: 'Request a Quote', href: '/request-a-quote/' }}
     image={heroVisual.image}
     imageAlt={heroVisual.alt}
-    caption="WMC-owned fleet"
+    cutout
+    caption="WMC chauffeur fleet"
   />
 
   <Section as="div" surface="warm-white">
@@ -205,6 +206,16 @@ const heroVisual = getFleetVisuals('car', 'exterior').find((v) => v.id === 'car-
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
+  }
+
+  @media (max-width: 479px) {
+    .contact-direct__actions {
+      gap: 12px;
+    }
+
+    .contact-direct__actions :global(.wmc-button) {
+      inline-size: 100%;
+    }
   }
 
   .contact-quote {

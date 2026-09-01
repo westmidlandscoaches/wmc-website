@@ -6,9 +6,9 @@ import Button from '../../components/ui/Button.astro';
 import PageHero from '../../components/content/PageHero.astro';
 import QuoteRequestForm from '../../components/forms/QuoteRequestForm.astro';
 import { contact } from '../../data/navigation';
-import { getFleetVisuals } from '../../data/fleetVisuals';
+import { getCutout } from '../../data/fleetVisuals';
 
-const heroVisual = getFleetVisuals('minibus', 'exterior').find((v) => v.id === 'minibus-01-exterior')!;
+const heroVisual = getCutout('minibus-04')!;
 ---
 
 <BaseLayout
@@ -26,7 +26,8 @@ const heroVisual = getFleetVisuals('minibus', 'exterior').find((v) => v.id === '
     secondaryCta={{ label: 'WhatsApp', href: contact.whatsappHref }}
     image={heroVisual.image}
     imageAlt={heroVisual.alt}
-    caption="WMC-owned fleet"
+    cutout
+    caption="WMC minibus fleet"
     detail={['Driver-operated', 'Cars, Minibuses & Coaches', 'Birmingham & the West Midlands']}
   />
 
@@ -78,5 +79,15 @@ const heroVisual = getFleetVisuals('minibus', 'exterior').find((v) => v.id === '
     flex-wrap: wrap;
     gap: var(--space-2);
     margin-block-start: var(--space-4);
+  }
+
+  @media (max-width: 479px) {
+    .quote-actions {
+      gap: 12px;
+    }
+
+    .quote-actions :global(.wmc-button) {
+      inline-size: 100%;
+    }
   }
 </style>

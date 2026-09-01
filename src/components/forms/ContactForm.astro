@@ -371,6 +371,16 @@ const enquiryTypes = [
     margin-block-start: var(--space-4);
   }
 
+  @media (max-width: 599px) {
+    .result__actions {
+      gap: 12px;
+    }
+
+    .result__actions :global(.wmc-button) {
+      inline-size: 100%;
+    }
+  }
+
   @keyframes result-in {
     from {
       opacity: 0;

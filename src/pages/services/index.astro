@@ -4,9 +4,9 @@ import PageContainer from '../../components/ui/PageContainer.astro';
 import Section from '../../components/ui/Section.astro';
 import Button from '../../components/ui/Button.astro';
 import PageHero from '../../components/content/PageHero.astro';
-import { getFleetVisuals } from '../../data/fleetVisuals';
+import { getCutout } from '../../data/fleetVisuals';
 
-const heroVisual = getFleetVisuals('minibus', 'exterior').find((v) => v.id === 'minibus-05-exterior-01')!;
+const heroVisual = getCutout('minibus-05')!;
 
 const services = [
   {
@@ -56,7 +56,8 @@ const services = [
     primaryCta={{ label: 'Request a Quote', href: '/request-a-quote/' }}
     image={heroVisual.image}
     imageAlt={heroVisual.alt}
-    caption="WMC-owned fleet"
+    cutout
+    caption="WMC minibus fleet"
   />
 
   <Section as="div" surface="heritage-ivory">
