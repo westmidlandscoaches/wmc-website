@@ -5,12 +5,10 @@ import PageContainer from '../components/ui/PageContainer.astro';
 import Section from '../components/ui/Section.astro';
 import Button from '../components/ui/Button.astro';
 import FaqAccordion from '../components/content/FaqAccordion.astro';
-import PageHero from '../components/content/PageHero.astro';
+import HomeHero from '../components/content/HomeHero.astro';
 import FeaturedFleet, { type FeaturedFleetItem } from '../components/fleet/FeaturedFleet.tsx';
-import { getFleetVisuals, getHomepageHero } from '../data/fleetVisuals';
+import { getFleetVisuals } from '../data/fleetVisuals';
 import { contact } from '../data/navigation';
-
-const hero = getHomepageHero()!;
 
 const carPanel = getFleetVisuals('car', 'exterior')[0];
 const minibusPanel = getFleetVisuals('minibus', 'exterior').find((v) => v.id === 'minibus-05-exterior-01')!;
@@ -143,18 +141,7 @@ const faqItems = [
   path="/"
 >
   <!-- 1. HERO -->
-  <PageHero
-    size="home"
-    priority
-    eyebrow="Birmingham & the West Midlands"
-    title="Private transport, properly organised."
-    lead="Coach, Minibus & Chauffeur-Driven Car Hire in Birmingham and the West Midlands, organised around the people, route and requirements of each journey."
-    primaryCta={{ label: 'Request a Quote', href: '/request-a-quote/' }}
-    secondaryCta={{ label: 'View Fleet', href: '/fleet/' }}
-    image={hero.image}
-    imageAlt={hero.alt}
-    caption="From the WMC-owned fleet"
-  />
+  <HomeHero />
 
   <!-- 2. VERIFIED PROOF -->
   <Section as="div" surface="heritage-ivory">

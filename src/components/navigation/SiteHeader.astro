@@ -1,18 +1,23 @@
 ---
 import { Image } from 'astro:assets';
 import Button from '../ui/Button.astro';
-import { primaryNav, primaryCta } from '../../data/navigation';
+import { primaryNav, primaryCta, contact } from '../../data/navigation';
 import wmcLogoDark from '../../assets/brand/wmc-logo-dark-use.webp';
+
+const path = Astro.url.pathname;
+
+/** A link is current when it matches the page, ignoring hash-only entries. */
+const isCurrent = (href: string) => !href.includes('#') && path === href;
 ---
 
 <header class="site-header" data-scrolled="false" id="site-header">
   <div class="site-header__inner">
-    <a class="site-header__brand" href="/">
+    <a class="site-header__brand" href="/" aria-label="West Midlands Coaches — home">
       <Image
         src={wmcLogoDark}
         alt="West Midlands Coaches"
-        widths={[180, 260, 360]}
-        sizes="180px"
+        widths={[140, 200, 280, 400]}
+        sizes="(min-width: 1024px) 170px, (min-width: 768px) 156px, 134px"
         loading="eager"
         class="site-header__logo"
       />
@@ -22,7 +27,13 @@ import wmcLogoDark from '../../assets/brand/wmc-logo-dark-use.webp';
       <ul class="site-header__nav-list">
         {primaryNav.map((item) => (
           <li>
-            <a class="text-navigation site-header__nav-link" href={item.href}>{item.label}</a>
+            <a
+              class="text-navigation site-header__nav-link"
+              href={item.href}
+              aria-current={isCurrent(item.href) ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
           </li>
         ))}
       </ul>
@@ -32,37 +43,80 @@ import wmcLogoDark from '../../assets/brand/wmc-logo-dark-use.webp';
       <Button href={primaryCta.href} variant="primary" tone="dark">{primaryCta.label}</Button>
     </div>
 
-    <details class="site-header__toggle">
-      <summary class="site-header__toggle-summary">
-        <span class="visually-hidden">Menu</span>
-        <span class="site-header__toggle-bar" aria-hidden="true"></span>
-      </summary>
-
-      <div class="site-header__mobile">
-        <nav aria-label="Mobile">
-          <ul class="site-header__mobile-list">
-            {primaryNav.map((item) => (
-              <li>
-                <a class="text-h5 site-header__mobile-link" href={item.href}>{item.label}</a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <div class="site-header__mobile-cta">
-          <Button href={primaryCta.href} variant="primary" tone="dark">{primaryCta.label}</Button>
-        </div>
-      </div>
-    </details>
+    <button
+      type="button"
+      class="site-header__toggle"
+      aria-expanded="false"
+      aria-controls="site-menu"
+      data-menu-toggle
+    >
+      <span class="visually-hidden">Open menu</span>
+      <span class="site-header__toggle-bar" aria-hidden="true"></span>
+    </button>
   </div>
 </header>
+
+<!-- Off-canvas navigation. Hidden entirely until the toggle script runs. -->
+<div class="site-menu" id="site-menu" data-menu hidden>
+  <div class="site-menu__scrim" data-menu-scrim></div>
+
+  <div class="site-menu__panel" role="dialog" aria-modal="true" aria-label="Site navigation">
+    <div class="site-menu__head">
+      <Image
+        src={wmcLogoDark}
+        alt="West Midlands Coaches"
+        widths={[140, 200, 280]}
+        sizes="132px"
+        loading="lazy"
+        class="site-menu__logo"
+      />
+      <button type="button" class="site-menu__close" data-menu-close>
+        <span class="visually-hidden">Close menu</span>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </div>
+
+    <nav class="site-menu__nav" aria-label="Mobile">
+      <ul class="site-menu__list">
+        {primaryNav.map((item, index) => (
+          <li style={`--row-index:${index}`}>
+            <a
+              class="site-menu__link"
+              href={item.href}
+              aria-current={isCurrent(item.href) ? 'page' : undefined}
+            >
+              <span>{item.label}</span>
+              <span class="site-menu__arrow" aria-hidden="true">&#8594;</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="site-menu__foot">
+      <Button href={primaryCta.href} variant="primary" tone="dark">{primaryCta.label}</Button>
+      <div class="site-menu__direct">
+        <a class="site-menu__direct-link" href={contact.phoneHref}>Call {contact.phoneDisplay}</a>
+        <a
+          class="site-menu__direct-link"
+          href={contact.whatsappHref}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <style>
   .site-header {
     position: sticky;
     inset-block-start: 0;
     z-index: 100;
-    /* Obsidian surface: the approved logo is the dark-use variant, so the
-       header is built around it rather than recolouring the artwork. */
     background-color: var(--color-obsidian);
     border-block-end: var(--border-width-hairline) solid transparent;
     transition: border-color var(--motion-hover) var(--motion-easing-premium),
@@ -71,7 +125,7 @@ import wmcLogoDark from '../../assets/brand/wmc-logo-dark-use.webp';
 
   .site-header[data-scrolled='true'] {
     border-block-end-color: var(--color-charcoal-border);
-    box-shadow: 0 6px 20px rgb(0 0 0 / 0.35);
+    box-shadow: 0 6px 24px rgb(0 0 0 / 0.28);
   }
 
   .site-header__inner {
@@ -87,7 +141,7 @@ import wmcLogoDark from '../../assets/brand/wmc-logo-dark-use.webp';
   @media (min-width: 768px) {
     .site-header__inner {
       padding-inline: var(--space-4);
-      block-size: 92px;
+      block-size: 96px;
     }
   }
 
@@ -100,13 +154,19 @@ import wmcLogoDark from '../../assets/brand/wmc-logo-dark-use.webp';
   }
 
   .site-header__logo {
-    inline-size: 112px;
+    inline-size: 134px;
     block-size: auto;
   }
 
   @media (min-width: 768px) {
     .site-header__logo {
-      inline-size: 140px;
+      inline-size: 156px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .site-header__logo {
+      inline-size: 170px;
     }
   }
 
@@ -129,12 +189,7 @@ import wmcLogoDark from '../../assets/brand/wmc-logo-dark-use.webp';
     text-decoration: none;
     color: var(--color-mist-taupe);
     padding-block: var(--space-1);
-    transition: color var(--motion-hover) var(--motion-easing-premium);
-  }
-
-  .site-header__nav-link:hover,
-  .site-header__nav-link:focus-visible {
-    color: var(--color-warm-white);
+    transition: color 190ms var(--motion-easing-premium);
   }
 
   .site-header__nav-link::after {
@@ -149,16 +204,31 @@ import wmcLogoDark from '../../assets/brand/wmc-logo-dark-use.webp';
     transition: transform 190ms var(--motion-easing-premium);
   }
 
+  .site-header__nav-link:hover,
+  .site-header__nav-link:focus-visible {
+    color: var(--color-warm-white);
+  }
+
   .site-header__nav-link:hover::after,
   .site-header__nav-link:focus-visible::after {
     transform: scaleX(1);
+  }
+
+  /* Current page keeps a quiet, permanent marker. */
+  .site-header__nav-link[aria-current='page'] {
+    color: var(--color-warm-white);
+  }
+
+  .site-header__nav-link[aria-current='page']::after {
+    transform: scaleX(1);
+    background-color: var(--gold-rule);
   }
 
   .site-header__cta {
     display: none;
   }
 
-  .site-header__toggle-summary {
+  .site-header__toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -168,11 +238,6 @@ import wmcLogoDark from '../../assets/brand/wmc-logo-dark-use.webp';
     border: var(--border-width-hairline) solid var(--color-charcoal-border);
     border-radius: var(--radius-control);
     cursor: pointer;
-    list-style: none;
-  }
-
-  .site-header__toggle-summary::-webkit-details-marker {
-    display: none;
   }
 
   .site-header__toggle-bar,
@@ -200,57 +265,6 @@ import wmcLogoDark from '../../assets/brand/wmc-logo-dark-use.webp';
     inset-block-start: 6px;
   }
 
-  .site-header__mobile {
-    position: absolute;
-    inset-inline: 0;
-    inset-block-start: 100%;
-    border-block-start: var(--border-width-hairline) solid var(--color-charcoal-border);
-    background-color: var(--color-obsidian);
-    padding: var(--space-4) var(--space-3) var(--space-5);
-    box-shadow: 0 14px 32px rgb(0 0 0 / 0.5);
-    animation: mobile-nav-in 200ms var(--motion-easing-premium);
-  }
-
-  @keyframes mobile-nav-in {
-    from {
-      opacity: 0;
-      transform: translateY(-6px);
-    }
-  }
-
-  .site-header__mobile-list {
-    list-style: none;
-    margin: 0 0 var(--space-4);
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    border-block-start: var(--border-width-hairline) solid var(--color-charcoal-border);
-  }
-
-  .site-header__mobile-list li {
-    border-block-end: var(--border-width-hairline) solid var(--color-charcoal-border);
-  }
-
-  .site-header__mobile-link {
-    position: relative;
-    text-decoration: none;
-    color: var(--color-warm-white);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-block: var(--space-2);
-    min-block-size: var(--touch-target-min);
-  }
-
-  .site-header__mobile-link::after {
-    content: '\2192';
-    color: var(--color-champagne-gold);
-  }
-
-  .site-header__mobile-cta :global(.wmc-button) {
-    inline-size: 100%;
-  }
-
   @media (min-width: 1024px) {
     .site-header__nav {
       display: block;
@@ -264,8 +278,193 @@ import wmcLogoDark from '../../assets/brand/wmc-logo-dark-use.webp';
       display: none;
     }
   }
-</style>
 
+  /* ---------------------------------------------------------------
+     Off-canvas menu
+     --------------------------------------------------------------- */
+  .site-menu[hidden] {
+    display: none;
+  }
+
+  .site-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+  }
+
+  .site-menu__scrim {
+    position: absolute;
+    inset: 0;
+    background-color: rgb(11 10 9 / 0.6);
+    opacity: 0;
+    transition: opacity 260ms var(--motion-easing-premium);
+  }
+
+  .site-menu[data-open='true'] .site-menu__scrim {
+    opacity: 1;
+  }
+
+  .site-menu__panel {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    inline-size: min(400px, 88vw);
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-obsidian);
+    border-inline-start: var(--border-width-hairline) solid var(--color-charcoal-border);
+    padding-block-end: env(safe-area-inset-bottom, 0px);
+    opacity: 0;
+    transform: translateX(28px);
+    transition: opacity 260ms var(--motion-easing-premium),
+      transform 260ms var(--motion-easing-premium);
+  }
+
+  .site-menu[data-open='true'] .site-menu__panel {
+    opacity: 1;
+    transform: none;
+  }
+
+  .site-menu__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    block-size: 76px;
+    border-block-end: var(--border-width-hairline) solid var(--color-charcoal-border);
+  }
+
+  .site-menu__logo {
+    inline-size: 132px;
+    block-size: auto;
+  }
+
+  .site-menu__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--touch-target-min);
+    block-size: var(--touch-target-min);
+    flex-shrink: 0;
+    background: transparent;
+    border: var(--border-width-hairline) solid var(--color-charcoal-border);
+    border-radius: var(--radius-control);
+    color: var(--color-warm-white);
+    cursor: pointer;
+    transition: border-color var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  .site-menu__close:hover {
+    border-color: var(--gold-rule);
+  }
+
+  .site-menu__nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-3) 0;
+  }
+
+  .site-menu__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .site-menu__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    min-block-size: 56px;
+    padding-inline: var(--space-3);
+    text-decoration: none;
+    color: var(--color-warm-white);
+    font-size: var(--text-h6);
+    line-height: var(--leading-h6);
+    font-weight: var(--font-weight-semibold);
+    border-inline-start: 2px solid transparent;
+    transition: background-color var(--motion-hover) var(--motion-easing-premium),
+      border-color var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  .site-menu__arrow {
+    color: var(--color-champagne-gold);
+    transition: transform var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  .site-menu__link:hover,
+  .site-menu__link:focus-visible {
+    background-color: var(--surface-tint-dark);
+  }
+
+  .site-menu__link:hover .site-menu__arrow,
+  .site-menu__link:focus-visible .site-menu__arrow {
+    transform: translateX(4px);
+  }
+
+  .site-menu__link[aria-current='page'] {
+    border-inline-start-color: var(--color-champagne-gold);
+    background-color: var(--surface-tint-dark);
+  }
+
+  /* Light stagger, only while opening. */
+  .site-menu[data-open='true'] .site-menu__list li {
+    animation: menu-row 260ms var(--motion-easing-premium) both;
+    animation-delay: calc(var(--row-index) * 40ms + 60ms);
+  }
+
+  @keyframes menu-row {
+    from {
+      opacity: 0;
+      transform: translateX(12px);
+    }
+  }
+
+  .site-menu__foot {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border-block-start: var(--border-width-hairline) solid var(--color-charcoal-border);
+  }
+
+  .site-menu__foot :global(.wmc-button) {
+    inline-size: 100%;
+    min-block-size: 52px;
+  }
+
+  .site-menu__direct {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .site-menu__direct-link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--touch-target-min);
+    color: var(--color-mist-taupe);
+    font-size: var(--text-small);
+    font-weight: var(--font-weight-semibold);
+    text-decoration: none;
+    border-block-end: 1px solid var(--gold-rule);
+  }
+
+  .site-menu__direct-link:hover {
+    color: var(--color-warm-white);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-menu__scrim,
+    .site-menu__panel {
+      transition: none;
+    }
+
+    .site-menu[data-open='true'] .site-menu__list li {
+      animation: none;
+    }
+  }
+</style>
 
 <script>
   const header = document.getElementById('site-header');
@@ -277,5 +476,78 @@ import wmcLogoDark from '../../assets/brand/wmc-logo-dark-use.webp';
 
     sync();
     window.addEventListener('scroll', sync, { passive: true });
+  }
+
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const panel = menu?.querySelector<HTMLElement>('.site-menu__panel');
+
+  if (menu && toggle && panel) {
+    const FOCUSABLE = 'a[href], button:not([disabled])';
+    let open = false;
+
+    const setOpen = (next: boolean) => {
+      open = next;
+      toggle.setAttribute('aria-expanded', String(next));
+      toggle.querySelector('.visually-hidden')!.textContent = next ? 'Close menu' : 'Open menu';
+      document.body.style.overflow = next ? 'hidden' : '';
+
+      if (next) {
+        menu.hidden = false;
+        // Forced reflow rather than rAF: the transition still plays, but the
+        // open state can never be left pending if frames are throttled.
+        void panel.offsetWidth;
+        menu.dataset.open = 'true';
+        panel.querySelector<HTMLElement>(FOCUSABLE)?.focus();
+        return;
+      }
+
+      menu.dataset.open = 'false';
+      const finish = () => {
+        if (!open) menu.hidden = true;
+      };
+      panel.addEventListener('transitionend', finish, { once: true });
+      window.setTimeout(finish, 320);
+      toggle.focus();
+    };
+
+    toggle.addEventListener('click', () => setOpen(!open));
+    menu.querySelector('[data-menu-close]')?.addEventListener('click', () => setOpen(false));
+    menu.querySelector('[data-menu-scrim]')?.addEventListener('click', () => setOpen(false));
+
+    // Choosing a destination closes the menu.
+    menu.querySelectorAll('a[href]').forEach((link) => {
+      link.addEventListener('click', () => setOpen(false));
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (!open) return;
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setOpen(false);
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+
+      const focusable = panel.querySelectorAll<HTMLElement>(FOCUSABLE);
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+
+    // Returning to desktop width leaves no orphaned open panel.
+    window.matchMedia('(min-width: 1024px)').addEventListener('change', (event) => {
+      if (event.matches && open) setOpen(false);
+    });
   }
 </script>

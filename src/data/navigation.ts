@@ -4,6 +4,7 @@ export interface NavLink {
 }
 
 export const primaryNav: NavLink[] = [
+  { label: 'Home', href: '/' },
   { label: 'Fleet', href: '/fleet/' },
   { label: 'Services', href: '/services/' },
   { label: 'Airport Transfers', href: '/services/#airport-transfers' },

@@ -1,33 +1,82 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageContainer from '../../components/ui/PageContainer.astro';
 import Section from '../../components/ui/Section.astro';
+import Button from '../../components/ui/Button.astro';
 import PageHero from '../../components/content/PageHero.astro';
-import { getFleetVisuals } from '../../data/fleetVisuals';
+import VehicleGallery, { type GalleryGroup } from '../../components/gallery/VehicleGallery.tsx';
+import { getFleetVisuals, getFleetGroups, type FleetCategory } from '../../data/fleetVisuals';
 
 const heroVisual = getFleetVisuals('coach', 'exterior').find((v) => v.id === 'coach-02-exterior-01')!;
 
-const categories = [
+const categories: {
+  id: string;
+  category: FleetCategory;
+  title: string;
+  singular: string;
+  copy: string;
+  fleetParam: string;
+}[] = [
   {
     id: 'cars',
+    category: 'car',
     title: 'Cars',
+    singular: 'Car',
     copy: 'Chauffeur-driven transport for individual and smaller-party requirements.',
-    visuals: getFleetVisuals('car'),
+    fleetParam: 'car',
   },
   {
     id: 'minibuses',
+    category: 'minibus',
     title: 'Minibuses',
+    singular: 'Minibus',
     copy: 'Group transport for journeys that require more passenger capacity.',
-    visuals: getFleetVisuals('minibus'),
+    fleetParam: 'minibus',
   },
   {
     id: 'coaches',
+    category: 'coach',
     title: 'Coaches',
+    singular: 'Coach',
     copy: 'Larger-group passenger transport.',
-    visuals: getFleetVisuals('coach'),
+    fleetParam: 'coach',
   },
 ];
+
+const sections = categories.map((category) => ({
+  ...category,
+  groups: getFleetGroups(category.category),
+}));
+
+// Gallery payloads are pre-optimised at build time so the island ships URLs,
+// not source images. Full-size frames are only fetched once a gallery opens.
+const galleryGroups: GalleryGroup[] = await Promise.all(
+  sections.flatMap((section) =>
+    section.groups.map(async (group) => ({
+      id: group.id,
+      label: group.label,
+      categoryLabel: section.singular,
+      quoteHref: `/request-a-quote/?fleet=${section.fleetParam}`,
+      images: await Promise.all(
+        group.visuals.map(async (visual) => {
+          const [full, thumb] = await Promise.all([
+            getImage({ src: visual.image, width: 1600 }),
+            getImage({ src: visual.image, width: 240 }),
+          ]);
+          return {
+            src: full.src,
+            thumb: thumb.src,
+            width: full.attributes.width as number,
+            height: full.attributes.height as number,
+            alt: visual.alt,
+            view: visual.view,
+          };
+        }),
+      ),
+    })),
+  ),
+);
 ---
 
 <BaseLayout
@@ -42,64 +91,397 @@ const categories = [
     title="Explore the WMC fleet."
     lead="14 WMC-owned vehicles across Cars, Minibuses and Coaches, with transport organised around the requirements of each journey."
     primaryCta={{ label: 'Tell Us About Your Journey', href: '/request-a-quote/' }}
+    secondaryCta={{ label: 'Explore Fleet', href: '#fleet-categories' }}
     image={heroVisual.image}
     imageAlt={heroVisual.alt}
     caption="WMC-owned fleet"
     detail={['Cars', 'Minibuses', 'Coaches', 'Driver-operated']}
   />
 
-  {categories.map((category, index) => (
-    <Section as="div" surface={index % 2 === 0 ? 'heritage-ivory' : 'warm-white'}>
+  <!-- Category discovery -->
+  <nav class="fleet-nav" id="fleet-categories" aria-label="Fleet categories">
+    <PageContainer>
+      <ul class="fleet-nav__list">
+        {sections.map((section) => (
+          <li>
+            <a class="fleet-nav__link" href={`#${section.id}`}>
+              <span class="fleet-nav__title">{section.title}</span>
+              <span class="fleet-nav__count">
+                {section.groups.length === 1 ? '1 vehicle' : `${section.groups.length} vehicles`}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </PageContainer>
+  </nav>
+
+  {sections.map((section, sectionIndex) => (
+    <Section as="div" surface={sectionIndex % 2 === 0 ? 'warm-white' : 'heritage-ivory'}>
       <PageContainer>
-        <div id={category.id} class="category">
-          <h2>{category.title}</h2>
-          <p class="text-body-large category__copy">{category.copy}</p>
-          <div class="category__gallery">
-            {category.visuals.map((visual) => (
-              <Image
-                src={visual.image}
-                alt={visual.alt}
-                widths={[400, 640, 900]}
-                sizes="(min-width: 768px) 33vw, 100vw"
-                loading="lazy"
-                class="category__image"
-              />
+        <div id={section.id} class="category">
+          <header class="category__head">
+            <p class="eyebrow">{`0${sectionIndex + 1} — ${section.title}`}</p>
+            <h2 class="category__title">{section.title}</h2>
+            <p class="text-body-large category__copy">{section.copy}</p>
+            <a class="arrow-link" href={`/request-a-quote/?fleet=${section.fleetParam}`}>
+              {`Request a Quote for a ${section.singular}`}
+            </a>
+          </header>
+
+          <!-- Composition follows the inventory: the first group leads, the rest support. -->
+          <div class="vehicles" data-count={section.groups.length}>
+            {section.groups.map((group, groupIndex) => (
+              <article class="vehicle" data-lead={groupIndex === 0 && section.groups.length > 2}>
+                <div class="vehicle__media">
+                  <Image
+                    src={group.cover.image}
+                    alt={group.cover.alt}
+                    widths={[420, 700, 1100]}
+                    sizes="(min-width: 1024px) 45vw, (min-width: 640px) 50vw, 100vw"
+                    loading="lazy"
+                    class="vehicle__image"
+                  />
+                </div>
+
+                <div class="vehicle__body">
+                  <div class="vehicle__meta">
+                    <h3 class="text-h5 vehicle__label">{group.label}</h3>
+                    <p class="vehicle__category">{section.singular}</p>
+                  </div>
+
+                  <ul class="vehicle__tags">
+                    {group.exterior.length > 0 && (
+                      <li class="vehicle__tag">{`Exterior (${group.exterior.length})`}</li>
+                    )}
+                    {group.interior.length > 0 && (
+                      <li class="vehicle__tag">{`Interior (${group.interior.length})`}</li>
+                    )}
+                  </ul>
+
+                  <div class="vehicle__actions">
+                    <button type="button" class="vehicle__gallery" data-gallery-open={group.id}>
+                      {group.visuals.length === 1 ? 'View Photograph' : 'View Gallery'}
+                      <span class="vehicle__arrow" aria-hidden="true">&#8594;</span>
+                    </button>
+                    <a class="vehicle__quote" href={`/request-a-quote/?fleet=${section.fleetParam}`}>
+                      Request a Quote
+                    </a>
+                  </div>
+                </div>
+              </article>
             ))}
           </div>
         </div>
       </PageContainer>
     </Section>
   ))}
+
+  <!-- Help choosing -->
+  <Section as="div" surface="obsidian">
+    <PageContainer>
+      <div class="help">
+        <div>
+          <p class="eyebrow eyebrow--dark">Choosing transport</p>
+          <h2 class="text-h3 help__title">Not sure which vehicle you need?</h2>
+        </div>
+        <div class="help__body">
+          <p class="text-body-large help__copy">
+            Tell WMC about the journey, passenger numbers and luggage requirements and the team can
+            review which vehicle category is appropriate.
+          </p>
+          <Button href="/request-a-quote/" variant="primary" tone="dark">
+            Tell Us About Your Journey
+          </Button>
+        </div>
+      </div>
+    </PageContainer>
+  </Section>
+
+  <VehicleGallery client:idle groups={galleryGroups} />
 </BaseLayout>
 
 <style>
+  /* ---------------------------------------------------------------
+     Category navigation
+     --------------------------------------------------------------- */
+  .fleet-nav {
+    position: sticky;
+    inset-block-start: 76px;
+    z-index: 50;
+    background-color: var(--color-warm-white);
+    border-block-end: var(--border-width-hairline) solid var(--color-linen-border);
+  }
+
+  @media (min-width: 768px) {
+    .fleet-nav {
+      inset-block-start: 96px;
+    }
+  }
+
+  .fleet-nav__list {
+    display: flex;
+    gap: var(--space-1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    margin-inline: calc(var(--space-3) * -1);
+    padding-inline: var(--space-3);
+  }
+
+  @media (min-width: 768px) {
+    .fleet-nav__list {
+      margin-inline: 0;
+      padding-inline: 0;
+      gap: var(--space-2);
+    }
+  }
+
+  .fleet-nav__link {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    min-block-size: var(--touch-target-min);
+    padding: var(--space-2) var(--space-3);
+    text-decoration: none;
+    color: var(--color-slate-taupe);
+    border-block-end: 2px solid transparent;
+    transition: color var(--motion-hover) var(--motion-easing-premium),
+      border-color var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  .fleet-nav__link:hover,
+  .fleet-nav__link:focus-visible {
+    color: var(--color-obsidian);
+    border-block-end-color: var(--color-champagne-gold);
+  }
+
+  .fleet-nav__title {
+    font-size: var(--text-h6);
+    line-height: var(--leading-h6);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-obsidian);
+  }
+
+  .fleet-nav__count {
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+
+  /* ---------------------------------------------------------------
+     Category section
+     --------------------------------------------------------------- */
   .category {
-    scroll-margin-block-start: 110px;
+    scroll-margin-block-start: 160px;
+  }
+
+  .category__head {
+    max-inline-size: 62ch;
+    margin-block-end: var(--space-6);
+  }
+
+  .category__title {
+    margin: 0 0 var(--space-2);
   }
 
   .category__copy {
     color: var(--color-slate-taupe);
-    max-inline-size: 60ch;
-    margin-block-end: var(--space-4);
+    margin: 0 0 var(--space-3);
   }
 
-  .category__gallery {
+  /* ---------------------------------------------------------------
+     Vehicle cards
+     --------------------------------------------------------------- */
+  .vehicles {
     display: grid;
-    gap: var(--space-3);
-    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
   }
 
-  .category__gallery :global(img) {
+  @media (min-width: 640px) {
+    .vehicles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* A lead vehicle spans the row when the set is large enough to need one. */
+    .vehicle[data-lead='true'] {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .vehicles[data-count='4'],
+    .vehicles[data-count='5'],
+    .vehicles[data-count='6'] {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .vehicle {
+    display: flex;
+    flex-direction: column;
+    border: var(--border-width-hairline) solid var(--color-linen-border);
+    border-radius: var(--radius-media);
+    background-color: var(--color-warm-white);
+    overflow: hidden;
+    transition: transform var(--motion-hover) var(--motion-easing-premium),
+      border-color var(--motion-hover) var(--motion-easing-premium),
+      box-shadow var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  .vehicle__media {
+    overflow: hidden;
+    background-color: var(--color-graphite-surface);
+  }
+
+  .vehicle__media :global(.vehicle__image) {
     inline-size: 100%;
     block-size: auto;
     aspect-ratio: 4 / 3;
     object-fit: cover;
-    border-radius: var(--radius-panel);
+    transition: transform var(--motion-reveal-medium) var(--motion-easing-premium);
   }
 
-  @media (min-width: 768px) {
-    .category__gallery {
-      grid-template-columns: repeat(3, 1fr);
+  .vehicle[data-lead='true'] .vehicle__media :global(.vehicle__image) {
+    aspect-ratio: 16 / 9;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .vehicle:hover {
+      transform: translateY(-3px);
+      border-color: var(--color-mist-taupe);
+      box-shadow: var(--shadow-raised);
+    }
+
+    .vehicle:hover .vehicle__media :global(.vehicle__image) {
+      transform: scale(1.035);
+    }
+
+    .vehicle:hover .vehicle__arrow {
+      transform: translateX(4px);
+    }
+  }
+
+  .vehicle__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    flex: 1;
+  }
+
+  .vehicle__meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .vehicle__label {
+    margin: 0;
+  }
+
+  .vehicle__category {
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-champagne-gold);
+  }
+
+  .vehicle__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .vehicle__tag {
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    color: var(--color-slate-taupe);
+    padding: 2px var(--space-2);
+    border: var(--border-width-hairline) solid var(--color-linen-border);
+    border-radius: var(--radius-control);
+  }
+
+  .vehicle__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    margin-block-start: auto;
+    padding-block-start: var(--space-2);
+  }
+
+  .vehicle__gallery {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-block-size: var(--touch-target-min);
+    padding: 0;
+    background: transparent;
+    border: 0;
+    color: var(--color-obsidian);
+    font-family: inherit;
+    font-size: var(--text-button);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+  }
+
+  .vehicle__arrow {
+    color: var(--color-champagne-gold);
+    transition: transform var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  .vehicle__quote {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--touch-target-min);
+    color: var(--color-slate-taupe);
+    font-size: var(--text-small);
+    font-weight: var(--font-weight-semibold);
+    text-decoration: underline;
+    text-decoration-color: var(--gold-rule);
+    text-underline-offset: 4px;
+  }
+
+  .vehicle__quote:hover {
+    color: var(--color-obsidian);
+  }
+
+  /* ---------------------------------------------------------------
+     Help choosing
+     --------------------------------------------------------------- */
+  .help {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .help__title {
+    color: var(--color-warm-white);
+    margin: 0;
+    max-inline-size: 18ch;
+  }
+
+  .help__copy {
+    color: var(--color-mist-taupe);
+    margin: 0 0 var(--space-4);
+    max-inline-size: 54ch;
+  }
+
+  @media (min-width: 1024px) {
+    .help {
+      grid-template-columns: 5fr 7fr;
+      gap: var(--space-7);
+      align-items: start;
     }
   }
 </style>

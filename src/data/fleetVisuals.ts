@@ -26,6 +26,17 @@ import coach01Interior from '../assets/images/fleet/interiors/wmc-coach-01-inter
 import coach02Exterior1 from '../assets/images/fleet/coaches/wmc-coach-02-exterior-01.webp';
 import coach02Exterior2 from '../assets/images/fleet/coaches/wmc-coach-02-exterior-02.webp';
 
+import car01NoBg from '../assets/images/fleet/cars/wmc-car-01-nobg.webp';
+import car02NoBg from '../assets/images/fleet/cars/wmc-car-02-nobg.webp';
+import minibus01NoBg from '../assets/images/fleet/minibuses/wmc-minibus-01-nobg.webp';
+import minibus02NoBg from '../assets/images/fleet/minibuses/wmc-minibus-02-nobg.webp';
+import minibus03NoBg from '../assets/images/fleet/minibuses/wmc-minibus-03-nobg.webp';
+import minibus04NoBg from '../assets/images/fleet/minibuses/wmc-minibus-04-nobg.webp';
+import minibus05NoBg from '../assets/images/fleet/minibuses/wmc-minibus-05-nobg.webp';
+import minibus06NoBg from '../assets/images/fleet/minibuses/wmc-minibus-06-nobg.webp';
+import coach01NoBg from '../assets/images/fleet/coaches/wmc-coach-01-nobg.webp';
+import coach02NoBg from '../assets/images/fleet/coaches/wmc-coach-02-nobg.webp';
+
 export type FleetCategory = 'car' | 'minibus' | 'coach';
 export type FleetView = 'exterior' | 'interior';
 
@@ -35,15 +46,29 @@ export interface FleetVisual {
   view: FleetView;
   image: ImageMetadata;
   alt: string;
+  /**
+   * Internal grouping key: which supplied vehicle set the photograph belongs
+   * to. Never rendered publicly and never a fleet or model designation — it
+   * only keeps a vehicle's own photographs together in one gallery.
+   */
+  vehicleGroup: string;
+  /** Position within its group's gallery. Lower sorts first. */
+  galleryOrder: number;
   /** Suitable as a large hero/LCP image (quality, composition, negative space). */
   homepageHero?: boolean;
   /** Suitable as a featured/gallery-scale image. */
   homepageFeatured?: boolean;
+  /** Strongest image of its group; used as the browsing card cover. */
+  groupCover?: boolean;
+  /** Supplied with the background removed: renders on a WMC surface, not in a scene. */
+  cutout?: boolean;
 }
 
 export const fleetVisuals: FleetVisual[] = [
   {
     id: 'car-01-exterior',
+    vehicleGroup: 'car-01',
+    galleryOrder: 1,
     category: 'car',
     view: 'exterior',
     image: car01Exterior,
@@ -52,6 +77,8 @@ export const fleetVisuals: FleetVisual[] = [
   },
   {
     id: 'car-02-exterior',
+    vehicleGroup: 'car-02',
+    galleryOrder: 1,
     category: 'car',
     view: 'exterior',
     image: car02Exterior,
@@ -60,6 +87,8 @@ export const fleetVisuals: FleetVisual[] = [
 
   {
     id: 'minibus-01-exterior',
+    vehicleGroup: 'minibus-01',
+    galleryOrder: 1,
     category: 'minibus',
     view: 'exterior',
     image: minibus01Exterior,
@@ -68,6 +97,8 @@ export const fleetVisuals: FleetVisual[] = [
   },
   {
     id: 'minibus-01-interior-01',
+    vehicleGroup: 'minibus-01',
+    galleryOrder: 2,
     category: 'minibus',
     view: 'interior',
     image: minibus01Interior,
@@ -75,6 +106,8 @@ export const fleetVisuals: FleetVisual[] = [
   },
   {
     id: 'minibus-02-exterior',
+    vehicleGroup: 'minibus-02',
+    galleryOrder: 1,
     category: 'minibus',
     view: 'exterior',
     image: minibus02Exterior,
@@ -82,6 +115,8 @@ export const fleetVisuals: FleetVisual[] = [
   },
   {
     id: 'minibus-02-interior-01',
+    vehicleGroup: 'minibus-02',
+    galleryOrder: 3,
     category: 'minibus',
     view: 'interior',
     image: minibus02Interior1,
@@ -89,6 +124,8 @@ export const fleetVisuals: FleetVisual[] = [
   },
   {
     id: 'minibus-02-interior-02',
+    vehicleGroup: 'minibus-02',
+    galleryOrder: 2,
     category: 'minibus',
     view: 'interior',
     image: minibus02Interior2,
@@ -96,6 +133,8 @@ export const fleetVisuals: FleetVisual[] = [
   },
   {
     id: 'minibus-03-exterior',
+    vehicleGroup: 'minibus-03',
+    galleryOrder: 1,
     category: 'minibus',
     view: 'exterior',
     image: minibus03Exterior,
@@ -103,6 +142,8 @@ export const fleetVisuals: FleetVisual[] = [
   },
   {
     id: 'minibus-03-interior-01',
+    vehicleGroup: 'minibus-03',
+    galleryOrder: 2,
     category: 'minibus',
     view: 'interior',
     image: minibus03Interior,
@@ -110,6 +151,8 @@ export const fleetVisuals: FleetVisual[] = [
   },
   {
     id: 'minibus-04-exterior',
+    vehicleGroup: 'minibus-04',
+    galleryOrder: 1,
     category: 'minibus',
     view: 'exterior',
     image: minibus04Exterior,
@@ -117,6 +160,8 @@ export const fleetVisuals: FleetVisual[] = [
   },
   {
     id: 'minibus-05-exterior-01',
+    vehicleGroup: 'minibus-05',
+    galleryOrder: 1,
     category: 'minibus',
     view: 'exterior',
     image: minibus05Exterior1,
@@ -125,6 +170,8 @@ export const fleetVisuals: FleetVisual[] = [
   },
   {
     id: 'minibus-05-exterior-02',
+    vehicleGroup: 'minibus-05',
+    galleryOrder: 2,
     category: 'minibus',
     view: 'exterior',
     image: minibus05Exterior2,
@@ -132,6 +179,8 @@ export const fleetVisuals: FleetVisual[] = [
   },
   {
     id: 'minibus-05-interior-01',
+    vehicleGroup: 'minibus-05',
+    galleryOrder: 3,
     category: 'minibus',
     view: 'interior',
     image: minibus05Interior,
@@ -139,6 +188,8 @@ export const fleetVisuals: FleetVisual[] = [
   },
   {
     id: 'minibus-06-exterior',
+    vehicleGroup: 'minibus-06',
+    galleryOrder: 1,
     category: 'minibus',
     view: 'exterior',
     image: minibus06Exterior,
@@ -147,6 +198,8 @@ export const fleetVisuals: FleetVisual[] = [
 
   {
     id: 'coach-01-exterior',
+    vehicleGroup: 'coach-01',
+    galleryOrder: 1,
     category: 'coach',
     view: 'exterior',
     image: coach01Exterior,
@@ -156,6 +209,8 @@ export const fleetVisuals: FleetVisual[] = [
   },
   {
     id: 'coach-01-interior-01',
+    vehicleGroup: 'coach-01',
+    galleryOrder: 2,
     category: 'coach',
     view: 'interior',
     image: coach01Interior,
@@ -163,6 +218,8 @@ export const fleetVisuals: FleetVisual[] = [
   },
   {
     id: 'coach-02-exterior-01',
+    vehicleGroup: 'coach-02',
+    galleryOrder: 1,
     category: 'coach',
     view: 'exterior',
     image: coach02Exterior1,
@@ -171,10 +228,123 @@ export const fleetVisuals: FleetVisual[] = [
   },
   {
     id: 'coach-02-exterior-02',
+    vehicleGroup: 'coach-02',
+    galleryOrder: 2,
     category: 'coach',
     view: 'exterior',
     image: coach02Exterior2,
     alt: 'WMC coach photographed from the front three-quarter view with a member of staff nearby',
+  },
+
+  {
+    id: 'car-01-cutout',
+    vehicleGroup: 'car-01',
+    galleryOrder: 0,
+    groupCover: true,
+    cutout: true,
+    category: 'car',
+    view: 'exterior',
+    image: car01NoBg,
+    alt: 'WMC chauffeur car in West Midlands Coaches livery, front three-quarter studio view with the background removed',
+  },
+  {
+    id: 'car-02-cutout',
+    vehicleGroup: 'car-02',
+    galleryOrder: 0,
+    groupCover: true,
+    cutout: true,
+    category: 'car',
+    view: 'exterior',
+    image: car02NoBg,
+    alt: 'WMC chauffeur vehicle, front three-quarter studio view with the background removed',
+  },
+  {
+    id: 'minibus-01-cutout',
+    vehicleGroup: 'minibus-01',
+    galleryOrder: 0,
+    groupCover: true,
+    cutout: true,
+    category: 'minibus',
+    view: 'exterior',
+    image: minibus01NoBg,
+    alt: 'WMC minibus, front three-quarter studio view with the background removed',
+  },
+  {
+    id: 'minibus-02-cutout',
+    vehicleGroup: 'minibus-02',
+    galleryOrder: 0,
+    groupCover: true,
+    cutout: true,
+    category: 'minibus',
+    view: 'exterior',
+    image: minibus02NoBg,
+    alt: 'WMC minibus, front three-quarter studio view with the background removed',
+  },
+  {
+    id: 'minibus-03-cutout',
+    vehicleGroup: 'minibus-03',
+    galleryOrder: 0,
+    groupCover: true,
+    cutout: true,
+    category: 'minibus',
+    view: 'exterior',
+    image: minibus03NoBg,
+    alt: 'WMC minibus in West Midlands Coaches livery, front three-quarter studio view with the background removed',
+  },
+  {
+    id: 'minibus-04-cutout',
+    vehicleGroup: 'minibus-04',
+    galleryOrder: 0,
+    groupCover: true,
+    cutout: true,
+    category: 'minibus',
+    view: 'exterior',
+    image: minibus04NoBg,
+    alt: 'WMC minibus, front three-quarter studio view with the background removed',
+  },
+  {
+    id: 'minibus-05-cutout',
+    vehicleGroup: 'minibus-05',
+    galleryOrder: 0,
+    groupCover: true,
+    cutout: true,
+    category: 'minibus',
+    view: 'exterior',
+    image: minibus05NoBg,
+    alt: 'WMC minibus, front three-quarter studio view with the background removed',
+  },
+  {
+    id: 'minibus-06-cutout',
+    vehicleGroup: 'minibus-06',
+    galleryOrder: 0,
+    groupCover: true,
+    cutout: true,
+    category: 'minibus',
+    view: 'exterior',
+    image: minibus06NoBg,
+    alt: 'WMC minibus, front three-quarter studio view with the background removed',
+  },
+  {
+    id: 'coach-01-cutout',
+    vehicleGroup: 'coach-01',
+    galleryOrder: 0,
+    groupCover: true,
+    cutout: true,
+    category: 'coach',
+    view: 'exterior',
+    image: coach01NoBg,
+    alt: 'WMC coach in West Midland Coaches livery, front three-quarter studio view with the background removed',
+  },
+  {
+    id: 'coach-02-cutout',
+    vehicleGroup: 'coach-02',
+    galleryOrder: 0,
+    groupCover: true,
+    cutout: true,
+    category: 'coach',
+    view: 'exterior',
+    image: coach02NoBg,
+    alt: 'WMC coach, front three-quarter studio view with the background removed',
   },
 ];
 
@@ -186,4 +356,50 @@ export function getFleetVisuals(category: FleetCategory, view?: FleetView): Flee
 
 export function getHomepageHero(): FleetVisual | undefined {
   return fleetVisuals.find((v) => v.homepageHero);
+}
+
+/** The background-removed cutout for a vehicle group, when one was supplied. */
+export function getCutout(vehicleGroup: string): FleetVisual | undefined {
+  return fleetVisuals.find((v) => v.vehicleGroup === vehicleGroup && v.cutout);
+}
+
+export interface FleetGroup {
+  /** Internal key. Not shown to visitors. */
+  id: string;
+  category: FleetCategory;
+  /** Neutral browsing label, e.g. "Vehicle 01". Not a fleet or model number. */
+  label: string;
+  cover: FleetVisual;
+  exterior: FleetVisual[];
+  interior: FleetVisual[];
+  visuals: FleetVisual[];
+}
+
+/**
+ * Groups a category's photography by the vehicle set it came from. Labels are
+ * positional browsing identifiers only — nothing here asserts a model, a
+ * specification or an official fleet number.
+ */
+export function getFleetGroups(category: FleetCategory): FleetGroup[] {
+  const byGroup = new Map<string, FleetVisual[]>();
+
+  for (const visual of fleetVisuals) {
+    if (visual.category !== category) continue;
+    const list = byGroup.get(visual.vehicleGroup) ?? [];
+    list.push(visual);
+    byGroup.set(visual.vehicleGroup, list);
+  }
+
+  return Array.from(byGroup.entries()).map(([id, all], index) => {
+    const visuals = [...all].sort((a, b) => a.galleryOrder - b.galleryOrder);
+    return {
+      id,
+      category,
+      label: `Vehicle ${String(index + 1).padStart(2, '0')}`,
+      cover: visuals.find((v) => v.groupCover) ?? visuals[0],
+      exterior: visuals.filter((v) => v.view === 'exterior'),
+      interior: visuals.filter((v) => v.view === 'interior'),
+      visuals,
+    };
+  });
 }

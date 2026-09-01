@@ -1,0 +1,314 @@
+---
+import { Image } from 'astro:assets';
+import Button from '../ui/Button.astro';
+import { getCutout } from '../../data/fleetVisuals';
+
+// The homepage stage uses the supplied background-removed Audi. The photograph
+// itself is untouched: everything behind and beneath it is CSS.
+const vehicle = getCutout('car-01')!;
+---
+
+<section class="home-hero">
+  <div class="home-hero__field" aria-hidden="true"></div>
+
+  <div class="home-hero__inner">
+    <div class="home-hero__copy">
+      <p class="home-hero__label">Private Passenger Transport</p>
+      <h1 class="home-hero__title">Private transport, properly organised.</h1>
+      <p class="home-hero__lead">
+        Coach, Minibus &amp; Chauffeur-Driven Car Hire in Birmingham and the West Midlands,
+        organised around the people, route and requirements of each journey.
+      </p>
+      <div class="home-hero__actions">
+        <Button href="/request-a-quote/" variant="primary" tone="dark">Request a Quote</Button>
+        <Button href="/fleet/" variant="secondary" tone="dark">Explore the Fleet</Button>
+      </div>
+    </div>
+
+    <div class="home-hero__stage">
+      <span class="home-hero__glow" aria-hidden="true"></span>
+      <Image
+        src={vehicle.image}
+        alt={vehicle.alt}
+        widths={[520, 760, 1040, 1448]}
+        sizes="(min-width: 1280px) 58vw, (min-width: 1024px) 56vw, (min-width: 640px) 84vw, 100vw"
+        loading="eager"
+        fetchpriority="high"
+        class="home-hero__vehicle"
+      />
+      <span class="home-hero__shadow" aria-hidden="true"></span>
+    </div>
+  </div>
+
+  <div class="home-hero__rule" aria-hidden="true"></div>
+</section>
+
+<style>
+  .home-hero {
+    position: relative;
+    background-color: var(--color-obsidian);
+    color: var(--color-warm-white);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* Layer 2 — a single, barely-there light field. Not a scene. */
+  .home-hero__field {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(58% 62% at 68% 46%, rgb(251 249 244 / 0.09), transparent 68%),
+      radial-gradient(46% 50% at 12% 22%, rgb(194 156 89 / 0.06), transparent 70%);
+  }
+
+  .home-hero__inner {
+    position: relative;
+    display: grid;
+    gap: var(--space-4);
+    max-inline-size: var(--content-max-width);
+    margin-inline: auto;
+    padding-inline: var(--space-3);
+    padding-block: var(--space-5) var(--space-2);
+  }
+
+  @media (min-width: 768px) {
+    .home-hero__inner {
+      padding-inline: var(--space-4);
+    }
+  }
+
+  /* --- copy --- */
+  .home-hero__label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-mist-taupe);
+  }
+
+  .home-hero__label::before {
+    content: '';
+    inline-size: 30px;
+    block-size: 1px;
+    background-color: var(--color-champagne-gold);
+    flex-shrink: 0;
+  }
+
+  .home-hero__title {
+    margin: 0 0 var(--space-3);
+    color: var(--color-warm-white);
+    text-wrap: balance;
+  }
+
+  .home-hero__lead {
+    margin: 0 0 var(--space-5);
+    max-inline-size: 42ch;
+    color: var(--color-mist-taupe);
+    font-size: var(--text-lead);
+    line-height: var(--leading-lead);
+  }
+
+  .home-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .home-hero__actions :global(.wmc-button) {
+    min-block-size: 52px;
+    padding-inline: var(--space-4);
+  }
+
+  @media (max-width: 479px) {
+    .home-hero__actions :global(.wmc-button) {
+      inline-size: 100%;
+    }
+  }
+
+  /* --- vehicle stage --- */
+  .home-hero__stage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .home-hero__stage :global(.home-hero__vehicle) {
+    position: relative;
+    z-index: 1;
+    inline-size: 100%;
+    block-size: auto;
+    /* The cutout keeps its own transparent margin; nothing is cropped. */
+    object-fit: contain;
+  }
+
+  /* Light pooled behind the vehicle, sitting under it. */
+  .home-hero__glow {
+    position: absolute;
+    inset-block: 6%;
+    inset-inline: 4%;
+    z-index: 0;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(251 249 244 / 0.12), transparent 76%);
+  }
+
+  /* Contact shadow so the vehicle reads as grounded, not floating. */
+  .home-hero__shadow {
+    position: absolute;
+    z-index: 0;
+    inset-block-end: 12%;
+    inset-inline: 16%;
+    block-size: 4%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(0 0 0 / 0.55), transparent 78%);
+  }
+
+  .home-hero__rule {
+    position: relative;
+    block-size: 1px;
+    background: linear-gradient(
+      to right,
+      var(--color-champagne-gold),
+      rgb(194 156 89 / 0.18) 38%,
+      transparent 72%
+    );
+  }
+
+  /* --- tablet: copy leads, vehicle stays large beneath without
+     pushing the hero past a screenful --- */
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .home-hero__inner {
+      padding-block: var(--space-6) var(--space-3);
+      gap: var(--space-2);
+    }
+
+    .home-hero__copy {
+      max-inline-size: 34rem;
+    }
+
+    .home-hero__stage {
+      justify-content: flex-end;
+    }
+
+    .home-hero__stage :global(.home-hero__vehicle) {
+      inline-size: min(100%, 620px);
+    }
+  }
+
+  /* --- desktop: two columns, vehicle allowed past the text column --- */
+  @media (min-width: 1024px) {
+    .home-hero__inner {
+      grid-template-columns: 42fr 58fr;
+      align-items: center;
+      gap: var(--space-5);
+      padding-block: var(--space-8) var(--space-7);
+      min-block-size: min(74vh, 700px);
+    }
+
+    .home-hero__copy {
+      max-inline-size: none;
+    }
+
+    .home-hero__stage {
+      /* Breaks the inner padding so the car reads at full presence. */
+      margin-inline-end: calc(var(--space-6) * -1);
+    }
+
+    .home-hero__stage :global(.home-hero__vehicle) {
+      inline-size: 112%;
+      max-inline-size: none;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .home-hero__stage {
+      margin-inline-end: calc(var(--space-8) * -1);
+    }
+  }
+
+  /* --- reveal: enhancement only, never a visibility gate --- */
+  /* Both attributes come from the same script, so a script that never runs
+     leaves the hero fully visible instead of blank. */
+  .home-hero[data-anim='on']:not([data-ready]) .home-hero__copy > *,
+  .home-hero[data-anim='on']:not([data-ready]) .home-hero__stage {
+    opacity: 0;
+  }
+
+  .home-hero[data-ready='true'] .home-hero__copy > * {
+    animation: hero-rise 480ms var(--motion-easing-premium) both;
+  }
+
+  .home-hero[data-ready='true'] .home-hero__copy > *:nth-child(2) {
+    animation-delay: 70ms;
+  }
+
+  .home-hero[data-ready='true'] .home-hero__copy > *:nth-child(3) {
+    animation-delay: 140ms;
+  }
+
+  .home-hero[data-ready='true'] .home-hero__copy > *:nth-child(4) {
+    animation-delay: 210ms;
+  }
+
+  .home-hero[data-ready='true'] .home-hero__stage {
+    animation: hero-vehicle 640ms var(--motion-easing-premium) both;
+    animation-delay: 90ms;
+  }
+
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes hero-vehicle {
+    from {
+      opacity: 0;
+      transform: translateX(24px) scale(1.015);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-hero .home-hero__copy > *,
+    .home-hero .home-hero__stage {
+      opacity: 1;
+      animation: none !important;
+    }
+  }
+</style>
+
+<script>
+  // Only opts into the entrance once JS is running, so a failed script leaves
+  // the hero fully visible rather than blank.
+  const hero = document.querySelector<HTMLElement>('.home-hero');
+
+  if (hero) {
+    hero.dataset.anim = 'on';
+    requestAnimationFrame(() => {
+      hero.dataset.ready = 'true';
+    });
+
+    // Safety net: if the entrance never completes (paused tab, unsupported
+    // animations), drop both attributes. That removes the animation rules
+    // along with the start-state, so the hero can never stay invisible.
+    window.setTimeout(() => {
+      hero.removeAttribute('data-ready');
+      hero.removeAttribute('data-anim');
+    }, 1600);
+  }
+</script>
