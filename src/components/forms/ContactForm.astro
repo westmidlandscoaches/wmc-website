@@ -58,7 +58,7 @@ const enquiryTypes = [
       </div>
       <div class="field">
         <label class="field__label" for="contact_subject">Enquiry Type <span aria-hidden="true">*</span></label>
-        <div class="select-wrap">
+        <div class="select-wrap wmc-select">
           <select class="field__input" id="contact_subject" name="subject_type" required>
             <option value="">Select an enquiry type</option>
             {enquiryTypes.map((type) => <option value={type}>{type}</option>)}

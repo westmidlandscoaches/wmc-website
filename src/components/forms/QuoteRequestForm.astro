@@ -281,7 +281,7 @@ const vehicleCopy: Record<string, string> = {
           <div class="field-row">
             <div class="field">
               <label class="field__label" for="journey_purpose">Journey purpose</label>
-              <div class="select-wrap">
+              <div class="select-wrap wmc-select">
                 <select class="field__input" id="journey_purpose" name="journey_purpose">
                   <option value="">Select a purpose</option>
                   {journeyPurposes.map((option) => (
@@ -294,16 +294,25 @@ const vehicleCopy: Record<string, string> = {
               <label class="field__label" for="preferred_vehicle">
                 Preferred WMC Vehicle <span class="field__optional">Optional</span>
               </label>
-              <div class="select-wrap">
+              <div class="select-wrap wmc-select">
                 <select class="field__input" id="preferred_vehicle" name="preferred_vehicle">
                   <option value="">No specific vehicle preference</option>
                   {fleetGroups.map((group) => (
-                    <optgroup label={group.seatGroup}>
+                    <optgroup label={group.seatGroup} data-seat-group={group.seatGroup}>
                       {group.vehicles.map((vehicle) => (
-                        <option value={vehicle.id}>{vehicleLabel(vehicle)}</option>
+                        <option
+                          value={vehicle.id}
+                          data-service-level={vehicle.serviceLevel.toLowerCase()}
+                          data-category={vehicle.category}
+                        >
+                          {vehicleLabel(vehicle)}
+                        </option>
                       ))}
                     </optgroup>
                   ))}
+                  <option class="vehicle-empty" value="" data-empty-state hidden>
+                    No matching WMC vehicle — change your preferences or choose “Please recommend”.
+                  </option>
                 </select>
               </div>
               <p class="field__help">
@@ -325,7 +334,7 @@ const vehicleCopy: Record<string, string> = {
             <label class="field__label" for="referral_source">
               Where did you find us? <span class="field__optional">Optional</span>
             </label>
-            <div class="select-wrap">
+            <div class="select-wrap wmc-select">
               <select class="field__input" id="referral_source" name="referral_source">
                 <option value="">Prefer not to say</option>
                 {referralSources.map((option) => (
@@ -566,8 +575,12 @@ const vehicleCopy: Record<string, string> = {
     padding: 0;
   }
 
-  .quote-form__step {
-    scroll-margin-block-start: 112px;
+  .quote-form__step,
+  .action-bar,
+  .error-summary {
+    /* Never come to rest underneath the sticky header, which would leave the
+       top of a control visually covered and unclickable. */
+    scroll-margin-block-start: calc(var(--header-offset) + var(--space-3));
   }
 
   .quote-form__legend {
@@ -1361,6 +1374,49 @@ const vehicleCopy: Record<string, string> = {
       }
     };
 
+    /**
+     * The specific-vehicle list only ever offers vehicles that match the
+     * chosen service level and category. A selection that stops matching is
+     * cleared rather than silently submitted.
+     */
+    const preferredVehicle = form.querySelector<HTMLSelectElement>('[name="preferred_vehicle"]');
+    const emptyOption = preferredVehicle?.querySelector<HTMLOptionElement>('[data-empty-state]');
+
+    const syncVehicleOptions = () => {
+      if (!preferredVehicle) return;
+
+      const level = value('service_level');
+      const category = value('vehicle_category');
+      const options = Array.from(
+        preferredVehicle.querySelectorAll<HTMLOptionElement>('option[data-service-level]'),
+      );
+
+      let matches = 0;
+      for (const option of options) {
+        const levelOk = !level || option.dataset.serviceLevel === level;
+        const categoryOk =
+          !category || category === 'recommend' || option.dataset.category === category;
+        const show = levelOk && categoryOk;
+        option.hidden = !show;
+        option.disabled = !show;
+        if (show) matches += 1;
+      }
+
+      // Empty optgroups would otherwise leave stray capacity headings behind.
+      for (const group of preferredVehicle.querySelectorAll<HTMLOptGroupElement>('optgroup')) {
+        const anyVisible = Array.from(group.querySelectorAll('option')).some((o) => !o.hidden);
+        group.hidden = !anyVisible;
+      }
+
+      if (emptyOption) {
+        emptyOption.hidden = matches > 0;
+        emptyOption.disabled = true;
+      }
+
+      const selected = preferredVehicle.selectedOptions[0];
+      if (selected && selected.hidden) preferredVehicle.value = '';
+    };
+
     // --- conditionals ---
     const syncConditionals = () => {
       const ret = root.querySelector<HTMLElement>('[data-conditional="return"]');
@@ -1373,12 +1429,24 @@ const vehicleCopy: Record<string, string> = {
 
       const lug = root.querySelector<HTMLElement>('[data-conditional="luggage"]');
       if (lug) lug.dataset.visible = String(value('luggage') === 'yes');
+
+      syncVehicleOptions();
     };
 
     form.addEventListener('change', (event) => {
       const target = event.target as HTMLElement;
-      if (target instanceof HTMLInputElement && (target.name === 'return_journey' || target.name === 'luggage')) {
+      if (
+        target instanceof HTMLInputElement &&
+        (target.name === 'return_journey' || target.name === 'luggage')
+      ) {
         syncConditionals();
+      }
+
+      if (
+        target instanceof HTMLInputElement &&
+        (target.name === 'service_level' || target.name === 'vehicle_category')
+      ) {
+        syncVehicleOptions();
       }
       saveDraft();
     });
@@ -1935,6 +2003,7 @@ const vehicleCopy: Record<string, string> = {
         }
       }
 
+      // ?service= carries either a journey purpose or a service level.
       const service = params.get('service');
       const purpose = field('journey_purpose');
       if (service && purpose instanceof HTMLSelectElement) {
@@ -1942,17 +2011,36 @@ const vehicleCopy: Record<string, string> = {
         if (match) purpose.value = match.value;
       }
 
-      const vehicle = params.get('vehicle');
-      const preferred = field('preferred_vehicle');
-      if (vehicle && preferred instanceof HTMLSelectElement) {
-        const match = Array.from(preferred.options).find((o) => o.value === vehicle);
-        if (match) preferred.value = match.value;
+      if (service) {
+        const levelRadio = form.querySelector<HTMLInputElement>(
+          `input[name="service_level"][value="${service}"]`,
+        );
+        if (levelRadio) {
+          form
+            .querySelectorAll<HTMLInputElement>('input[name="service_level"]')
+            .forEach((r) => (r.checked = false));
+          levelRadio.checked = true;
+        }
       }
+
+    };
+
+    const applyUrlVehicle = () => {
+      const vehicle = new URLSearchParams(window.location.search).get('vehicle');
+      const preferred = field('preferred_vehicle');
+      if (!vehicle || !(preferred instanceof HTMLSelectElement)) return;
+      const match = Array.from(preferred.options).find(
+        (option) => option.value === vehicle && !option.hidden,
+      );
+      if (match) preferred.value = match.value;
     };
 
     restoreDraft();
     applyUrlContext();
     syncConditionals();
+    // Re-apply the vehicle from the URL now that filtering has run, so a valid
+    // deep link is not cleared by the first filter pass.
+    applyUrlVehicle();
     showStep(1, false);
   }
 </script>

@@ -239,6 +239,115 @@ button {
   transform: scaleX(1);
 }
 
+/* ---------------------------------------------------------------
+   Select control. Native semantics kept; only the closed control is
+   styled, because the opened list is drawn by the operating system.
+   --------------------------------------------------------------- */
+.wmc-select {
+  position: relative;
+}
+
+.wmc-select select {
+  appearance: none;
+  inline-size: 100%;
+  min-block-size: 54px;
+  padding-inline: var(--space-2) var(--space-6);
+  font-family: inherit;
+  font-size: var(--text-form-input);
+  line-height: var(--leading-form-input);
+  color: var(--color-ink);
+  background-color: var(--color-warm-white);
+  border: var(--border-width-hairline) solid var(--color-linen-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 190ms var(--motion-easing-premium),
+    background-color 190ms var(--motion-easing-premium),
+    box-shadow 190ms var(--motion-easing-premium);
+}
+
+.wmc-select select:hover {
+  border-color: var(--color-mist-taupe);
+  background-color: var(--color-heritage-ivory);
+}
+
+.wmc-select select:focus-visible {
+  outline: none;
+  border-color: var(--color-champagne-gold);
+  box-shadow: 0 0 0 3px var(--gold-wash);
+}
+
+.wmc-select select option:disabled {
+  color: var(--color-mist-taupe);
+}
+
+.wmc-select::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: var(--space-3);
+  inset-block-start: 50%;
+  inline-size: 9px;
+  block-size: 9px;
+  margin-block-start: -6px;
+  border-inline-end: 2px solid var(--color-slate-taupe);
+  border-block-end: 2px solid var(--color-slate-taupe);
+  transform: rotate(45deg);
+  pointer-events: none;
+  transition: border-color 190ms var(--motion-easing-premium);
+}
+
+.wmc-select:focus-within::after {
+  border-color: var(--color-champagne-gold);
+}
+
+/* ---------------------------------------------------------------
+   Scrollbars
+   --------------------------------------------------------------- */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-mist-taupe) var(--color-heritage-ivory);
+}
+
+::-webkit-scrollbar {
+  inline-size: 10px;
+  block-size: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--color-heritage-ivory);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-mist-taupe);
+  border-radius: 999px;
+  border: 2px solid var(--color-heritage-ivory);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-champagne-gold);
+}
+
+/* Dark surfaces get a matching dark track. */
+.site-menu,
+.vgal {
+  scrollbar-color: var(--color-charcoal-border) var(--color-obsidian);
+}
+
+.site-menu ::-webkit-scrollbar-track,
+.vgal ::-webkit-scrollbar-track {
+  background-color: var(--color-obsidian);
+}
+
+.site-menu ::-webkit-scrollbar-thumb,
+.vgal ::-webkit-scrollbar-thumb {
+  background-color: var(--color-charcoal-border);
+  border-color: var(--color-obsidian);
+}
+
+.site-menu ::-webkit-scrollbar-thumb:hover,
+.vgal ::-webkit-scrollbar-thumb:hover {
+  background-color: var(--gold-rule);
+}
+
 /* Reduced motion — honoured globally */
 @media (prefers-reduced-motion: reduce) {
   *,

@@ -1,22 +1,34 @@
 ---
-import { Image, getImage } from 'astro:assets';
+import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageContainer from '../../components/ui/PageContainer.astro';
 import Section from '../../components/ui/Section.astro';
 import Button from '../../components/ui/Button.astro';
 import PageHero from '../../components/content/PageHero.astro';
-import VehicleGallery, { type GalleryGroup } from '../../components/gallery/VehicleGallery.tsx';
-import { getFleetVisuals, getFleetGroups, type FleetCategory } from '../../data/fleetVisuals';
+import { getFleetVisuals } from '../../data/fleetVisuals';
+import {
+  fleetSlots,
+  vehicleLabel,
+  FLEET_TOTAL,
+  type FleetSlot,
+  type FleetVehicle,
+  type VehicleCategory,
+} from '../../data/fleet';
 
 const heroVisual = getFleetVisuals('coach', 'exterior').find((v) => v.id === 'coach-02-exterior-01')!;
 
+const slots = fleetSlots();
+const confirmedVehicles: FleetVehicle[] = slots
+  .filter((slot): slot is Extract<FleetSlot, { status: 'confirmed' }> => slot.status === 'confirmed')
+  .map((slot) => slot.vehicle);
+const pendingCount = slots.length - confirmedVehicles.length;
+
 const categories: {
   id: string;
-  category: FleetCategory;
+  category: VehicleCategory;
   title: string;
   singular: string;
   copy: string;
-  fleetParam: string;
 }[] = [
   {
     id: 'cars',
@@ -24,7 +36,6 @@ const categories: {
     title: 'Cars',
     singular: 'Car',
     copy: 'Chauffeur-driven transport for individual and smaller-party requirements.',
-    fleetParam: 'car',
   },
   {
     id: 'minibuses',
@@ -32,7 +43,6 @@ const categories: {
     title: 'Minibuses',
     singular: 'Minibus',
     copy: 'Group transport for journeys that require more passenger capacity.',
-    fleetParam: 'minibus',
   },
   {
     id: 'coaches',
@@ -40,43 +50,17 @@ const categories: {
     title: 'Coaches',
     singular: 'Coach',
     copy: 'Larger-group passenger transport.',
-    fleetParam: 'coach',
   },
 ];
 
 const sections = categories.map((category) => ({
   ...category,
-  groups: getFleetGroups(category.category),
+  vehicles: confirmedVehicles.filter((vehicle) => vehicle.category === category.category),
 }));
 
-// Gallery payloads are pre-optimised at build time so the island ships URLs,
-// not source images. Full-size frames are only fetched once a gallery opens.
-const galleryGroups: GalleryGroup[] = await Promise.all(
-  sections.flatMap((section) =>
-    section.groups.map(async (group) => ({
-      id: group.id,
-      label: group.label,
-      categoryLabel: section.singular,
-      quoteHref: `/request-a-quote/?fleet=${section.fleetParam}`,
-      images: await Promise.all(
-        group.visuals.map(async (visual) => {
-          const [full, thumb] = await Promise.all([
-            getImage({ src: visual.image, width: 1600 }),
-            getImage({ src: visual.image, width: 240 }),
-          ]);
-          return {
-            src: full.src,
-            thumb: thumb.src,
-            width: full.attributes.width as number,
-            height: full.attributes.height as number,
-            alt: visual.alt,
-            view: visual.view,
-          };
-        }),
-      ),
-    })),
-  ),
-);
+/** Prefills the quotation form with everything already known about a vehicle. */
+const quoteHref = (vehicle: FleetVehicle) =>
+  `/request-a-quote/?fleet=${vehicle.category}&service=${vehicle.serviceLevel.toLowerCase()}&vehicle=${vehicle.id}`;
 ---
 
 <BaseLayout
@@ -89,7 +73,7 @@ const galleryGroups: GalleryGroup[] = await Promise.all(
     eyebrow="The fleet"
     breadcrumb={[{ label: 'Home', href: '/' }, { label: 'Fleet' }]}
     title="Explore the WMC fleet."
-    lead="14 WMC-owned vehicles across Cars, Minibuses and Coaches, with transport organised around the requirements of each journey."
+    lead={`${FLEET_TOTAL} WMC-owned vehicles across Cars, Minibuses and Coaches, with transport organised around the requirements of each journey.`}
     primaryCta={{ label: 'Tell Us About Your Journey', href: '/request-a-quote/' }}
     secondaryCta={{ label: 'Explore Fleet', href: '#fleet-categories' }}
     image={heroVisual.image}
@@ -98,7 +82,6 @@ const galleryGroups: GalleryGroup[] = await Promise.all(
     detail={['Cars', 'Minibuses', 'Coaches', 'Driver-operated']}
   />
 
-  <!-- Category discovery -->
   <nav class="fleet-nav" id="fleet-categories" aria-label="Fleet categories">
     <PageContainer>
       <ul class="fleet-nav__list">
@@ -107,7 +90,7 @@ const galleryGroups: GalleryGroup[] = await Promise.all(
             <a class="fleet-nav__link" href={`#${section.id}`}>
               <span class="fleet-nav__title">{section.title}</span>
               <span class="fleet-nav__count">
-                {section.groups.length === 1 ? '1 vehicle' : `${section.groups.length} vehicles`}
+                {section.vehicles.length === 1 ? '1 vehicle' : `${section.vehicles.length} vehicles`}
               </span>
             </a>
           </li>
@@ -124,50 +107,49 @@ const galleryGroups: GalleryGroup[] = await Promise.all(
             <p class="eyebrow">{`0${sectionIndex + 1} — ${section.title}`}</p>
             <h2 class="category__title">{section.title}</h2>
             <p class="text-body-large category__copy">{section.copy}</p>
-            <a class="arrow-link" href={`/request-a-quote/?fleet=${section.fleetParam}`}>
-              {`Request a Quote for a ${section.singular}`}
-            </a>
           </header>
 
-          <!-- Composition follows the inventory: the first group leads, the rest support. -->
-          <div class="vehicles" data-count={section.groups.length}>
-            {section.groups.map((group, groupIndex) => (
-              <article class="vehicle" data-lead={groupIndex === 0 && section.groups.length > 2}>
+          <div class="vehicles">
+            {section.vehicles.map((vehicle) => (
+              <article class="vehicle">
                 <div class="vehicle__media">
-                  <Image
-                    src={group.cover.image}
-                    alt={group.cover.alt}
-                    widths={[420, 700, 1100]}
-                    sizes="(min-width: 1024px) 45vw, (min-width: 640px) 50vw, 100vw"
-                    loading="lazy"
-                    class="vehicle__image"
-                  />
+                  {vehicle.image ? (
+                    <Image
+                      src={vehicle.image}
+                      alt={`${vehicleLabel(vehicle)}, ${vehicle.seatGroup}`}
+                      widths={[420, 700, 1000]}
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      loading="lazy"
+                      class="vehicle__image"
+                    />
+                  ) : (
+                    <p class="vehicle__placeholder">
+                      <span class="vehicle__placeholder-mark" aria-hidden="true">WMC</span>
+                      Vehicle image being updated
+                    </p>
+                  )}
                 </div>
 
                 <div class="vehicle__body">
                   <div class="vehicle__meta">
-                    <h3 class="text-h5 vehicle__label">{group.label}</h3>
-                    <p class="vehicle__category">{section.singular}</p>
+                    <p class="vehicle__seats">{vehicle.seatGroup}</p>
+                    <p class="vehicle__level">{vehicle.serviceLevel}</p>
                   </div>
 
-                  <ul class="vehicle__tags">
-                    {group.exterior.length > 0 && (
-                      <li class="vehicle__tag">{`Exterior (${group.exterior.length})`}</li>
-                    )}
-                    {group.interior.length > 0 && (
-                      <li class="vehicle__tag">{`Interior (${group.interior.length})`}</li>
-                    )}
-                  </ul>
+                  <h3 class="text-h5 vehicle__name">{vehicle.makeModel}</h3>
+                  <p class="vehicle__colour">{vehicle.colour}</p>
 
-                  <div class="vehicle__actions">
-                    <button type="button" class="vehicle__gallery" data-gallery-open={group.id}>
-                      {group.visuals.length === 1 ? 'View Photograph' : 'View Gallery'}
-                      <span class="vehicle__arrow" aria-hidden="true">&#8594;</span>
-                    </button>
-                    <a class="vehicle__quote" href={`/request-a-quote/?fleet=${section.fleetParam}`}>
-                      Request a Quote
-                    </a>
-                  </div>
+                  {vehicle.features.length > 0 && (
+                    <ul class="vehicle__features">
+                      {vehicle.features.map((feature) => (
+                        <li class="vehicle__feature">{feature}</li>
+                      ))}
+                    </ul>
+                  )}
+
+                  <a class="arrow-link vehicle__quote" href={quoteHref(vehicle)}>
+                    Request a Quote
+                  </a>
                 </div>
               </article>
             ))}
@@ -177,7 +159,35 @@ const galleryGroups: GalleryGroup[] = await Promise.all(
     </Section>
   ))}
 
-  <!-- Help choosing -->
+  <!-- The remaining fleet slots, shown honestly rather than filled in. -->
+  <Section as="div" surface="warm-white">
+    <PageContainer>
+      <div class="pending">
+        <header class="pending__head">
+          <p class="eyebrow">Also in the fleet</p>
+          <h2 class="text-h4 pending__title">
+            {`${pendingCount} of the ${FLEET_TOTAL} WMC vehicles are still being documented.`}
+          </h2>
+          <p class="text-body pending__copy">
+            WMC owns {FLEET_TOTAL} vehicles. Details for the remaining {pendingCount} are being
+            confirmed and will be published once verified.
+          </p>
+        </header>
+
+        <ul class="pending__list">
+          {Array.from({ length: pendingCount }, (_, index) => (
+            <li class="pending__slot">
+              <span class="pending__index">
+                {`Vehicle ${String(confirmedVehicles.length + index + 1).padStart(2, '0')}`}
+              </span>
+              <span class="pending__status">Vehicle details awaiting confirmation</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </PageContainer>
+  </Section>
+
   <Section as="div" surface="obsidian">
     <PageContainer>
       <div class="help">
@@ -197,26 +207,16 @@ const galleryGroups: GalleryGroup[] = await Promise.all(
       </div>
     </PageContainer>
   </Section>
-
-  <VehicleGallery client:idle groups={galleryGroups} />
 </BaseLayout>
 
 <style>
-  /* ---------------------------------------------------------------
-     Category navigation
-     --------------------------------------------------------------- */
+  /* --------------------------- Category nav --------------------------- */
   .fleet-nav {
     position: sticky;
-    inset-block-start: 76px;
+    inset-block-start: var(--header-offset);
     z-index: 50;
     background-color: var(--color-warm-white);
     border-block-end: var(--border-width-hairline) solid var(--color-linen-border);
-  }
-
-  @media (min-width: 768px) {
-    .fleet-nav {
-      inset-block-start: 70px;
-    }
   }
 
   .fleet-nav__list {
@@ -272,11 +272,9 @@ const galleryGroups: GalleryGroup[] = await Promise.all(
     line-height: var(--leading-small);
   }
 
-  /* ---------------------------------------------------------------
-     Category section
-     --------------------------------------------------------------- */
+  /* ---------------------------- Category ----------------------------- */
   .category {
-    scroll-margin-block-start: 160px;
+    scroll-margin-block-start: calc(var(--header-offset) + 92px);
   }
 
   .category__head {
@@ -290,12 +288,10 @@ const galleryGroups: GalleryGroup[] = await Promise.all(
 
   .category__copy {
     color: var(--color-slate-taupe);
-    margin: 0 0 var(--space-3);
+    margin: 0;
   }
 
-  /* ---------------------------------------------------------------
-     Vehicle cards
-     --------------------------------------------------------------- */
+  /* ---------------------------- Vehicles ----------------------------- */
   .vehicles {
     display: grid;
     gap: var(--space-4);
@@ -305,17 +301,10 @@ const galleryGroups: GalleryGroup[] = await Promise.all(
     .vehicles {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
-    /* A lead vehicle spans the row when the set is large enough to need one. */
-    .vehicle[data-lead='true'] {
-      grid-column: 1 / -1;
-    }
   }
 
   @media (min-width: 1024px) {
-    .vehicles[data-count='4'],
-    .vehicles[data-count='5'],
-    .vehicles[data-count='6'] {
+    .vehicles {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
@@ -332,23 +321,6 @@ const galleryGroups: GalleryGroup[] = await Promise.all(
       box-shadow var(--motion-hover) var(--motion-easing-premium);
   }
 
-  .vehicle__media {
-    overflow: hidden;
-    background-color: var(--color-graphite-surface);
-  }
-
-  .vehicle__media :global(.vehicle__image) {
-    inline-size: 100%;
-    block-size: auto;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    transition: transform var(--motion-reveal-medium) var(--motion-easing-premium);
-  }
-
-  .vehicle[data-lead='true'] .vehicle__media :global(.vehicle__image) {
-    aspect-ratio: 16 / 9;
-  }
-
   @media (hover: hover) and (pointer: fine) {
     .vehicle:hover {
       transform: translateY(-3px);
@@ -357,18 +329,51 @@ const galleryGroups: GalleryGroup[] = await Promise.all(
     }
 
     .vehicle:hover .vehicle__media :global(.vehicle__image) {
-      transform: scale(1.035);
+      transform: scale(1.03);
     }
+  }
 
-    .vehicle:hover .vehicle__arrow {
-      transform: translateX(4px);
-    }
+  .vehicle__media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background-color: var(--color-night-graphite);
+  }
+
+  .vehicle__media :global(.vehicle__image) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: contain;
+    transition: transform var(--motion-reveal-medium) var(--motion-easing-premium);
+  }
+
+  /* Branded stand-in — never another vehicle's photograph. */
+  .vehicle__placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    padding: var(--space-3);
+    text-align: center;
+    color: var(--color-mist-taupe);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+
+  .vehicle__placeholder-mark {
+    font-size: var(--text-h4);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.12em;
+    color: var(--gold-rule);
   }
 
   .vehicle__body {
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    gap: var(--space-1);
     padding: var(--space-3);
     flex: 1;
   }
@@ -380,30 +385,45 @@ const galleryGroups: GalleryGroup[] = await Promise.all(
     gap: var(--space-2);
   }
 
-  .vehicle__label {
-    margin: 0;
-  }
-
-  .vehicle__category {
+  .vehicle__seats,
+  .vehicle__level {
     margin: 0;
     font-size: var(--text-small);
     line-height: var(--leading-small);
     font-weight: var(--font-weight-semibold);
     letter-spacing: 0.1em;
     text-transform: uppercase;
+  }
+
+  .vehicle__seats {
+    color: var(--color-slate-taupe);
+  }
+
+  .vehicle__level {
     color: var(--color-champagne-gold);
   }
 
-  .vehicle__tags {
+  .vehicle__name {
+    margin: 0;
+  }
+
+  .vehicle__colour {
+    margin: 0 0 var(--space-2);
+    color: var(--color-slate-taupe);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+
+  .vehicle__features {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-1);
     list-style: none;
-    margin: 0;
+    margin: 0 0 var(--space-3);
     padding: 0;
   }
 
-  .vehicle__tag {
+  .vehicle__feature {
     font-size: var(--text-small);
     line-height: var(--leading-small);
     color: var(--color-slate-taupe);
@@ -412,54 +432,67 @@ const galleryGroups: GalleryGroup[] = await Promise.all(
     border-radius: var(--radius-control);
   }
 
-  .vehicle__actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-3);
-    margin-block-start: auto;
-    padding-block-start: var(--space-2);
-  }
-
-  .vehicle__gallery {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
-    min-block-size: var(--touch-target-min);
-    padding: 0;
-    background: transparent;
-    border: 0;
-    color: var(--color-obsidian);
-    font-family: inherit;
-    font-size: var(--text-button);
-    font-weight: var(--font-weight-semibold);
-    cursor: pointer;
-  }
-
-  .vehicle__arrow {
-    color: var(--color-champagne-gold);
-    transition: transform var(--motion-hover) var(--motion-easing-premium);
-  }
-
   .vehicle__quote {
     display: inline-flex;
     align-items: center;
+    margin-block-start: auto;
     min-block-size: var(--touch-target-min);
+  }
+
+  /* ----------------------------- Pending ----------------------------- */
+  .pending__head {
+    max-inline-size: 60ch;
+    margin-block-end: var(--space-4);
+  }
+
+  .pending__title {
+    margin: 0 0 var(--space-2);
+  }
+
+  .pending__copy {
     color: var(--color-slate-taupe);
+    margin: 0;
+  }
+
+  .pending__list {
+    display: grid;
+    gap: var(--space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  @media (min-width: 640px) {
+    .pending__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .pending__slot {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-3);
+    border: 1px dashed var(--color-linen-border);
+    border-radius: var(--radius-panel);
+    background-color: var(--color-heritage-ivory);
+  }
+
+  .pending__index {
     font-size: var(--text-small);
+    line-height: var(--leading-small);
     font-weight: var(--font-weight-semibold);
-    text-decoration: underline;
-    text-decoration-color: var(--gold-rule);
-    text-underline-offset: 4px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-slate-taupe);
   }
 
-  .vehicle__quote:hover {
-    color: var(--color-obsidian);
+  .pending__status {
+    color: var(--color-ink);
+    font-weight: var(--font-weight-semibold);
   }
 
-  /* ---------------------------------------------------------------
-     Help choosing
-     --------------------------------------------------------------- */
+  /* ------------------------------ Help ------------------------------- */
   .help {
     display: grid;
     gap: var(--space-4);
