@@ -190,11 +190,17 @@ const hasActions = Boolean(primaryCta || secondaryCta || tertiaryCta);
     background: radial-gradient(closest-side, rgb(0 0 0 / 0.55), transparent 78%);
   }
 
-  /* Stacked layouts: cap the staged vehicle so the hero cannot run far past
-     a screenful with empty space around the car. */
+  /*
+   * Stacked layouts: the staged vehicle is bounded on BOTH axes so it reads at
+   * the same presence as the home hero's car. A height-only cap lets a wide,
+   * short cutout (a saloon or a coach seen side-on) grow to ~90% of the
+   * viewport and touch the edges, while a taller cutout of the same height
+   * stays modest — the inline cap is what keeps the two comparable.
+   */
   @media (max-width: 1023px) {
     .page-hero[data-cutout='true'] .page-hero__media :global(.page-hero__image) {
-      max-block-size: 46vh;
+      max-block-size: var(--hero-vehicle-max-block, 46vh);
+      max-inline-size: var(--hero-vehicle-max-inline, 34rem);
       margin-inline: auto;
     }
 

@@ -14,6 +14,8 @@ import minibus04NoBg from '../assets/images/fleet/minibuses/wmc-minibus-04-nobg.
 import minibus05NoBg from '../assets/images/fleet/minibuses/wmc-minibus-05-nobg.webp';
 import minibus06NoBg from '../assets/images/fleet/minibuses/wmc-minibus-06-nobg.webp';
 import minibus07NoBg from '../assets/images/fleet/minibuses/wmc-minibus-07-nobg.webp';
+import minibus08NoBg from '../assets/images/fleet/minibuses/wmc-minibus-08-nobg.webp';
+import minibus09NoBg from '../assets/images/fleet/minibuses/wmc-minibus-09-nobg.webp';
 import coach01NoBg from '../assets/images/fleet/coaches/wmc-coach-01-nobg.webp';
 import coach02NoBg from '../assets/images/fleet/coaches/wmc-coach-02-nobg.webp';
 
@@ -120,13 +122,7 @@ export const fleetVehicles: FleetVehicle[] = [
     serviceLevel: 'Executive',
     category: 'minibus',
     features: ['Air Conditioning', 'Leather Seats', 'Armrests', 'Charging Ports'],
-    /*
-     * Photography pending. WMC supplied one identical file under two different
-     * vehicle names ("16-Seater Executive" and "19-Seater Standard"), so it
-     * identifies neither vehicle on its own. The asset is ingested as
-     * minibus-08 and stays unassigned until WMC confirms which vehicle it is,
-     * rather than being published as a coin-flip between the two.
-     */
+    image: minibus08NoBg,
   },
   {
     id: 'sprinter-16-white-standard-02',
@@ -149,6 +145,7 @@ export const fleetVehicles: FleetVehicle[] = [
     serviceLevel: 'Standard',
     category: 'minibus',
     features: ['Standard Seating'],
+    image: minibus09NoBg,
   },
 
   {
