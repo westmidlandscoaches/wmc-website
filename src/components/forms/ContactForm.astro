@@ -435,7 +435,7 @@ const enquiryTypes = [
         el?.removeAttribute('aria-describedby');
       });
       if (summary) summary.hidden = true;
-      if (errorList) errorList.innerHTML = '';
+      if (errorList) errorList.replaceChildren();
     };
 
     const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
@@ -474,19 +474,6 @@ const enquiryTypes = [
         summary.hidden = false;
         summary.focus();
       }
-    };
-
-    /**
-     * Development-only delivery diagnostics. Web3Forms answers a rejected
-     * submission with a specific reason (an unrecognised access key, for
-     * instance) that the customer-facing error panel deliberately never shows.
-     * Only the HTTP status, the success flag and Web3Forms' own message are
-     * ever passed here — never a field name, a field value, or the FormData
-     * itself, so no enquiry data can reach the console.
-     */
-    const reportDeliveryFailure = (detail: string) => {
-      if (!import.meta.env.DEV) return;
-      console.warn(`[WMC contact form] Web3Forms did not accept the submission — ${detail}`);
     };
 
     const setSending = (state: boolean) => {
@@ -544,7 +531,6 @@ const enquiryTypes = [
 
       if (!getAccessKey()) {
         // Without a key nothing can be delivered, so never claim success.
-        reportDeliveryFailure('missing access key: PUBLIC_WEB3FORMS_ACCESS_KEY is empty');
         showResult(errorPanel, successPanel);
         return;
       }
@@ -560,11 +546,6 @@ const enquiryTypes = [
         const delivered = response.ok && result?.success === true;
 
         if (!delivered) {
-          reportDeliveryFailure(
-            `status ${response.status} · success ${String(result?.success)} · ${
-              result?.message ?? 'no message returned'
-            }`,
-          );
           showResult(errorPanel, successPanel);
           return;
         }

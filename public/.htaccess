@@ -1,0 +1,94 @@
+# West Midlands Coaches — Apache configuration for Hostinger static hosting.
+#
+# Everything here is deliberately conservative: it hardens transport and
+# response headers without touching how the site is built or served. The
+# Content-Security-Policy is REPORT-ONLY on purpose — it observes and reports
+# only, and cannot break Astro's inline scripts, Google Maps/Places or the
+# Web3Forms submission. Promote it to an enforcing `Content-Security-Policy`
+# header only after the browser console shows no violations for a full pass
+# over every page and both forms.
+
+# ---------------------------------------------------------------------------
+# HTTPS and canonical host
+#
+# One combined rule, so http://www reaches https://non-www in a single hop
+# rather than chaining two redirects. HTTPS is detected via both the standard
+# variable and the proxy header Hostinger sets, and the rules only fire when
+# the request is not already on the canonical scheme and host, so they cannot
+# loop.
+# ---------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Force HTTPS.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+  # Force non-www.
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Security headers
+# ---------------------------------------------------------------------------
+<IfModule mod_headers.c>
+  # Never let a browser second-guess a declared Content-Type.
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Send the origin cross-site, the full path same-site.
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Clickjacking. frame-ancestors is the modern control; X-Frame-Options is
+  # kept for older browsers that ignore it.
+  Header always set Content-Security-Policy "frame-ancestors 'self'"
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  # Drop capabilities the site never uses. Geolocation is included
+  # deliberately: Places autocomplete here is text-query only and never calls
+  # navigator.geolocation, so denying it costs nothing.
+  Header always set Permissions-Policy "accelerometer=(), autoplay=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), xr-spatial-tracking=()"
+
+  # HSTS. Six months, no preload and no includeSubDomains, so a subdomain that
+  # is not yet on HTTPS cannot be knocked offline by this.
+  Header always set Strict-Transport-Security "max-age=15768000"
+
+  # Report-only policy: wide enough for everything the site legitimately does.
+  # 'unsafe-inline' covers Astro's inline bootstrap scripts and scoped styles;
+  # tighten it with hashes or a nonce before enforcing.
+  Header always set Content-Security-Policy-Report-Only "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://maps.googleapis.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https://maps.googleapis.com https://maps.gstatic.com https://*.googleapis.com https://*.ggpht.com; connect-src 'self' https://api.web3forms.com https://maps.googleapis.com https://places.googleapis.com; worker-src 'self' blob:"
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Do not serve dotfiles or local environment files, whatever ends up uploaded.
+# ---------------------------------------------------------------------------
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
+<FilesMatch "(^\.env|\.env\.|\.map$|\.mjs\.map$|^npm-debug\.log)">
+  Require all denied
+</FilesMatch>
+
+# ---------------------------------------------------------------------------
+# Caching. Astro fingerprints everything under /_astro/, so those are
+# immutable; HTML must always be revalidated.
+# ---------------------------------------------------------------------------
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 month"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+ErrorDocument 404 /404.html

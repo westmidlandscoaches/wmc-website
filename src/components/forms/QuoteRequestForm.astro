@@ -1061,7 +1061,7 @@ const vehicleCopy: Record<string, string> = {
   }
 
   /*
-   * The review blocks are injected with innerHTML, so they never carry the
+   * The review blocks are created at runtime, so they never carry the
    * scoped-style attribute. These rules are scoped by the container instead.
    */
   .review__grid :global(.review__block) {
@@ -1529,16 +1529,6 @@ const vehicleCopy: Record<string, string> = {
   const mapsKey = host?.dataset.mapsKey?.trim() ?? '';
 
   if (host && mapsKey) {
-    /**
-     * Development-only tracing for the Places integration. Never receives the
-     * API key, a customer address, a query or any form data — only load state
-     * and Google's own error text.
-     */
-    const trace = (message: string) => {
-      if (!import.meta.env.DEV) return;
-      console.info('[WMC places] ' + message);
-    };
-
     let placesPromise: Promise<PlacesLib | null> | null = null;
 
     /** Loads the Maps JS API once, on the first keystroke in an address field. */
@@ -1552,27 +1542,16 @@ const vehicleCopy: Record<string, string> = {
 
         const importLib = () => {
           const fn = w.google?.maps?.importLibrary;
-          if (!fn) {
-            trace('maps js loaded: no — google.maps.importLibrary is unavailable');
-            return resolve(null);
-          }
-          trace('maps js loaded: yes');
+          if (!fn) return resolve(null);
           fn('places')
             .then((lib) => {
               const ok = Boolean(
                 (lib as PlacesLib)?.AutocompleteSuggestion &&
                   (lib as PlacesLib)?.AutocompleteSessionToken,
               );
-              trace('places library loaded: ' + (ok ? 'yes' : 'no — unexpected library shape'));
               resolve(ok ? (lib as PlacesLib) : null);
             })
-            .catch((error: unknown) => {
-              trace(
-                'places library loaded: no — ' +
-                  (error instanceof Error ? error.message : String(error)),
-              );
-              resolve(null);
-            });
+            .catch(() => resolve(null));
         };
 
         if (w.google?.maps?.importLibrary) return importLib();
@@ -1594,27 +1573,16 @@ const vehicleCopy: Record<string, string> = {
 
         globals[callbackName] = () => {
           const fn = w.google?.maps?.importLibrary;
-          if (!fn) {
-            trace('maps js loaded: no — callback fired without importLibrary');
-            return finish(null);
-          }
-          trace('maps js loaded: yes');
+          if (!fn) return finish(null);
           fn('places')
             .then((lib) => {
               const ok = Boolean(
                 (lib as PlacesLib)?.AutocompleteSuggestion &&
                   (lib as PlacesLib)?.AutocompleteSessionToken,
               );
-              trace('places library loaded: ' + (ok ? 'yes' : 'no — unexpected library shape'));
               finish(ok ? (lib as PlacesLib) : null);
             })
-            .catch((error: unknown) => {
-              trace(
-                'places library loaded: no — ' +
-                  (error instanceof Error ? error.message : String(error)),
-              );
-              finish(null);
-            });
+            .catch(() => finish(null));
         };
 
         const script = document.createElement('script');
@@ -1624,15 +1592,9 @@ const vehicleCopy: Record<string, string> = {
           '?libraries=places&loading=async&v=weekly' +
           '&callback=' + callbackName +
           '&key=' + encodeURIComponent(mapsKey);
-        script.addEventListener('error', () => {
-          trace('maps js loaded: no — loader script failed to load');
-          finish(null);
-        });
+        script.addEventListener('error', () => finish(null));
         // A blocked or hung loader must not leave typing waiting forever.
-        window.setTimeout(() => {
-          if (!settled) trace('maps js loaded: no — timed out waiting for callback');
-          finish(null);
-        }, 10000);
+        window.setTimeout(() => finish(null), 10000);
         document.head.appendChild(script);
       });
 
@@ -1733,12 +1695,8 @@ const vehicleCopy: Record<string, string> = {
           if (!address) return;
           // Keep a venue or airport name that the postal address omits.
           commit(name && !address.startsWith(name) ? `${name}, ${address}` : address);
-        } catch (error: unknown) {
-          // The prediction text already in the field remains valid.
-          trace(
-            'place details: failed — ' +
-              (error instanceof Error ? error.message : String(error)),
-          );
+        } catch {
+          /* The prediction text already in the field remains valid. */
         }
         // A session ends with a selection; the next query starts a new one.
         sessionToken = null;
@@ -1782,10 +1740,7 @@ const vehicleCopy: Record<string, string> = {
 
       const query = async (text: string) => {
         const places = await loadPlaces();
-        if (!places) {
-          trace('autocomplete request: skipped — places library unavailable');
-          return close();
-        }
+        if (!places) return close();
 
         const mine = (sequence += 1);
         try {
@@ -1796,7 +1751,6 @@ const vehicleCopy: Record<string, string> = {
             sessionToken,
           });
           if (mine !== sequence) return; // a newer keystroke already won
-          trace('autocomplete request: success — ' + suggestions.length + ' suggestion(s)');
 
           rows = suggestions
             .map((s) => s.placePrediction)
@@ -1809,12 +1763,8 @@ const vehicleCopy: Record<string, string> = {
               prediction,
             }));
           render();
-        } catch (error: unknown) {
+        } catch {
           // Quota, network or key problems all degrade to manual typing.
-          trace(
-            'autocomplete request: failed — ' +
-              (error instanceof Error ? error.message : String(error)),
-          );
           close();
         }
       };
@@ -2184,7 +2134,7 @@ const vehicleCopy: Record<string, string> = {
         el.hidden = true;
       });
       form.querySelectorAll<HTMLElement>('[data-error-list]').forEach((el) => {
-        el.innerHTML = '';
+        el.replaceChildren();
       });
     };
 
@@ -2205,7 +2155,7 @@ const vehicleCopy: Record<string, string> = {
       errors.forEach((error) => setError(error.name, error.message));
 
       if (list) {
-        list.innerHTML = '';
+        list.replaceChildren();
         errors.forEach((error) => {
           const li = document.createElement('li');
           const link = document.createElement('a');
@@ -2226,9 +2176,6 @@ const vehicleCopy: Record<string, string> = {
     };
 
     // --- review ---
-    const escape = (v: string) =>
-      v.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
-
     const renderReview = () => {
       if (!reviewBody) return;
       const stops = stopList
@@ -2302,22 +2249,43 @@ const vehicleCopy: Record<string, string> = {
         },
       ];
 
-      reviewBody.innerHTML = groups
-        .map(
-          (group) => `
-          <div class="review__block${group.wide ? ' review__block--wide' : ''}">
-            <div class="review__head">
-              <h4>${escape(group.title)}</h4>
-              <button type="button" class="review__edit" data-edit-step="${group.step}">Edit</button>
-            </div>
-            <dl>
-              ${group.rows
-                .map(([label, val]) => `<dt>${escape(label)}</dt><dd>${escape(val || '—')}</dd>`)
-                .join('')}
-            </dl>
-          </div>`,
-        )
-        .join('');
+      // Built as DOM nodes, never as an HTML string: every customer value goes
+      // in through textContent, so it cannot be interpreted as markup.
+      const blocks = groups.map((group) => {
+        const block = document.createElement('div');
+        block.className = 'review__block' + (group.wide ? ' review__block--wide' : '');
+
+        const head = document.createElement('div');
+        head.className = 'review__head';
+
+        const heading = document.createElement('h4');
+        heading.textContent = group.title;
+        head.appendChild(heading);
+
+        const edit = document.createElement('button');
+        edit.type = 'button';
+        edit.className = 'review__edit';
+        edit.dataset.editStep = String(group.step);
+        edit.textContent = 'Edit';
+        head.appendChild(edit);
+
+        block.appendChild(head);
+
+        const dl = document.createElement('dl');
+        for (const [label, val] of group.rows) {
+          const dt = document.createElement('dt');
+          dt.textContent = label;
+          const dd = document.createElement('dd');
+          dd.textContent = val || '—';
+          dl.appendChild(dt);
+          dl.appendChild(dd);
+        }
+        block.appendChild(dl);
+
+        return block;
+      });
+
+      reviewBody.replaceChildren(...blocks);
     };
 
     reviewBody?.addEventListener('click', (event) => {
@@ -2473,19 +2441,6 @@ const vehicleCopy: Record<string, string> = {
       return `${whatsappBase}?text=${encodeURIComponent(lines.join('\n'))}`;
     };
 
-    /**
-     * Development-only delivery diagnostics. Web3Forms answers a rejected
-     * submission with a specific reason (an unrecognised access key, for
-     * instance) that the customer-facing error panel deliberately never shows.
-     * Only the HTTP status, the success flag and Web3Forms' own message are
-     * ever passed here — never a field name, a field value, or the FormData
-     * itself, so no enquiry data can reach the console.
-     */
-    const reportDeliveryFailure = (detail: string) => {
-      if (!import.meta.env.DEV) return;
-      console.warn(`[WMC quote request] Web3Forms did not accept the submission — ${detail}`);
-    };
-
     const setSending = (state: boolean) => {
       sending = state;
       if (!submitButton) return;
@@ -2522,7 +2477,6 @@ const vehicleCopy: Record<string, string> = {
 
       if (!getAccessKey()) {
         // Without a key nothing can be delivered, so never claim success.
-        reportDeliveryFailure('missing access key: PUBLIC_WEB3FORMS_ACCESS_KEY is empty');
         showResult(errorPanel, successPanel);
         return;
       }
@@ -2538,11 +2492,6 @@ const vehicleCopy: Record<string, string> = {
         const delivered = response.ok && result?.success === true;
 
         if (!delivered) {
-          reportDeliveryFailure(
-            `status ${response.status} · success ${String(result?.success)} · ${
-              result?.message ?? 'no message returned'
-            }`,
-          );
           showResult(errorPanel, successPanel);
           return;
         }
@@ -2608,13 +2557,12 @@ const vehicleCopy: Record<string, string> = {
       const fleet = params.get('fleet');
       const allowedFleet = ['car', 'minibus', 'coach'];
       if (fleet && allowedFleet.includes(fleet)) {
-        const radio = form.querySelector<HTMLInputElement>(
-          `input[name="vehicle_category"][value="${fleet}"]`,
+        const categories = Array.from(
+          form.querySelectorAll<HTMLInputElement>('input[name="vehicle_category"]'),
         );
+        const radio = categories.find((r) => r.value === fleet);
         if (radio) {
-          form
-            .querySelectorAll<HTMLInputElement>('input[name="vehicle_category"]')
-            .forEach((r) => (r.checked = false));
+          categories.forEach((r) => (r.checked = false));
           radio.checked = true;
         }
       }
@@ -2628,13 +2576,12 @@ const vehicleCopy: Record<string, string> = {
       }
 
       if (service) {
-        const levelRadio = form.querySelector<HTMLInputElement>(
-          `input[name="service_level"][value="${service}"]`,
+        const levels = Array.from(
+          form.querySelectorAll<HTMLInputElement>('input[name="service_level"]'),
         );
+        const levelRadio = levels.find((r) => r.value === service);
         if (levelRadio) {
-          form
-            .querySelectorAll<HTMLInputElement>('input[name="service_level"]')
-            .forEach((r) => (r.checked = false));
+          levels.forEach((r) => (r.checked = false));
           levelRadio.checked = true;
         }
       }
