@@ -10,18 +10,13 @@ import {
   fleetSlots,
   vehicleLabel,
   FLEET_TOTAL,
-  type FleetSlot,
   type FleetVehicle,
   type VehicleCategory,
 } from '../../data/fleet';
 
 const heroVisual = getCutout('coach-01')!;
 
-const slots = fleetSlots();
-const confirmedVehicles: FleetVehicle[] = slots
-  .filter((slot): slot is Extract<FleetSlot, { status: 'confirmed' }> => slot.status === 'confirmed')
-  .map((slot) => slot.vehicle);
-const pendingCount = slots.length - confirmedVehicles.length;
+const confirmedVehicles: FleetVehicle[] = fleetSlots();
 
 const categories: {
   id: string;
@@ -160,31 +155,15 @@ const quoteHref = (vehicle: FleetVehicle) =>
     </Section>
   ))}
 
-  <!-- The remaining fleet slots, shown honestly rather than filled in. -->
+  <!-- Client-provided compliance statement. Nothing beyond what WMC confirmed. -->
   <Section as="div" surface="warm-white">
     <PageContainer>
-      <div class="pending">
-        <header class="pending__head">
-          <p class="eyebrow">Also in the fleet</p>
-          <h2 class="text-h4 pending__title">
-            {`${pendingCount} of the ${FLEET_TOTAL} WMC vehicles are still being documented.`}
-          </h2>
-          <p class="text-body pending__copy">
-            WMC owns {FLEET_TOTAL} vehicles. Details for the remaining {pendingCount} are being
-            confirmed and will be published once verified.
-          </p>
-        </header>
-
-        <ul class="pending__list">
-          {Array.from({ length: pendingCount }, (_, index) => (
-            <li class="pending__slot">
-              <span class="pending__index">
-                {`Vehicle ${String(confirmedVehicles.length + index + 1).padStart(2, '0')}`}
-              </span>
-              <span class="pending__status">Vehicle details awaiting confirmation</span>
-            </li>
-          ))}
-        </ul>
+      <div class="standards">
+        <p class="eyebrow">Professional standards</p>
+        <p class="text-body-large standards__copy">
+          All WMC fleet vehicles are DVSA approved, and WMC drivers hold the appropriate licences
+          for the transport they operate.
+        </p>
       </div>
     </PageContainer>
   </Section>
@@ -468,60 +447,16 @@ const quoteHref = (vehicle: FleetVehicle) =>
     min-block-size: var(--touch-target-min);
   }
 
-  /* ----------------------------- Pending ----------------------------- */
-  .pending__head {
-    max-inline-size: 60ch;
-    margin-block-end: var(--space-4);
-  }
-
-  .pending__title {
-    margin: 0 0 var(--space-2);
-  }
-
-  .pending__copy {
-    color: var(--color-slate-taupe);
-    margin: 0;
-  }
-
-  .pending__list {
-    display: grid;
-    gap: var(--space-2);
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  @media (min-width: 640px) {
-    .pending__list {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  .pending__slot {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding: var(--space-3);
-    border: 1px dashed var(--color-linen-border);
-    border-radius: var(--radius-panel);
-    background-color: var(--color-heritage-ivory);
-  }
-
-  .pending__index {
-    font-size: var(--text-small);
-    line-height: var(--leading-small);
-    font-weight: var(--font-weight-semibold);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--color-slate-taupe);
-  }
-
-  .pending__status {
-    color: var(--color-ink);
-    font-weight: var(--font-weight-semibold);
-  }
-
   /* ------------------------------ Help ------------------------------- */
+  .standards {
+    max-inline-size: 62ch;
+  }
+
+  .standards__copy {
+    margin: 0;
+    color: var(--color-ink);
+  }
+
   .help {
     display: grid;
     gap: var(--space-4);

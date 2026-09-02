@@ -2,49 +2,268 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageContainer from '../../components/ui/PageContainer.astro';
 import Section from '../../components/ui/Section.astro';
+import Button from '../../components/ui/Button.astro';
 import PageHero from '../../components/content/PageHero.astro';
 import { getCutout } from '../../data/fleetVisuals';
+import { contact } from '../../data/navigation';
+import { FLEET_TOTAL, fleetByCategory } from '../../data/fleet';
 
 const heroVisual = getCutout('coach-02')!;
+
+/* Category counts are derived from the central fleet record, so this page can
+   never drift from the vehicles WMC has actually confirmed. */
+const fleetCategories = [
+  {
+    href: '/fleet/#cars',
+    title: 'Cars',
+    count: fleetByCategory('car').length,
+    copy: 'Chauffeur-driven transport for individual and smaller-party requirements.',
+  },
+  {
+    href: '/fleet/#minibuses',
+    title: 'Minibuses',
+    count: fleetByCategory('minibus').length,
+    copy: 'Group transport for journeys that require more passenger capacity.',
+  },
+  {
+    href: '/fleet/#coaches',
+    title: 'Coaches',
+    count: fleetByCategory('coach').length,
+    copy: 'Larger-group passenger transport.',
+  },
+];
+
+const howItWorks = [
+  {
+    index: '01',
+    title: 'The journey comes first',
+    copy: 'WMC starts with the route, the timing, the passengers and what is travelling with them — not with a vehicle from a list.',
+  },
+  {
+    index: '02',
+    title: 'Appropriate transport is matched',
+    copy: 'The vehicle is chosen against those requirements, across Cars, Minibuses and Coaches.',
+  },
+  {
+    index: '03',
+    title: 'A bespoke quotation is prepared',
+    copy: 'Every quotation is built around the specific journey. WMC does not publish fixed prices or take instant bookings.',
+  },
+];
+
+const confidencePoints = [
+  {
+    title: 'A company-owned fleet',
+    copy: `All ${FLEET_TOTAL} vehicles belong to WMC. What you see on the Fleet page is the transport WMC actually operates.`,
+  },
+  {
+    title: 'Driver-operated only',
+    copy: 'Every WMC journey is driver-operated. Self-drive hire is not offered.',
+  },
+  {
+    title: 'Organised, not just supplied',
+    copy: 'Route, timing and stops are treated as part of the arrangement rather than left to the day itself.',
+  },
+  {
+    title: 'One point of arrangement',
+    copy: 'Journey details given to WMC carry through to the quotation, so the requirement is not re-explained at each stage.',
+  },
+];
+
+const whoWeTransport = [
+  { href: '/services/#airport-transfers', title: 'Airport Transfers', copy: 'Organised around flight times, terminals and passenger numbers.' },
+  { href: '/services/#corporate-transport', title: 'Corporate Transport', copy: 'Staff, client and business event travel.' },
+  { href: '/services/#private-group-transport', title: 'Private Group Transport', copy: 'Groups travelling together under one arrangement.' },
+  { href: '/services/#wedding-transport', title: 'Wedding Transport', copy: 'Organised around the timing and party of the day.' },
+  { href: '/services/#schools-education', title: 'Schools & Education', copy: 'Education groups, timing and numbers.' },
+  { href: '/services/#day-trips-excursions', title: 'Day Trips & Excursions', copy: 'Transport built around the itinerary.' },
+];
 ---
 
 <BaseLayout
   title="About | West Midlands Coaches"
-  description="West Midlands Coaches organises private passenger transport across Birmingham and the West Midlands with a company-owned fleet of Cars, Minibuses and Coaches."
+  description={`West Midlands Coaches Ltd has organised private passenger transport across Birmingham and the West Midlands since 2014, with ${FLEET_TOTAL} company-owned, driver-operated Cars, Minibuses and Coaches.`}
   path="/about/"
 >
   <PageHero
     priority
     eyebrow="Established 2014"
     breadcrumb={[{ label: 'Home', href: '/' }, { label: 'About' }]}
-    title="About West Midlands Coaches."
-    lead="Established in 2014, WMC organises private passenger transport from Birmingham and the West Midlands using a company-owned fleet across Cars, Minibuses and Coaches."
+    title="Transport, properly organised."
+    lead={`Established in 2014, West Midlands Coaches Ltd organises private passenger transport from Birmingham and the West Midlands using a company-owned fleet of ${FLEET_TOTAL} Cars, Minibuses and Coaches.`}
     primaryCta={{ label: 'Request a Quote', href: '/request-a-quote/' }}
     secondaryCta={{ label: 'View Fleet', href: '/fleet/' }}
     image={heroVisual.image}
     imageAlt={heroVisual.alt}
     cutout
     caption="WMC coach fleet"
+    detail={['Established 2014', 'Birmingham & the West Midlands', 'Driver-operated']}
   />
 
+  <!-- WHO WE ARE -->
   <Section as="div" surface="warm-white">
     <PageContainer>
       <div class="about">
         <div class="about__aside">
-          <p class="eyebrow">How WMC works</p>
+          <p class="eyebrow">Who we are</p>
           <hr class="journey-line about__line" data-journey-line aria-hidden="true" />
         </div>
 
         <div class="about__body">
           <p class="text-body-large">
-            WMC operates a company-owned fleet of 14 vehicles across Cars, Minibuses and Coaches, all
-            driver-operated. Rather than simply supplying a vehicle, WMC organises the journey itself
-            &mdash; matching appropriate transport to the people, route and requirements involved, and
-            preparing a bespoke quotation around those details.
+            West Midlands Coaches Ltd is a private passenger transport company based in Birmingham,
+            operating across the wider West Midlands. The company was established in 2014 and grew
+            out of a family connection with the transport industry &mdash; beginning as a smaller
+            operation and building, over time, into the company-owned fleet of {FLEET_TOTAL} vehicles
+            WMC runs today.
           </p>
           <p class="text-body-large">
-            WMC's primary market is Birmingham and the wider West Midlands.
+            That fleet spans three categories &mdash; Cars, Minibuses and Coaches &mdash; and every
+            vehicle in it is driver-operated. WMC does not offer self-drive hire, and does not
+            broker journeys out to a vehicle it does not own.
           </p>
+          <p class="text-body-large about__statement">
+            Organise the journey, not just the vehicle.
+          </p>
+        </div>
+      </div>
+    </PageContainer>
+  </Section>
+
+  <!-- HOW WMC WORKS -->
+  <Section as="div" surface="heritage-ivory">
+    <PageContainer>
+      <header class="section-head">
+        <p class="eyebrow">How WMC works</p>
+        <h2 class="section-head__title">A journey-first way of arranging transport.</h2>
+      </header>
+
+      <ol class="steps">
+        {howItWorks.map((step, index) => (
+          <li class="steps__item" data-reveal style={`--reveal-delay:${index * 80}ms`}>
+            <span class="steps__index" aria-hidden="true">{step.index}</span>
+            <hr class="steps__rule" aria-hidden="true" />
+            <h3 class="text-h4 steps__title">{step.title}</h3>
+            <p class="text-body steps__copy">{step.copy}</p>
+          </li>
+        ))}
+      </ol>
+    </PageContainer>
+  </Section>
+
+  <!-- OUR FLEET -->
+  <Section as="div" surface="warm-white">
+    <PageContainer>
+      <header class="section-head">
+        <p class="eyebrow">Our fleet</p>
+        <h2 class="section-head__title">{FLEET_TOTAL} WMC-owned vehicles.</h2>
+      </header>
+
+      <div class="categories">
+        {fleetCategories.map((category, index) => (
+          <a class="card categories__card" href={category.href} data-reveal style={`--reveal-delay:${index * 70}ms`}>
+            <span class="categories__count">{category.count}</span>
+            <h3 class="text-h5 categories__title">{category.title}</h3>
+            <p class="text-small categories__copy">{category.copy}</p>
+            <span class="arrow-link categories__action">Explore</span>
+          </a>
+        ))}
+      </div>
+
+      <p class="text-body categories__note">
+        Each vehicle is listed with the capacity, colour, service level and features WMC has
+        confirmed for it &mdash; nothing beyond that.
+      </p>
+    </PageContainer>
+  </Section>
+
+  <!-- JOURNEY CONFIDENCE -->
+  <Section as="div" surface="obsidian">
+    <PageContainer>
+      <header class="section-head">
+        <p class="eyebrow eyebrow--dark">Journey Confidence</p>
+        <h2 class="section-head__title section-head__title--dark">
+          Knowing the journey has actually been organised.
+        </h2>
+      </header>
+
+      <ul class="confidence">
+        {confidencePoints.map((point, index) => (
+          <li class="card card--dark confidence__item" data-reveal style={`--reveal-delay:${index * 70}ms`}>
+            <h3 class="text-h6 confidence__title">{point.title}</h3>
+            <p class="text-small confidence__copy">{point.copy}</p>
+          </li>
+        ))}
+      </ul>
+    </PageContainer>
+  </Section>
+
+  <!-- WHO WE TRANSPORT -->
+  <Section as="div" surface="heritage-ivory">
+    <PageContainer>
+      <header class="section-head">
+        <p class="eyebrow">Who we transport</p>
+        <h2 class="section-head__title">The journeys WMC organises.</h2>
+      </header>
+
+      <ul class="transport">
+        {whoWeTransport.map((item, index) => (
+          <li data-reveal style={`--reveal-delay:${index * 55}ms`}>
+            <a class="card transport__row" href={item.href}>
+              <span class="transport__text">
+                <span class="text-h6 transport__title">{item.title}</span>
+                <span class="text-small transport__copy">{item.copy}</span>
+              </span>
+              <span class="transport__arrow" aria-hidden="true">&#8594;</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </PageContainer>
+  </Section>
+
+  <!-- COMPLIANCE / PROFESSIONAL STANDARDS -->
+  <Section as="div" surface="warm-white">
+    <PageContainer>
+      <div class="about">
+        <div class="about__aside">
+          <p class="eyebrow">Professional standards</p>
+          <hr class="journey-line about__line" data-journey-line aria-hidden="true" />
+        </div>
+
+        <div class="about__body">
+          <p class="text-body-large">
+            All WMC fleet vehicles are DVSA approved, and WMC drivers hold the appropriate licences
+            for the transport they operate.
+          </p>
+          <p class="text-body">
+            {contact.companyName} is registered in England and Wales, company number
+            {' '}{contact.companyNumber}.
+          </p>
+        </div>
+      </div>
+    </PageContainer>
+  </Section>
+
+  <!-- CTA -->
+  <Section as="div" surface="night-graphite">
+    <PageContainer>
+      <div class="cta">
+        <div>
+          <p class="eyebrow eyebrow--dark">Request a quotation</p>
+          <h2 class="text-h3 cta__title">Tell us about your journey.</h2>
+        </div>
+        <div class="cta__body">
+          <p class="text-body-large cta__copy">
+            Share the route, timing and passenger numbers and WMC will prepare a quotation around
+            the journey.
+          </p>
+          <div class="cta__actions">
+            <Button href="/request-a-quote/" variant="primary" tone="dark">Request a Quote</Button>
+            <Button href={contact.phoneHref} variant="secondary" tone="dark">
+              Call {contact.phoneDisplay}
+            </Button>
+          </div>
         </div>
       </div>
     </PageContainer>
@@ -52,6 +271,7 @@ const heroVisual = getCutout('coach-02')!;
 </BaseLayout>
 
 <style>
+  /* ------------------------- Narrative blocks ------------------------- */
   .about {
     display: grid;
     gap: var(--space-4);
@@ -69,9 +289,229 @@ const heroVisual = getCutout('coach-02')!;
     color: var(--color-ink);
   }
 
+  .about__body > * {
+    margin: 0;
+  }
+
+  .about__statement {
+    padding-inline-start: var(--space-3);
+    border-inline-start: 1px solid var(--gold-rule-strong);
+    font-weight: var(--font-weight-semibold);
+  }
+
   @media (min-width: 1024px) {
     .about {
       grid-template-columns: 3fr 8fr;
+      gap: var(--space-7);
+      align-items: start;
+    }
+  }
+
+  /* ----------------------------- How it works ----------------------------- */
+  .steps {
+    display: grid;
+    gap: var(--space-5);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .steps__index {
+    display: block;
+    font-size: var(--text-h6);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.08em;
+    color: var(--color-champagne-gold);
+  }
+
+  .steps__rule {
+    inline-size: 100%;
+    block-size: 1px;
+    border: 0;
+    margin: var(--space-2) 0 var(--space-3);
+    background-color: var(--color-linen-border);
+  }
+
+  .steps__title {
+    margin: 0 0 var(--space-2);
+  }
+
+  .steps__copy {
+    margin: 0;
+    color: var(--color-slate-taupe);
+  }
+
+  @media (min-width: 768px) {
+    .steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-4);
+    }
+  }
+
+  /* ------------------------------ Fleet ------------------------------ */
+  .categories {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .categories__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-3);
+    text-decoration: none;
+    min-inline-size: 0;
+  }
+
+  .categories__count {
+    font-size: var(--text-h2);
+    line-height: 1;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-obsidian);
+  }
+
+  .categories__title {
+    margin: var(--space-1) 0 0;
+  }
+
+  .categories__copy {
+    margin: 0;
+    color: var(--color-slate-taupe);
+  }
+
+  .categories__action {
+    margin-block-start: var(--space-3);
+  }
+
+  .categories__note {
+    margin: var(--space-4) 0 0;
+    max-inline-size: 62ch;
+    color: var(--color-slate-taupe);
+  }
+
+  @media (min-width: 640px) {
+    .categories {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* -------------------------- Journey Confidence -------------------------- */
+  .confidence {
+    display: grid;
+    gap: var(--space-3);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .confidence__item {
+    padding: var(--space-3);
+    min-inline-size: 0;
+  }
+
+  .confidence__title {
+    margin: 0 0 var(--space-1);
+    color: var(--color-warm-white);
+  }
+
+  .confidence__copy {
+    margin: 0;
+    color: var(--color-mist-taupe);
+  }
+
+  @media (min-width: 640px) {
+    .confidence {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .confidence {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  /* --------------------------- Who we transport --------------------------- */
+  .transport {
+    display: grid;
+    gap: var(--space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .transport__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    min-block-size: var(--touch-target-min);
+    padding: var(--space-3);
+    text-decoration: none;
+    min-inline-size: 0;
+  }
+
+  .transport__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-inline-size: 0;
+  }
+
+  .transport__title {
+    color: var(--color-obsidian);
+  }
+
+  .transport__copy {
+    color: var(--color-slate-taupe);
+  }
+
+  .transport__arrow {
+    flex-shrink: 0;
+    color: var(--color-champagne-gold);
+    transition: transform var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .transport__row:hover .transport__arrow {
+      transform: translateX(4px);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .transport {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-3);
+    }
+  }
+
+  /* -------------------------------- CTA -------------------------------- */
+  .cta {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .cta__title {
+    margin: 0;
+    color: var(--color-warm-white);
+    max-inline-size: 18ch;
+  }
+
+  .cta__copy {
+    margin: 0 0 var(--space-4);
+    color: var(--color-mist-taupe);
+    max-inline-size: 54ch;
+  }
+
+  .cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  @media (min-width: 1024px) {
+    .cta {
+      grid-template-columns: 5fr 7fr;
       gap: var(--space-7);
       align-items: start;
     }

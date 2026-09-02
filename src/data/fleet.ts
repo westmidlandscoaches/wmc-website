@@ -9,9 +9,11 @@
 
 import car01NoBg from '../assets/images/fleet/cars/wmc-car-01-nobg.webp';
 import car02NoBg from '../assets/images/fleet/cars/wmc-car-02-nobg.webp';
+import car03NoBg from '../assets/images/fleet/cars/wmc-car-03-nobg.webp';
 import minibus04NoBg from '../assets/images/fleet/minibuses/wmc-minibus-04-nobg.webp';
 import minibus05NoBg from '../assets/images/fleet/minibuses/wmc-minibus-05-nobg.webp';
 import minibus06NoBg from '../assets/images/fleet/minibuses/wmc-minibus-06-nobg.webp';
+import minibus07NoBg from '../assets/images/fleet/minibuses/wmc-minibus-07-nobg.webp';
 import coach01NoBg from '../assets/images/fleet/coaches/wmc-coach-01-nobg.webp';
 import coach02NoBg from '../assets/images/fleet/coaches/wmc-coach-02-nobg.webp';
 
@@ -40,17 +42,8 @@ export interface FleetVehicle {
   image?: ImageMetadata;
 }
 
-/**
- * One slot in the 14-vehicle fleet. Three slots are unconfirmed: WMC has not
- * yet supplied those vehicle identities, so they are shown as awaiting
- * confirmation rather than filled with invented vehicles.
- */
-export type FleetSlot =
-  | { status: 'confirmed'; vehicle: FleetVehicle }
-  | { status: 'awaiting-confirmation' };
-
-/** Official fleet size stated by WMC. */
-export const FLEET_TOTAL = 14;
+/** Official fleet size stated by WMC. Every vehicle in it is confirmed. */
+export const FLEET_TOTAL = 11;
 
 export const fleetVehicles: FleetVehicle[] = [
   {
@@ -73,6 +66,7 @@ export const fleetVehicles: FleetVehicle[] = [
     serviceLevel: 'Executive',
     category: 'car',
     features: [],
+    image: car03NoBg,
   },
 
   {
@@ -115,6 +109,7 @@ export const fleetVehicles: FleetVehicle[] = [
       'TV',
       'Fridge',
     ],
+    image: minibus07NoBg,
   },
   {
     id: 'sprinter-16-white-executive',
@@ -125,6 +120,13 @@ export const fleetVehicles: FleetVehicle[] = [
     serviceLevel: 'Executive',
     category: 'minibus',
     features: ['Air Conditioning', 'Leather Seats', 'Armrests', 'Charging Ports'],
+    /*
+     * Photography pending. WMC supplied one identical file under two different
+     * vehicle names ("16-Seater Executive" and "19-Seater Standard"), so it
+     * identifies neither vehicle on its own. The asset is ingested as
+     * minibus-08 and stays unassigned until WMC confirms which vehicle it is,
+     * rather than being published as a coin-flip between the two.
+     */
   },
   {
     id: 'sprinter-16-white-standard-02',
@@ -221,16 +223,9 @@ export function fleetBySeatGroup(): { seatGroup: string; vehicles: FleetVehicle[
   return groups;
 }
 
-/** All 14 slots: the 11 confirmed vehicles, then the 3 still to be supplied. */
-export function fleetSlots(): FleetSlot[] {
-  const confirmed: FleetSlot[] = fleetVehicles.map((vehicle) => ({
-    status: 'confirmed',
-    vehicle,
-  }));
-  const pending: FleetSlot[] = Array.from({ length: FLEET_TOTAL - fleetVehicles.length }, () => ({
-    status: 'awaiting-confirmation',
-  }));
-  return [...confirmed, ...pending];
+/** Every vehicle in the fleet, in the client's listed order. */
+export function fleetSlots(): FleetVehicle[] {
+  return fleetVehicles;
 }
 
 /** Vehicles in one booking category. */

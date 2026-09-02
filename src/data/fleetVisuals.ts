@@ -28,12 +28,15 @@ import coach02Exterior2 from '../assets/images/fleet/coaches/wmc-coach-02-exteri
 
 import car01NoBg from '../assets/images/fleet/cars/wmc-car-01-nobg.webp';
 import car02NoBg from '../assets/images/fleet/cars/wmc-car-02-nobg.webp';
+import car03NoBg from '../assets/images/fleet/cars/wmc-car-03-nobg.webp';
 import minibus01NoBg from '../assets/images/fleet/minibuses/wmc-minibus-01-nobg.webp';
 import minibus02NoBg from '../assets/images/fleet/minibuses/wmc-minibus-02-nobg.webp';
 import minibus03NoBg from '../assets/images/fleet/minibuses/wmc-minibus-03-nobg.webp';
 import minibus04NoBg from '../assets/images/fleet/minibuses/wmc-minibus-04-nobg.webp';
 import minibus05NoBg from '../assets/images/fleet/minibuses/wmc-minibus-05-nobg.webp';
 import minibus06NoBg from '../assets/images/fleet/minibuses/wmc-minibus-06-nobg.webp';
+import minibus07NoBg from '../assets/images/fleet/minibuses/wmc-minibus-07-nobg.webp';
+import minibus08NoBg from '../assets/images/fleet/minibuses/wmc-minibus-08-nobg.webp';
 import coach01NoBg from '../assets/images/fleet/coaches/wmc-coach-01-nobg.webp';
 import coach02NoBg from '../assets/images/fleet/coaches/wmc-coach-02-nobg.webp';
 
@@ -259,6 +262,17 @@ export const fleetVisuals: FleetVisual[] = [
     alt: 'WMC chauffeur vehicle, front three-quarter studio view with the background removed',
   },
   {
+    id: 'car-03-cutout',
+    vehicleGroup: 'car-03',
+    galleryOrder: 0,
+    groupCover: true,
+    cutout: true,
+    category: 'car',
+    view: 'exterior',
+    image: car03NoBg,
+    alt: 'WMC Mercedes-Benz S-Class in West Midlands Coaches livery, front three-quarter studio view with the background removed',
+  },
+  {
     id: 'minibus-01-cutout',
     vehicleGroup: 'minibus-01',
     galleryOrder: 0,
@@ -323,6 +337,28 @@ export const fleetVisuals: FleetVisual[] = [
     view: 'exterior',
     image: minibus06NoBg,
     alt: 'WMC minibus, front three-quarter studio view with the background removed',
+  },
+  {
+    id: 'minibus-07-cutout',
+    vehicleGroup: 'minibus-07',
+    galleryOrder: 0,
+    groupCover: true,
+    cutout: true,
+    category: 'minibus',
+    view: 'exterior',
+    image: minibus07NoBg,
+    alt: 'WMC Mercedes-Benz Sprinter in West Midlands Coaches livery, front three-quarter studio view with the background removed',
+  },
+  {
+    id: 'minibus-08-cutout',
+    vehicleGroup: 'minibus-08',
+    galleryOrder: 0,
+    groupCover: true,
+    cutout: true,
+    category: 'minibus',
+    view: 'exterior',
+    image: minibus08NoBg,
+    alt: 'WMC Mercedes-Benz Sprinter, front three-quarter studio view with the background removed',
   },
   {
     id: 'coach-01-cutout',

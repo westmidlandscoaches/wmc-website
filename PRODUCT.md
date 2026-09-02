@@ -20,7 +20,7 @@ West Midlands Coaches organises private passenger transport (chauffeur-driven ca
 
 ## Positioning
 
-WMC combines a 14-vehicle, company-owned, multi-category fleet (Cars, Minibuses, Coaches) with a journey-first service model: organising the journey, not just supplying a vehicle. The website must make the real fleet inspectable, preserve journey/vehicle context into the quote request, and build "Journey Confidence" through professional organisation — not generic luxury or low-price claims.
+WMC combines an 11-vehicle, company-owned, multi-category fleet (Cars, Minibuses, Coaches) with a journey-first service model: organising the journey, not just supplying a vehicle. The website must make the real fleet inspectable, preserve journey/vehicle context into the quote request, and build "Journey Confidence" through professional organisation — not generic luxury or low-price claims.
 
 ## Operating Context
 
@@ -30,7 +30,7 @@ WMC combines a 14-vehicle, company-owned, multi-category fleet (Cars, Minibuses,
 
 ## Capabilities and Constraints
 
-- Fleet: exactly 14 WMC-owned vehicles across Cars, Minibuses, and Coaches. No invented vehicle counts, models, capacities, or amenities beyond what is confirmed.
+- Fleet: exactly 11 WMC-owned vehicles across Cars, Minibuses, and Coaches. No invented vehicle counts, models, capacities, or amenities beyond what is confirmed.
 - No self-drive; all hire is driver-operated.
 - Pricing is bespoke/quote-based only; do not imply fixed pricing or instant checkout.
 - No accessibility, safety, or guarantee claims beyond what is explicitly confirmed.
@@ -53,7 +53,7 @@ WMC combines a 14-vehicle, company-owned, multi-category fleet (Cars, Minibuses,
 ## Product Principles
 
 1. Organise the journey, not just supply the vehicle — service model and copy should reflect journey-first thinking, not vehicle rental framing.
-2. Real fleet, real confidence — every fleet claim must trace to the 14 confirmed WMC-owned vehicles; never invent specifications.
+2. Real fleet, real confidence — every fleet claim must trace to the 11 confirmed WMC-owned vehicles; never invent specifications.
 3. Bespoke, not instant — the quote flow is consultative; never simulate fixed pricing or instant booking.
 4. Premium via restraint — proportion, whitespace, typography, and photography carry the premium feel, not decoration or generic luxury signalling.
 5. Brand assets are fixed points — the Gold/Silver logo and Source Sans 3 typography are non-negotiable and must never be recreated or substituted.
