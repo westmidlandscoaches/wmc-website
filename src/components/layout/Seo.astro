@@ -10,6 +10,13 @@ const canonical = canonicalUrl(path);
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
+
+<!--
+  The supplied WMC mark, used exactly as delivered. It is a single 32x32
+  entry, which is why no apple-touch-icon is declared: that needs a 180x180
+  source, and upscaling this one would degrade the mark.
+-->
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
 <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
 
 <meta property="og:type" content="website" />
