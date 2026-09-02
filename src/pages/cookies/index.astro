@@ -1,0 +1,217 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageContainer from '../../components/ui/PageContainer.astro';
+import Section from '../../components/ui/Section.astro';
+import { contact } from '../../data/navigation';
+
+/*
+ * Verified in the browser before this page was written: document.cookie is
+ * empty on every page, including after Google Maps/Places has loaded and
+ * returned predictions, and localStorage is untouched. The only client-side
+ * storage the site uses is one sessionStorage entry for the quote draft.
+ * If a cookie is ever introduced, this page must change with it.
+ */
+const updated = 'September 2026';
+---
+
+<BaseLayout
+  title="Cookie Policy | West Midlands Coaches"
+  description="This website sets no cookies. What it does store on your device, and why."
+  path="/cookies/"
+>
+  <Section as="div" surface="warm-white">
+    <PageContainer>
+      <article class="legal">
+        <header class="legal__head">
+          <p class="eyebrow">Legal</p>
+          <h1 class="text-h2 legal__title">Cookie Policy</h1>
+          <p class="text-body-large legal__lead">
+            This website does not set any cookies.
+          </p>
+          <p class="text-small legal__meta">Last updated: {updated}</p>
+        </header>
+
+        <section class="legal__section">
+          <h2 class="text-h4">No cookies, and no cookie banner</h2>
+          <p>
+            There are no analytics cookies, no advertising or tracking cookies, no social media
+            cookies and no preference cookies on this site. Nothing here follows you between visits
+            or between websites.
+          </p>
+          <p>
+            That is also why you are not asked to accept anything: a consent banner exists to gather
+            permission for non-essential cookies, and this site sets none to consent to.
+          </p>
+        </section>
+
+        <section class="legal__section">
+          <h2 class="text-h4">What is stored on your device</h2>
+          <p>
+            One thing, and only while you are using the quotation form.
+          </p>
+          <dl class="legal__table">
+            <div class="legal__row">
+              <dt>Name</dt>
+              <dd><code>wmc-quote-draft</code></dd>
+            </div>
+            <div class="legal__row">
+              <dt>Type</dt>
+              <dd>Session storage, not a cookie</dd>
+            </div>
+            <div class="legal__row">
+              <dt>Purpose</dt>
+              <dd>
+                Keeps your answers as you move between the three steps of the quotation form, so a
+                reload or a step back does not lose what you have typed.
+              </dd>
+            </div>
+            <div class="legal__row">
+              <dt>Sent anywhere?</dt>
+              <dd>
+                No. Session storage is never attached to network requests. It stays in your browser.
+              </dd>
+            </div>
+            <div class="legal__row">
+              <dt>How long</dt>
+              <dd>
+                Deleted the moment your request is submitted successfully, and cleared by your
+                browser when you close the tab.
+              </dd>
+            </div>
+          </dl>
+          <p>
+            To remove it yourself at any time, close the tab, or clear site data for this site in
+            your browser settings.
+          </p>
+        </section>
+
+        <section class="legal__section">
+          <h2 class="text-h4">Third-party services</h2>
+          <p>
+            The quotation form's address fields use Google's Places service to suggest addresses.
+            Loading that service means your browser contacts Google, and Google may set its own
+            cookies or use its own storage under its domains, outside this site's control. This
+            happens only on the quotation page, and only once you start typing an address. Google's
+            privacy policy governs anything Google stores.
+          </p>
+          <p>
+            Submitting either form sends it to Web3Forms, which delivers it to WMC by email. That is
+            a single outgoing request; it does not set cookies on this site.
+          </p>
+          <p>
+            Both are described in more detail in the{' '}
+            <a class="legal__link" href="/privacy/">privacy policy</a>.
+          </p>
+        </section>
+
+        <section class="legal__section">
+          <h2 class="text-h4">Questions</h2>
+          <p>
+            Contact WMC on <a class="legal__link" href={contact.phoneHref}>{contact.phoneDisplay}</a>{' '}
+            or through the <a class="legal__link" href="/contact/">contact page</a>.
+          </p>
+        </section>
+      </article>
+    </PageContainer>
+  </Section>
+</BaseLayout>
+
+<style>
+  .legal {
+    max-inline-size: 68ch;
+  }
+
+  .legal__head {
+    margin-block-end: var(--space-6);
+  }
+
+  .legal__title {
+    margin: 0 0 var(--space-3);
+  }
+
+  .legal__lead {
+    margin: 0 0 var(--space-3);
+    color: var(--color-ink);
+  }
+
+  .legal__meta {
+    margin: 0;
+    color: var(--color-slate-taupe);
+  }
+
+  .legal__section {
+    margin-block-end: var(--space-6);
+  }
+
+  .legal__section h2 {
+    margin: 0 0 var(--space-2);
+    color: var(--color-obsidian);
+  }
+
+  .legal__section p {
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    color: var(--color-ink);
+  }
+
+  .legal__section p:last-child {
+    margin-block-end: 0;
+  }
+
+  .legal__table {
+    margin: 0 0 var(--space-3);
+    border: var(--border-width-hairline) solid var(--color-linen-border);
+    border-radius: var(--radius-panel);
+    overflow: hidden;
+  }
+
+  .legal__row {
+    display: grid;
+    gap: 2px;
+    padding: var(--space-2) var(--space-3);
+    border-block-end: var(--border-width-hairline) solid var(--color-linen-border);
+  }
+
+  .legal__row:last-child {
+    border-block-end: 0;
+  }
+
+  .legal__row dt {
+    font-size: var(--text-small);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-slate-taupe);
+  }
+
+  .legal__row dd {
+    margin: 0;
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    color: var(--color-ink);
+  }
+
+  .legal__row code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+  }
+
+  @media (min-width: 600px) {
+    .legal__row {
+      grid-template-columns: 12rem minmax(0, 1fr);
+      gap: var(--space-3);
+      align-items: baseline;
+    }
+  }
+
+  .legal__link {
+    color: var(--color-obsidian);
+    text-decoration-color: var(--color-champagne-gold);
+    text-underline-offset: 3px;
+  }
+
+  .legal__link:hover {
+    text-decoration-color: var(--color-obsidian);
+  }
+</style>

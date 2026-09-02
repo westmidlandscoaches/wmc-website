@@ -1,0 +1,253 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageContainer from '../../components/ui/PageContainer.astro';
+import Section from '../../components/ui/Section.astro';
+import { contact } from '../../data/navigation';
+
+/*
+ * Every statement here describes behaviour that exists in this codebase and
+ * was verified in the browser. Nothing is asserted about WMC's internal
+ * handling of enquiries — retention, storage and erasure are WMC's to state,
+ * so this page directs those questions to WMC rather than inventing answers.
+ */
+const updated = 'September 2026';
+---
+
+<BaseLayout
+  title="Privacy Policy | West Midlands Coaches"
+  description="How West Midlands Coaches handles the information you provide through the quotation and contact forms on this website."
+  path="/privacy/"
+>
+  <Section as="div" surface="warm-white">
+    <PageContainer>
+      <article class="legal">
+        <header class="legal__head">
+          <p class="eyebrow">Legal</p>
+          <h1 class="text-h2 legal__title">Privacy Policy</h1>
+          <p class="text-body-large legal__lead">
+            This policy explains what happens to the information you enter on this website. It
+            covers the website only.
+          </p>
+          <p class="text-small legal__meta">Last updated: {updated}</p>
+        </header>
+
+        <section class="legal__section">
+          <h2 class="text-h4">Who we are</h2>
+          <p>
+            {contact.registeredName} (trading as {contact.companyName}), a company registered in
+            England and Wales, company number {contact.companyNumber}, registered at{' '}
+            {contact.address}. WMC is the data controller for information submitted through this
+            website.
+          </p>
+          <p>
+            To ask anything about this policy, or to make a request about your information, contact
+            WMC on <a class="legal__link" href={contact.phoneHref}>{contact.phoneDisplay}</a> or
+            through the details on the{' '}
+            <a class="legal__link" href="/contact/">contact page</a>.
+          </p>
+        </section>
+
+        <section class="legal__section">
+          <h2 class="text-h4">What we collect, and when</h2>
+          <p>
+            This website collects information only when you choose to submit one of its two forms.
+            There is no account system, and nothing is collected from you simply by browsing.
+          </p>
+
+          <h3 class="text-h6">Quotation request form</h3>
+          <p>
+            The <a class="legal__link" href="/request-a-quote/">quotation form</a> collects the
+            journey details you enter: pickup and destination, any additional stops, dates and
+            times, return journey details, passenger numbers, luggage requirements, service level
+            and vehicle preference, journey purpose, how you heard about WMC, any additional notes
+            you write, and your contact details — name, organisation, email address, telephone
+            number and preferred contact method.
+          </p>
+
+          <h3 class="text-h6">Contact form</h3>
+          <p>
+            The <a class="legal__link" href="/contact/">contact form</a> collects your name, email
+            address, telephone number if you provide one, the enquiry type you select, and your
+            message.
+          </p>
+
+          <p>
+            We ask for this information so WMC can understand the journey, prepare a quotation and
+            reply to you. The lawful basis is your request: processing is necessary to take steps
+            at your request before entering into a contract, and in WMC's legitimate interest in
+            responding to enquiries.
+          </p>
+        </section>
+
+        <section class="legal__section">
+          <h2 class="text-h4">How your form submission reaches WMC</h2>
+          <p>
+            This is a static website with no database and no server of its own. When you submit
+            either form, your browser sends the form contents directly to{' '}
+            <a
+              class="legal__link"
+              href="https://web3forms.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Web3Forms
+            </a>, a third-party form-delivery service, which emails the submission to WMC. Web3Forms
+            therefore processes your submission in transit, and their own privacy terms apply to
+            that step.
+          </p>
+          <p>
+            After that, your enquiry sits in WMC's email inbox like any other email. This website
+            keeps no copy of it. How long WMC keeps enquiry emails, and how to ask for yours to be
+            deleted, is a question for WMC directly using the contact details above.
+          </p>
+          <p>
+            If you choose WhatsApp as your preferred contact method, after your submission has been
+            confirmed the site opens WhatsApp with a short summary of the journey ready to send —
+            route, dates, times, passenger numbers, service level and vehicle preference. You choose
+            whether to send it. That summary deliberately excludes your email address, your notes,
+            your organisation and how you heard about WMC. Sending it puts the message into
+            WhatsApp, and WhatsApp's own terms apply to it.
+          </p>
+        </section>
+
+        <section class="legal__section">
+          <h2 class="text-h4">Address suggestions from Google</h2>
+          <p>
+            The pickup, destination and stop fields on the quotation form offer address suggestions.
+            To do that, the text you type into those fields is sent to Google's Places service as
+            you type, and Google returns matching places. Google receives that text, and your IP
+            address, as part of the request; Google's own privacy policy applies to it.
+          </p>
+          <p>
+            This only happens on the quotation page, only in the address fields, and only once you
+            have typed at least three characters. If Google is unavailable or blocked, the fields
+            keep working as ordinary text boxes and you can type an address by hand.
+          </p>
+        </section>
+
+        <section class="legal__section">
+          <h2 class="text-h4">Saving your progress</h2>
+          <p>
+            While you are filling in the quotation form, your answers are kept in your own browser's
+            session storage so that moving between the three steps, or reloading the page by
+            accident, does not lose your work. This stays on your device, is never sent anywhere by
+            the website itself, and is deleted as soon as your request is submitted successfully or
+            when you close the tab.
+          </p>
+        </section>
+
+        <section class="legal__section">
+          <h2 class="text-h4">What we do not do</h2>
+          <ul class="legal__list">
+            <li>No analytics or visitor tracking of any kind.</li>
+            <li>No advertising, remarketing or profiling.</li>
+            <li>No marketing emails; WMC replies to your enquiry, and nothing more.</li>
+            <li>Your details are not sold, rented or shared for marketing.</li>
+            <li>
+              No cookies are set by this website — see the{' '}
+              <a class="legal__link" href="/cookies/">cookie policy</a>.
+            </li>
+          </ul>
+        </section>
+
+        <section class="legal__section">
+          <h2 class="text-h4">Your rights</h2>
+          <p>
+            Under UK data protection law you have the right to ask what information WMC holds about
+            you, to have it corrected or deleted, to object to or restrict how it is used, and to
+            receive a copy of it. Contact WMC using the details above to make a request.
+          </p>
+          <p>
+            If you are not satisfied with the response, you can complain to the Information
+            Commissioner's Office at{' '}
+            <a
+              class="legal__link"
+              href="https://ico.org.uk/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ico.org.uk
+            </a>.
+          </p>
+        </section>
+
+        <section class="legal__section">
+          <h2 class="text-h4">Changes to this policy</h2>
+          <p>
+            If this website's handling of your information changes, this page will be updated and
+            the date at the top will change with it.
+          </p>
+        </section>
+      </article>
+    </PageContainer>
+  </Section>
+</BaseLayout>
+
+<style>
+  .legal {
+    max-inline-size: 68ch;
+  }
+
+  .legal__head {
+    margin-block-end: var(--space-6);
+  }
+
+  .legal__title {
+    margin: 0 0 var(--space-3);
+  }
+
+  .legal__lead {
+    margin: 0 0 var(--space-3);
+    color: var(--color-ink);
+  }
+
+  .legal__meta {
+    margin: 0;
+    color: var(--color-slate-taupe);
+  }
+
+  .legal__section {
+    margin-block-end: var(--space-6);
+  }
+
+  .legal__section h2 {
+    margin: 0 0 var(--space-2);
+    color: var(--color-obsidian);
+  }
+
+  .legal__section h3 {
+    margin: var(--space-4) 0 var(--space-1);
+    color: var(--color-obsidian);
+  }
+
+  .legal__section p {
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    color: var(--color-ink);
+  }
+
+  .legal__section p:last-child {
+    margin-block-end: 0;
+  }
+
+  .legal__list {
+    margin: 0;
+    padding-inline-start: var(--space-3);
+    display: grid;
+    gap: var(--space-1);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    color: var(--color-ink);
+  }
+
+  .legal__link {
+    color: var(--color-obsidian);
+    text-decoration-color: var(--color-champagne-gold);
+    text-underline-offset: 3px;
+  }
+
+  .legal__link:hover {
+    text-decoration-color: var(--color-obsidian);
+  }
+</style>

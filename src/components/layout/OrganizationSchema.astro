@@ -1,0 +1,43 @@
+---
+/**
+ * LocalBusiness structured data for WMC.
+ *
+ * Deliberately minimal: it carries only facts the client has confirmed and
+ * that already appear on the site. No aggregateRating, no review, no
+ * sameAs/social profiles, no openingHours, no geo coordinates and no
+ * priceRange — none of those are confirmed, and inventing them to satisfy a
+ * rich-result checklist would be a false public claim.
+ *
+ * Emitted once, on the homepage, so the entity is not duplicated site-wide.
+ */
+import { contact } from '../../data/navigation';
+import { SITE_URL } from '../../lib/seo';
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  '@id': `${SITE_URL}#organisation`,
+  name: contact.companyName,
+  legalName: contact.registeredName,
+  url: SITE_URL,
+  telephone: contact.phoneDisplay,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: '429 Meadway',
+    addressLocality: 'Birmingham',
+    postalCode: 'B33 0DZ',
+    addressCountry: 'GB',
+  },
+  identifier: {
+    '@type': 'PropertyValue',
+    name: 'Companies House company number',
+    value: contact.companyNumber,
+  },
+  areaServed: [
+    { '@type': 'City', name: 'Birmingham' },
+    { '@type': 'AdministrativeArea', name: 'West Midlands' },
+  ],
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} is:inline />

@@ -4,7 +4,23 @@
     {
       "name": "wmc-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 4321,
+      "autoPort": true
+    },
+    {
+      "name": "wmc-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "preview",
+        "--",
+        "--port",
+        "4321"
+      ],
       "port": 4321,
       "autoPort": true
     }

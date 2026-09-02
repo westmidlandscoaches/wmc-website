@@ -6,6 +6,7 @@ import Section from '../components/ui/Section.astro';
 import Button from '../components/ui/Button.astro';
 import FaqAccordion from '../components/content/FaqAccordion.astro';
 import HomeHero from '../components/content/HomeHero.astro';
+import OrganizationSchema from '../components/layout/OrganizationSchema.astro';
 import FeaturedFleet, { type FeaturedFleetItem } from '../components/fleet/FeaturedFleet.astro';
 import { getFleetVisuals } from '../data/fleetVisuals';
 import { contact } from '../data/navigation';
@@ -133,6 +134,8 @@ const faqItems = [
   description="Coach, Minibus & Chauffeur-Driven Car Hire in Birmingham and the West Midlands, organised around the people, route and requirements of each journey."
   path="/"
 >
+  <OrganizationSchema slot="structured-data" />
+
   <!-- 1. HERO -->
   <HomeHero />
 
