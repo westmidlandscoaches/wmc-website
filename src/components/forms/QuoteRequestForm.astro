@@ -13,6 +13,8 @@ import { contact } from '../../data/navigation';
 import { fleetBySeatGroup, vehicleLabel } from '../../data/fleet';
 
 const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? '';
+/* Optional. Without it every address field stays an ordinary text input. */
+const mapsKey = import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
 
 const fleetGroups = fleetBySeatGroup();
 
@@ -24,7 +26,12 @@ const vehicleCopy: Record<string, string> = {
 };
 ---
 
-<div class="quote-form" data-quote-form data-whatsapp-href={contact.whatsappHref}>
+<div
+  class="quote-form"
+  data-quote-form
+  data-whatsapp-href={contact.whatsappHref}
+  data-maps-key={mapsKey}
+>
   <header class="quote-form__head">
     <p class="eyebrow">Your journey details</p>
     <h2 class="text-h3 quote-form__title">Request a quotation</h2>
@@ -70,13 +77,13 @@ const vehicleCopy: Record<string, string> = {
           <div class="field">
             <label class="field__label" for="pickup">Pickup <span aria-hidden="true">*</span></label>
             <input class="field__input" id="pickup" name="pickup" type="text" required
-              placeholder="Address, postcode, airport or venue" autocomplete="off" />
+              placeholder="Address, postcode, airport or venue" autocomplete="off" data-address />
             <p class="field__error" data-error-for="pickup" hidden></p>
           </div>
           <div class="field">
             <label class="field__label" for="destination">Destination <span aria-hidden="true">*</span></label>
             <input class="field__input" id="destination" name="destination" type="text" required
-              placeholder="Address, postcode, airport or venue" autocomplete="off" />
+              placeholder="Address, postcode, airport or venue" autocomplete="off" data-address />
             <p class="field__error" data-error-for="destination" hidden></p>
           </div>
         </div>
@@ -410,7 +417,8 @@ const vehicleCopy: Record<string, string> = {
   <li class="quote-form__stop">
     <div class="field">
       <label class="field__label">Stop</label>
-      <input class="field__input" type="text" placeholder="Address, postcode, airport or venue" />
+      <input class="field__input" type="text" placeholder="Address, postcode, airport or venue"
+        autocomplete="off" data-address />
     </div>
     <button type="button" class="quote-form__remove-stop" data-remove-stop>
       <span class="visually-hidden">Remove stop</span>
@@ -430,7 +438,14 @@ const vehicleCopy: Record<string, string> = {
     border-radius: var(--radius-media);
     background-color: var(--color-warm-white);
     box-shadow: var(--shadow-low);
-    overflow: hidden;
+    /* Deliberately not overflow: hidden — that clipped the address
+       autocomplete dropdown. The only child needing the rounded corner is the
+       head, which now clips its own. */
+  }
+
+  .quote-form__head {
+    border-start-start-radius: var(--radius-media);
+    border-start-end-radius: var(--radius-media);
   }
 
   .quote-form__head {
@@ -554,6 +569,13 @@ const vehicleCopy: Record<string, string> = {
     border: 0;
     margin: 0;
     padding: 0;
+  }
+
+  /* The step animates in with a transform; a lingering transform would make
+     this element the containing block for the address dropdown, so it is
+     cleared once the animation finishes. */
+  .quote-form__step {
+    animation-fill-mode: none;
   }
 
   .quote-form__step,
@@ -1153,7 +1175,11 @@ const vehicleCopy: Record<string, string> = {
   /* ---------------------------------------------------------------
      Result panels
      --------------------------------------------------------------- */
+  /* The shell no longer clips its children, so the panel that ends the card
+     rounds its own bottom corners. */
   .result {
+    border-end-start-radius: var(--radius-media);
+    border-end-end-radius: var(--radius-media);
     padding: var(--space-5) var(--space-3);
     animation: result-in 220ms var(--motion-easing-premium);
   }
@@ -1393,7 +1419,455 @@ const vehicleCopy: Record<string, string> = {
       grid-template-columns: minmax(0, 1fr);
     }
   }
+  /* ---------------------------------------------------------------
+     Address autocomplete
+
+     Progressive enhancement over the existing text inputs: the listbox is
+     only created once Google returns predictions, so a missing key, a
+     blocked script or an API error simply leaves an ordinary field.
+     --------------------------------------------------------------- */
+  .quote-form :global(.address-field) {
+    position: relative;
+  }
+
+  .quote-form :global(.address-listbox) {
+    position: absolute;
+    z-index: 20;
+    inset-inline: 0;
+    inset-block-start: calc(100% + 4px);
+    max-block-size: 264px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+    background-color: var(--color-warm-white);
+    border: var(--border-width-hairline) solid var(--color-linen-border);
+    border-radius: 6px;
+    box-shadow: var(--shadow-raised);
+  }
+
+  .quote-form :global(.address-listbox[hidden]) {
+    display: none;
+  }
+
+  .quote-form :global(.address-option) {
+    display: grid;
+    gap: 1px;
+    padding: 10px var(--space-2);
+    border-radius: 4px;
+    cursor: pointer;
+    scroll-margin: 4px;
+  }
+
+  .quote-form :global(.address-option__main) {
+    font-size: var(--text-form-input);
+    line-height: 1.3;
+    color: var(--color-ink);
+  }
+
+  .quote-form :global(.address-option__secondary) {
+    font-size: var(--text-small);
+    line-height: 1.3;
+    color: var(--color-slate-taupe);
+  }
+
+  .quote-form :global(.address-option[data-active='true']),
+  .quote-form :global(.address-option:hover) {
+    background-color: var(--gold-wash);
+  }
+
+  .quote-form :global(.address-option[data-active='true'] .address-option__main) {
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* Touch gets the full target height; pointer devices stay compact. */
+  @media (max-width: 768px) {
+    .quote-form :global(.address-option) {
+      min-block-size: 44px;
+      align-content: center;
+      padding-block: var(--space-1);
+    }
+
+    .quote-form :global(.address-listbox) {
+      max-block-size: 244px;
+    }
+  }
 </style>
+
+<script>
+  /**
+   * Google Places (New) address autocomplete.
+   *
+   * Strictly an enhancement over the existing inputs: it never replaces a
+   * control, never blocks typing, and stands down silently when the key is
+   * absent or any Google call fails. Nothing about a prediction — the query,
+   * the place or its coordinates — is logged or stored anywhere beyond the
+   * form field the customer can already see.
+   */
+  interface PlacePrediction {
+    text: { toString(): string };
+    mainText?: { toString(): string } | null;
+    secondaryText?: { toString(): string } | null;
+    toPlace(): {
+      fetchFields(options: { fields: string[] }): Promise<unknown>;
+      formattedAddress?: string | null;
+      displayName?: string | null;
+    };
+  }
+
+  interface PlacesLib {
+    AutocompleteSuggestion: {
+      fetchAutocompleteSuggestions(request: Record<string, unknown>): Promise<{
+        suggestions: { placePrediction: PlacePrediction | null }[];
+      }>;
+    };
+    AutocompleteSessionToken: new () => unknown;
+  }
+
+  const host = document.querySelector<HTMLElement>('[data-quote-form]');
+  const mapsKey = host?.dataset.mapsKey?.trim() ?? '';
+
+  if (host && mapsKey) {
+    /**
+     * Development-only tracing for the Places integration. Never receives the
+     * API key, a customer address, a query or any form data — only load state
+     * and Google's own error text.
+     */
+    const trace = (message: string) => {
+      if (!import.meta.env.DEV) return;
+      console.info('[WMC places] ' + message);
+    };
+
+    let placesPromise: Promise<PlacesLib | null> | null = null;
+
+    /** Loads the Maps JS API once, on the first keystroke in an address field. */
+    const loadPlaces = (): Promise<PlacesLib | null> => {
+      if (placesPromise) return placesPromise;
+
+      placesPromise = new Promise<PlacesLib | null>((resolve) => {
+        const w = window as unknown as {
+          google?: { maps?: { importLibrary?: (name: string) => Promise<unknown> } };
+        };
+
+        const importLib = () => {
+          const fn = w.google?.maps?.importLibrary;
+          if (!fn) {
+            trace('maps js loaded: no — google.maps.importLibrary is unavailable');
+            return resolve(null);
+          }
+          trace('maps js loaded: yes');
+          fn('places')
+            .then((lib) => {
+              const ok = Boolean(
+                (lib as PlacesLib)?.AutocompleteSuggestion &&
+                  (lib as PlacesLib)?.AutocompleteSessionToken,
+              );
+              trace('places library loaded: ' + (ok ? 'yes' : 'no — unexpected library shape'));
+              resolve(ok ? (lib as PlacesLib) : null);
+            })
+            .catch((error: unknown) => {
+              trace(
+                'places library loaded: no — ' +
+                  (error instanceof Error ? error.message : String(error)),
+              );
+              resolve(null);
+            });
+        };
+
+        if (w.google?.maps?.importLibrary) return importLib();
+
+        // With loading=async the script's own load event fires before the
+        // bootstrap has installed google.maps.importLibrary, so Google requires
+        // the callback parameter to signal readiness. Waiting on load alone is
+        // why this silently found no library.
+        const callbackName = '__wmcMapsReady';
+        const globals = w as unknown as Record<string, unknown>;
+
+        let settled = false;
+        const finish = (lib: PlacesLib | null) => {
+          if (settled) return;
+          settled = true;
+          delete globals[callbackName];
+          resolve(lib);
+        };
+
+        globals[callbackName] = () => {
+          const fn = w.google?.maps?.importLibrary;
+          if (!fn) {
+            trace('maps js loaded: no — callback fired without importLibrary');
+            return finish(null);
+          }
+          trace('maps js loaded: yes');
+          fn('places')
+            .then((lib) => {
+              const ok = Boolean(
+                (lib as PlacesLib)?.AutocompleteSuggestion &&
+                  (lib as PlacesLib)?.AutocompleteSessionToken,
+              );
+              trace('places library loaded: ' + (ok ? 'yes' : 'no — unexpected library shape'));
+              finish(ok ? (lib as PlacesLib) : null);
+            })
+            .catch((error: unknown) => {
+              trace(
+                'places library loaded: no — ' +
+                  (error instanceof Error ? error.message : String(error)),
+              );
+              finish(null);
+            });
+        };
+
+        const script = document.createElement('script');
+        script.async = true;
+        script.src =
+          'https://maps.googleapis.com/maps/api/js' +
+          '?libraries=places&loading=async&v=weekly' +
+          '&callback=' + callbackName +
+          '&key=' + encodeURIComponent(mapsKey);
+        script.addEventListener('error', () => {
+          trace('maps js loaded: no — loader script failed to load');
+          finish(null);
+        });
+        // A blocked or hung loader must not leave typing waiting forever.
+        window.setTimeout(() => {
+          if (!settled) trace('maps js loaded: no — timed out waiting for callback');
+          finish(null);
+        }, 10000);
+        document.head.appendChild(script);
+      });
+
+      return placesPromise;
+    };
+
+    let uid = 0;
+
+    const enhance = (input: HTMLInputElement) => {
+      if (input.dataset.addressReady === 'true') return;
+      input.dataset.addressReady = 'true';
+
+      const wrapper = input.closest<HTMLElement>('.field');
+      if (!wrapper) return;
+      wrapper.classList.add('address-field');
+
+      const listId = `address-listbox-${(uid += 1)}`;
+      const list = document.createElement('ul');
+      list.className = 'address-listbox';
+      list.id = listId;
+      list.setAttribute('role', 'listbox');
+      list.hidden = true;
+      wrapper.appendChild(list);
+
+      input.setAttribute('role', 'combobox');
+      input.setAttribute('aria-autocomplete', 'list');
+      input.setAttribute('aria-expanded', 'false');
+      input.setAttribute('aria-controls', listId);
+
+      interface Row {
+        full: string;
+        main: string;
+        secondary: string;
+        prediction: PlacePrediction;
+      }
+
+      let rows: Row[] = [];
+      let activeIndex = -1;
+      let sessionToken: unknown = null;
+      let debounce = 0;
+      let sequence = 0;
+      // Set while writing a chosen address, so the input event that carries
+      // the value into form state cannot be mistaken for fresh typing and
+      // reopen the list.
+      let committing = false;
+
+      const close = () => {
+        // Retire any in-flight query so a late response cannot reopen the list
+        // after it has been dismissed or a prediction has been chosen.
+        sequence += 1;
+        window.clearTimeout(debounce);
+        list.hidden = true;
+        list.replaceChildren();
+        input.setAttribute('aria-expanded', 'false');
+        input.removeAttribute('aria-activedescendant');
+        rows = [];
+        activeIndex = -1;
+      };
+
+      const setActive = (index: number) => {
+        activeIndex = index;
+        Array.from(list.children).forEach((node, i) => {
+          const li = node as HTMLElement;
+          const on = i === index;
+          li.dataset.active = String(on);
+          li.setAttribute('aria-selected', String(on));
+          if (on) {
+            input.setAttribute('aria-activedescendant', li.id);
+            li.scrollIntoView({ block: 'nearest' });
+          }
+        });
+        if (index < 0) input.removeAttribute('aria-activedescendant');
+      };
+
+      /** Writes into the existing form state exactly as typing would. */
+      const commit = (val: string) => {
+        committing = true;
+        input.value = val;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        committing = false;
+      };
+
+      const choose = async (index: number) => {
+        const chosen = rows[index];
+        if (!chosen) return;
+
+        // Show the prediction straight away, then refine it to the formatted
+        // address once Google answers, so a slow lookup never blocks anyone.
+        commit(chosen.full);
+        close();
+
+        try {
+          const place = chosen.prediction.toPlace();
+          await place.fetchFields({ fields: ['formattedAddress', 'displayName'] });
+          const name = (place.displayName ?? '').trim();
+          const address = (place.formattedAddress ?? '').trim();
+          if (!address) return;
+          // Keep a venue or airport name that the postal address omits.
+          commit(name && !address.startsWith(name) ? `${name}, ${address}` : address);
+        } catch (error: unknown) {
+          // The prediction text already in the field remains valid.
+          trace(
+            'place details: failed — ' +
+              (error instanceof Error ? error.message : String(error)),
+          );
+        }
+        // A session ends with a selection; the next query starts a new one.
+        sessionToken = null;
+      };
+
+      const render = () => {
+        list.replaceChildren();
+        rows.forEach((row, i) => {
+          const li = document.createElement('li');
+          li.id = `${listId}-option-${i}`;
+          li.className = 'address-option';
+          li.setAttribute('role', 'option');
+          li.setAttribute('aria-selected', 'false');
+          li.dataset.active = 'false';
+
+          const main = document.createElement('span');
+          main.className = 'address-option__main';
+          main.textContent = row.main;
+          li.appendChild(main);
+
+          if (row.secondary) {
+            const secondary = document.createElement('span');
+            secondary.className = 'address-option__secondary';
+            secondary.textContent = row.secondary;
+            li.appendChild(secondary);
+          }
+
+          // pointerdown lands before the input blurs, so taps always register.
+          li.addEventListener('pointerdown', (event) => {
+            event.preventDefault();
+            void choose(i);
+          });
+
+          list.appendChild(li);
+        });
+
+        list.hidden = rows.length === 0;
+        input.setAttribute('aria-expanded', String(rows.length > 0));
+        setActive(-1);
+      };
+
+      const query = async (text: string) => {
+        const places = await loadPlaces();
+        if (!places) {
+          trace('autocomplete request: skipped — places library unavailable');
+          return close();
+        }
+
+        const mine = (sequence += 1);
+        try {
+          if (!sessionToken) sessionToken = new places.AutocompleteSessionToken();
+          const { suggestions } = await places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+            input: text,
+            includedRegionCodes: ['gb'],
+            sessionToken,
+          });
+          if (mine !== sequence) return; // a newer keystroke already won
+          trace('autocomplete request: success — ' + suggestions.length + ' suggestion(s)');
+
+          rows = suggestions
+            .map((s) => s.placePrediction)
+            .filter((prediction): prediction is PlacePrediction => Boolean(prediction))
+            .slice(0, 6)
+            .map((prediction) => ({
+              full: prediction.text.toString(),
+              main: prediction.mainText?.toString() ?? prediction.text.toString(),
+              secondary: prediction.secondaryText?.toString() ?? '',
+              prediction,
+            }));
+          render();
+        } catch (error: unknown) {
+          // Quota, network or key problems all degrade to manual typing.
+          trace(
+            'autocomplete request: failed — ' +
+              (error instanceof Error ? error.message : String(error)),
+          );
+          close();
+        }
+      };
+
+      input.addEventListener('input', () => {
+        if (committing) return;
+        window.clearTimeout(debounce);
+        const text = input.value.trim();
+        if (text.length < 3) return close();
+        debounce = window.setTimeout(() => void query(text), 220);
+      });
+
+      input.addEventListener('keydown', (event) => {
+        if (list.hidden || rows.length === 0) return;
+
+        if (event.key === 'ArrowDown') {
+          event.preventDefault();
+          setActive((activeIndex + 1) % rows.length);
+        } else if (event.key === 'ArrowUp') {
+          event.preventDefault();
+          setActive(activeIndex <= 0 ? rows.length - 1 : activeIndex - 1);
+        } else if (event.key === 'Enter' && activeIndex >= 0) {
+          // Only swallow Enter when it is choosing a prediction, so the key
+          // still reaches the form otherwise.
+          event.preventDefault();
+          void choose(activeIndex);
+        } else if (event.key === 'Escape') {
+          event.preventDefault();
+          close();
+        } else if (event.key === 'Tab' && activeIndex >= 0) {
+          void choose(activeIndex);
+        }
+      });
+
+      input.addEventListener('blur', () => {
+        window.setTimeout(close, 120);
+      });
+    };
+
+    const scan = () => {
+      host.querySelectorAll<HTMLInputElement>('input[data-address]').forEach(enhance);
+    };
+
+    scan();
+
+    // Stops are cloned from a template at runtime, so watch for new ones.
+    const stopList = host.querySelector<HTMLElement>('[data-stop-list]');
+    if (stopList) {
+      new MutationObserver(scan).observe(stopList, { childList: true, subtree: true });
+    }
+  }
+</script>
+
 
 <script is:inline>
   document.documentElement.classList.add('js-quote-form');
