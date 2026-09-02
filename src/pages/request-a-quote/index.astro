@@ -55,11 +55,33 @@ const heroVisual = getCutout('car-03')!;
 </BaseLayout>
 
 <style is:global>
-  /* Keeps the floating contact control clear of the form's step buttons on
-     narrow screens, without removing it from this page. */
-  @media (max-width: 767px) {
+  /*
+   * The floating contact control is fixed to the bottom-right, and the form's
+   * action buttons are full-width, so the two share that corner. Two things
+   * keep them apart on narrow screens: the control sits low and tight to the
+   * corner, and the form carries enough trailing space that its action bar can
+   * always be scrolled clear of it. Without that space the last button comes
+   * to rest underneath the launcher with no way to move it.
+   */
+  @media (max-width: 768px) {
     :root {
-      --fab-offset-block-end: 56px;
+      /* Stays in its own corner. Lifting it instead only moves the overlap
+         up onto the option cards. */
+      --fab-offset-block-end: 0px;
+    }
+
+    /* Trailing space so the form's last action can always be scrolled clear
+       of the corner the control occupies. */
+    .quote-form {
+      margin-block-end: 132px;
+    }
+
+    /* The three step actions are the one thing that must never sit under the
+       control, so they stop short of its column. Fields keep the full width. */
+    .quote-form .action-bar {
+      /* The control overlaps the button column by ~25px at every width; 40
+         clears it without narrowing the buttons noticeably. */
+      padding-inline-end: 40px;
     }
   }
 </style>
