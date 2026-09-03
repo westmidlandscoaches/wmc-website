@@ -2,39 +2,51 @@
 /**
  * Entry splash.
  *
+ * Structure and animation sequence mirror the CMD SplashIntro system —
+ * framed mark tile, tracked eyebrow, wordmark, support line, three signal
+ * lines, then a progress track with a travelling lead — rebuilt in WMC
+ * identity: Heritage Ivory ground, Ink text, Champagne Gold accent,
+ * Source Sans 3.
+ *
  * Deliberately opt-in rather than opt-out: the overlay is inert until an
  * inline head script adds `wmc-splash` to <html>, so a browser with no JS —
- * or one where the script fails — simply never sees it and the page renders
- * normally underneath. It never waits on images, never counts progress, and
- * is removed from the DOM entirely once finished so it cannot linger or
- * swallow a click.
- *
- * The large "WMC" in the composition is the approved monogram asset itself,
- * not type set to look like it: the mark is never recreated in typography.
+ * or one where the script fails — never sees it and the page renders
+ * normally underneath. It never waits on images and never reports progress
+ * it does not have; the track is a timed reveal, not a percentage.
  */
 import { Image } from 'astro:assets';
 import wmcMonogram from '../../assets/brand/WMC_Monogram.webp';
 ---
 
 <div class="splash" data-splash aria-hidden="true">
-  <div class="splash__inner">
-    <p class="splash__eyebrow">West Midlands Coaches Ltd</p>
+  <span class="splash__ambient splash__ambient--a"></span>
+  <span class="splash__ambient splash__ambient--b"></span>
 
+  <div class="splash__brand">
     <span class="splash__mark">
       <Image
         src={wmcMonogram}
         alt=""
-        widths={[320, 480, 720]}
-        sizes="(min-width: 768px) 340px, 240px"
+        widths={[160, 240, 320]}
+        sizes="72px"
         loading="eager"
         class="splash__mark-image"
       />
     </span>
 
-    <p class="splash__tagline">Transport, Properly Organised.</p>
+    <p class="splash__eyebrow">West Midlands Coaches Ltd</p>
+    <p class="splash__wordmark">WMC</p>
+    <p class="splash__support">Transport, Properly Organised.</p>
 
-    <span class="splash__track" aria-hidden="true">
-      <span class="splash__line"></span>
+    <span class="splash__signals">
+      <span class="splash__signal splash__signal--one"></span>
+      <span class="splash__signal splash__signal--two"></span>
+      <span class="splash__signal splash__signal--three"></span>
+    </span>
+
+    <span class="splash__loader">
+      <span class="splash__loader-fill"></span>
+      <span class="splash__loader-lead"></span>
     </span>
   </div>
 </div>
@@ -50,126 +62,305 @@ import wmcMonogram from '../../assets/brand/WMC_Monogram.webp';
   }
 
   :global(html.wmc-splash) .splash {
-    display: grid;
+    --splash-ease: cubic-bezier(0.16, 1, 0.3, 1);
+    /* Matches the JS hold, so the progress track finishes as the splash
+       leaves rather than stopping short or looping. */
+    --splash-hold: 2000ms;
     position: fixed;
-    inset: 0;
     z-index: 9999;
+    inset: 0;
+    display: grid;
     place-items: center;
-    padding: var(--space-4);
-    background-color: var(--color-obsidian);
+    padding: calc(env(safe-area-inset-top, 0px) + var(--space-4)) var(--space-3)
+      calc(env(safe-area-inset-bottom, 0px) + var(--space-4));
+    overflow: hidden;
+    color: var(--color-ink);
+    /* Warm White centre falling to Heritage Ivory, with two very quiet gold
+       washes on opposing diagonals. */
+    background:
+      radial-gradient(circle at 50% 44%, rgb(255 255 255 / 0.92), transparent 58%),
+      radial-gradient(circle at 16% 18%, rgb(194 156 89 / 0.10), transparent 46%),
+      radial-gradient(circle at 84% 82%, rgb(194 156 89 / 0.07), transparent 48%),
+      linear-gradient(165deg, var(--color-warm-white) 0%, var(--color-heritage-ivory) 100%);
     opacity: 1;
-    transition: opacity 380ms var(--motion-easing-premium);
+    transition: opacity 400ms var(--motion-easing-standard);
   }
 
-  /* Fading out: the overlay stops taking pointer input immediately, so it can
-     never intercept a click even if the transition stalls. */
+  @media (min-width: 768px) {
+    :global(html.wmc-splash) .splash {
+      --splash-hold: 3000ms;
+    }
+  }
+
+  /* Fading out: pointer input stops immediately, so the overlay can never
+     intercept a click even if the transition stalls. */
   :global(html.wmc-splash) .splash[data-closing='true'] {
     opacity: 0;
     pointer-events: none;
   }
 
-  .splash__inner {
-    display: grid;
-    justify-items: center;
-    text-align: center;
-    gap: var(--space-3);
-    inline-size: 100%;
-    max-inline-size: 420px;
+  :global(html.wmc-splash) .splash[data-closing='true'] .splash__brand {
+    animation: splash-recede 400ms var(--motion-easing-standard) both;
   }
 
-  .splash__eyebrow {
-    margin: 0;
-    font-size: 11px;
-    line-height: 1.6;
-    font-weight: var(--font-weight-semibold);
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--color-mist-taupe);
-  }
-
-  /* The approved monogram, framed at its own aspect and never redrawn. */
-  .splash__mark {
-    display: block;
-    inline-size: 240px;
-    max-inline-size: 68vw;
-  }
-
-  .splash__mark-image {
-    inline-size: 100%;
-    block-size: auto;
-  }
-
-  .splash__tagline {
-    margin: 0;
-    font-size: var(--text-body);
-    line-height: var(--leading-body);
-    color: var(--color-warm-white);
-  }
-
-  /* The journey line: a single gold pass, sized to the hold so it completes
-     as the splash leaves. No percentage, no spinner, no loading copy. */
-  .splash__track {
-    display: block;
-    inline-size: min(220px, 60vw);
-    block-size: 1px;
-    margin-block-start: var(--space-2);
-    background-color: var(--color-charcoal-border);
+  /* The page underneath must not scroll behind the overlay. Restored the
+     moment the class is removed. */
+  :global(html.wmc-splash) body {
     overflow: hidden;
   }
 
-  .splash__line {
+  /* Two distant points of gold, on opposing diagonals. */
+  .splash__ambient {
+    position: absolute;
+    inline-size: 8px;
+    block-size: 8px;
+    border-radius: 50%;
+    background-color: var(--color-champagne-gold);
+    box-shadow:
+      0 0 12px 2px rgb(194 156 89 / 0.45),
+      0 0 60px 26px rgb(194 156 89 / 0.10);
+    opacity: 0;
+  }
+
+  .splash__ambient--a {
+    inset-inline-start: 13%;
+    inset-block-start: 21%;
+  }
+
+  .splash__ambient--b {
+    inset-inline-end: 15%;
+    inset-block-end: 23%;
+  }
+
+  :global(html.wmc-splash) .splash__ambient--a {
+    animation: splash-ambient-a 6.4s ease-in-out 260ms infinite;
+  }
+
+  :global(html.wmc-splash) .splash__ambient--b {
+    animation: splash-ambient-b 5.2s ease-in-out 520ms infinite;
+  }
+
+  .splash__brand {
+    display: grid;
+    justify-items: center;
+    gap: 0.85rem;
+    text-align: center;
+  }
+
+  /* Small framed tile — the mark is never enlarged to hero scale. */
+  .splash__mark {
+    display: grid;
+    place-items: center;
+    inline-size: clamp(3.25rem, 9vw, 4.5rem);
+    block-size: clamp(3.25rem, 9vw, 4.5rem);
+    padding: 0.42rem;
+    border: 1px solid var(--gold-rule);
+    border-radius: 1rem;
+    background-color: rgb(255 255 255 / 0.78);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.6),
+      0 0.6rem 1.6rem rgb(11 10 9 / 0.10);
+    opacity: 0;
+  }
+
+  @supports (backdrop-filter: blur(6px)) {
+    .splash__mark {
+      backdrop-filter: blur(6px);
+    }
+  }
+
+  .splash__mark-image {
     display: block;
     inline-size: 100%;
     block-size: 100%;
-    background: linear-gradient(
-      to right,
-      transparent,
-      var(--color-champagne-gold),
-      transparent
-    );
-    transform: translateX(-100%);
+    object-fit: contain;
   }
 
-  @media (min-width: 768px) {
-    .splash__eyebrow {
-      font-size: 12px;
-      letter-spacing: 0.26em;
-    }
-
-    .splash__mark {
-      inline-size: 340px;
-    }
-
-    .splash__inner {
-      gap: var(--space-4);
-      max-inline-size: 520px;
-    }
-  }
-
-  /* --- entrance --- */
-  :global(html.wmc-splash) .splash__eyebrow,
-  :global(html.wmc-splash) .splash__mark,
-  :global(html.wmc-splash) .splash__tagline {
+  .splash__eyebrow {
+    margin: 0.15rem 0 0;
+    color: var(--color-slate-taupe);
+    font-size: clamp(0.6rem, 1.5vw, 0.68rem);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
     opacity: 0;
-    animation: splash-rise 520ms var(--motion-easing-premium) forwards;
   }
 
+  .splash__wordmark {
+    margin: 0;
+    color: var(--color-obsidian);
+    font-size: clamp(1.95rem, 3.2vw, 3.4rem);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.06em;
+    line-height: 1.05;
+    opacity: 0;
+  }
+
+  .splash__support {
+    max-inline-size: 84vw;
+    margin: 0;
+    color: var(--color-slate-taupe);
+    font-size: clamp(0.8rem, 2vw, 0.95rem);
+    text-wrap: balance;
+    opacity: 0;
+  }
+
+  /* Three signal lines of different lengths. */
+  .splash__signals {
+    display: grid;
+    justify-items: center;
+    gap: 0.35rem;
+    margin-block-start: 0.5rem;
+  }
+
+  .splash__signal {
+    block-size: 1px;
+    border-radius: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--color-mist-taupe) 22%,
+      var(--color-champagne-gold) 50%,
+      var(--color-mist-taupe) 78%,
+      transparent 100%
+    );
+    background-size: 220% 100%;
+    background-position: 120% 0;
+    opacity: 0;
+    transform: scaleX(0.2);
+  }
+
+  .splash__signal--one {
+    inline-size: clamp(6rem, 17vw, 9rem);
+  }
+
+  .splash__signal--two {
+    inline-size: clamp(3.4rem, 10vw, 5.25rem);
+  }
+
+  .splash__signal--three {
+    inline-size: clamp(4.6rem, 13vw, 7rem);
+  }
+
+  /* Separate, longer progress track. */
+  .splash__loader {
+    position: relative;
+    inline-size: min(62vw, 200px);
+    block-size: 2px;
+    margin-block-start: 0.9rem;
+    border-radius: 2px;
+    background-color: var(--color-linen-border);
+    overflow: hidden;
+  }
+
+  .splash__loader-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    transform-origin: left center;
+    transform: scaleX(0.02);
+    background: linear-gradient(
+      90deg,
+      var(--gold-rule-strong) 0%,
+      var(--color-champagne-gold) 100%
+    );
+  }
+
+  .splash__loader-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgb(255 255 255 / 0.46) 50%,
+      transparent 100%
+    );
+    background-size: 34% 100%;
+    background-repeat: no-repeat;
+    background-position: -40% 0;
+    opacity: 0.65;
+  }
+
+  .splash__loader-lead {
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 50%;
+    inline-size: 100%;
+    block-size: 0;
+    transform: translateX(2%);
+  }
+
+  .splash__loader-lead::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: -3px;
+    inset-block-start: -3px;
+    inline-size: 6px;
+    block-size: 6px;
+    border-radius: 50%;
+    background-color: var(--color-champagne-gold);
+    box-shadow: 0 0 6px 1px rgb(194 156 89 / 0.45);
+  }
+
+  /* --- sequence: tile, eyebrow, wordmark, support, signals, progress --- */
   :global(html.wmc-splash) .splash__mark {
-    animation-delay: 90ms;
+    animation: splash-mark 520ms var(--splash-ease) 120ms both;
   }
 
-  :global(html.wmc-splash) .splash__tagline {
-    animation-delay: 220ms;
+  :global(html.wmc-splash) .splash__eyebrow {
+    animation: splash-rise 430ms var(--splash-ease) 320ms both;
   }
 
-  /* One pass across the track, timed to the hold for each breakpoint. */
-  :global(html.wmc-splash) .splash__line {
-    animation: splash-sweep 2000ms var(--motion-easing-premium) 160ms forwards;
+  :global(html.wmc-splash) .splash__wordmark {
+    animation: splash-word 550ms var(--splash-ease) 500ms both;
   }
 
-  @media (min-width: 768px) {
-    :global(html.wmc-splash) .splash__line {
-      animation-duration: 3000ms;
+  :global(html.wmc-splash) .splash__support {
+    animation: splash-rise 550ms var(--splash-ease) 700ms both;
+  }
+
+  :global(html.wmc-splash) .splash__signal {
+    animation:
+      splash-signal 620ms var(--splash-ease) both,
+      splash-sweep 1500ms var(--motion-easing-standard) infinite;
+  }
+
+  :global(html.wmc-splash) .splash__signal--one {
+    animation-delay: 860ms, 1040ms;
+  }
+
+  :global(html.wmc-splash) .splash__signal--two {
+    animation-delay: 960ms, 1180ms;
+  }
+
+  :global(html.wmc-splash) .splash__signal--three {
+    animation-delay: 1060ms, 1320ms;
+  }
+
+  /* Runs the length of the hold and finishes filled — a timed reveal, never
+     a claim about how much has loaded. */
+  :global(html.wmc-splash) .splash__loader-fill {
+    animation:
+      splash-progress var(--splash-hold) var(--splash-ease) 160ms both,
+      splash-progress-sweep 1600ms ease-in-out 400ms infinite;
+  }
+
+  :global(html.wmc-splash) .splash__loader-lead {
+    animation: splash-progress-lead var(--splash-hold) var(--splash-ease) 160ms both;
+  }
+
+  @keyframes splash-mark {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.92);
+      filter: blur(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
     }
   }
 
@@ -180,33 +371,141 @@ import wmcMonogram from '../../assets/brand/WMC_Monogram.webp';
     }
     to {
       opacity: 1;
-      transform: none;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes splash-word {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+      clip-path: inset(0 0 42% 0);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes splash-signal {
+    from {
+      opacity: 0;
+      transform: scaleX(0.2);
+    }
+    to {
+      opacity: 0.9;
+      transform: scaleX(1);
     }
   }
 
   @keyframes splash-sweep {
     from {
-      transform: translateX(-100%);
+      background-position: 120% 0;
     }
     to {
+      background-position: -120% 0;
+    }
+  }
+
+  @keyframes splash-progress {
+    0% {
+      transform: scaleX(0.02);
+    }
+    28% {
+      transform: scaleX(0.42);
+    }
+    62% {
+      transform: scaleX(0.74);
+    }
+    100% {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes splash-progress-lead {
+    0% {
+      transform: translateX(2%);
+    }
+    28% {
+      transform: translateX(42%);
+    }
+    62% {
+      transform: translateX(74%);
+    }
+    100% {
       transform: translateX(100%);
     }
   }
 
-  /* Reduced motion: everything is simply present, and the overlay leaves at
-     once rather than animating. */
+  @keyframes splash-progress-sweep {
+    0% {
+      background-position: -40% 0;
+    }
+    100% {
+      background-position: 140% 0;
+    }
+  }
+
+  @keyframes splash-ambient-a {
+    0%,
+    100% {
+      opacity: 0.32;
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      opacity: 0.72;
+      transform: translate3d(4px, -6px, 0);
+    }
+  }
+
+  @keyframes splash-ambient-b {
+    0%,
+    100% {
+      opacity: 0.28;
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      opacity: 0.62;
+      transform: translate3d(-5px, 4px, 0);
+    }
+  }
+
+  @keyframes splash-recede {
+    from {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-4px) scale(0.985);
+    }
+  }
+
+  /* Reduced motion: the composition is simply present, and the overlay
+     leaves at once rather than animating. */
   @media (prefers-reduced-motion: reduce) {
     :global(html.wmc-splash) .splash {
       transition-duration: 1ms;
     }
 
-    :global(html.wmc-splash) .splash__eyebrow,
+    :global(html.wmc-splash) .splash__ambient,
     :global(html.wmc-splash) .splash__mark,
-    :global(html.wmc-splash) .splash__tagline,
-    :global(html.wmc-splash) .splash__line {
+    :global(html.wmc-splash) .splash__eyebrow,
+    :global(html.wmc-splash) .splash__wordmark,
+    :global(html.wmc-splash) .splash__support,
+    :global(html.wmc-splash) .splash__signal,
+    :global(html.wmc-splash) .splash__loader-fill,
+    :global(html.wmc-splash) .splash__loader-lead,
+    :global(html.wmc-splash) .splash[data-closing='true'] .splash__brand {
       animation: none;
       opacity: 1;
       transform: none;
+      filter: none;
+    }
+
+    :global(html.wmc-splash) .splash__loader-fill {
+      transform: scaleX(1);
     }
   }
 </style>
@@ -238,15 +537,14 @@ import wmcMonogram from '../../assets/brand/WMC_Monogram.webp';
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const desktop = window.matchMedia('(min-width: 768px)').matches;
-    // Held long enough to read as a deliberate entry, never long enough to
-    // feel like waiting. Nothing here depends on images or page load.
     const hold = reduced ? 0 : desktop ? 3000 : 2000;
-    const fade = reduced ? 1 : 380;
+    const fade = reduced ? 1 : 400;
 
     let done = false;
     const finish = () => {
       if (done) return;
       done = true;
+      // Removing the class also restores body scrolling.
       root.classList.remove('wmc-splash');
       splash?.remove();
     };
