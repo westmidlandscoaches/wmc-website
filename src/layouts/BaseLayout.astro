@@ -1,6 +1,7 @@
 ---
 import Seo from '../components/layout/Seo.astro';
 import SkipLink from '../components/layout/SkipLink.astro';
+import SplashScreen from '../components/layout/SplashScreen.astro';
 import SiteHeader from '../components/navigation/SiteHeader.astro';
 import SiteFooter from '../components/navigation/SiteFooter.astro';
 import FloatingContact from '../components/navigation/FloatingContact.astro';
@@ -33,6 +34,7 @@ const { title, description, path, ogImage, noindex, floatingContact = true } = A
     </script>
   </head>
   <body>
+    <SplashScreen />
     <SkipLink />
     <SiteHeader />
     <main id="main-content" tabindex="-1">

@@ -99,6 +99,15 @@
 
   /* Touch targets */
   --touch-target-min: 44px;
+
+  /*
+   * Staged hero vehicle bounding box, shared by the home hero and every
+   * PageHero cutout so a car, minibus and coach all read at one scale.
+   * Bounded on both axes: a height-only cap lets a wide, short cutout grow
+   * until it touches the edges, which is what made the home Audi dominate.
+   */
+  --hero-vehicle-max-inline: 34rem;
+  --hero-vehicle-max-block: 46vh;
 }
 
 @media (min-width: 768px) {
@@ -110,5 +119,9 @@
 @media (min-width: 1024px) {
   :root {
     --header-offset: 70px;
+    /* Matches the width the two-column PageHero grid gives its cutout, so the
+       home car and the quote-page car occupy the same share of the screen. */
+    --hero-vehicle-max-inline: min(46vw, 630px);
+    --hero-vehicle-max-block: 62vh;
   }
 }

@@ -1493,6 +1493,325 @@ const vehicleCopy: Record<string, string> = {
       max-block-size: 244px;
     }
   }
+
+  /* ---------------------------------------------------------------
+     Date and time pickers
+
+     Progressive enhancement over the native date/time inputs. The input
+     itself stays in the DOM and stays the value carrier — it keeps holding
+     an ISO value, so the draft, validation, review and Web3Forms payload all
+     read exactly what they read before. Only the browser's own picker
+     surface is replaced.
+     --------------------------------------------------------------- */
+  .picker-field {
+    position: relative;
+  }
+
+  /* Wraps the input only, so the trigger centres on the input box rather
+     than on the label-plus-input-plus-error stack. */
+  .quote-form :global(.picker-control) {
+    position: relative;
+    display: block;
+  }
+
+  /* Clears the trigger so a long localised date can never run underneath it. */
+  .quote-form :global(.picker-control .field__input) {
+    padding-inline-end: 52px;
+  }
+
+  /* The native indicator is what opens the browser popup; removing it leaves
+     the field looking like every other WMC input. */
+  .quote-form__form :global(input[data-picker]::-webkit-calendar-picker-indicator) {
+    display: none;
+    -webkit-appearance: none;
+  }
+
+  .quote-form__form :global(input[data-picker]) {
+    cursor: pointer;
+  }
+
+  .quote-form__form :global(input[data-picker][data-open='true']) {
+    border-color: var(--color-champagne-gold);
+    box-shadow: 0 0 0 3px var(--gold-wash);
+  }
+
+  /*
+   * 46px square keeps the tap target above the 44px minimum while the 18px
+   * icon itself lands ~15px in from the input's right edge, matching the
+   * field's own inline padding. Bounded by the control, so it cannot escape
+   * the input box at any width.
+   */
+  .quote-form :global(.picker-toggle) {
+    position: absolute;
+    inset-inline-end: 1px;
+    inset-block-start: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 46px;
+    block-size: 46px;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 6px;
+    color: var(--color-slate-taupe);
+    cursor: pointer;
+    transition: color var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  .quote-form :global(.picker-toggle:hover),
+  .quote-form :global(.picker-toggle[data-open='true']) {
+    color: var(--color-champagne-gold);
+  }
+
+  .quote-form :global(.picker-toggle svg) {
+    pointer-events: none;
+  }
+
+  .quote-form :global(.picker-pop) {
+    position: absolute;
+    z-index: 30;
+    inset-inline-start: 0;
+    inset-block-start: calc(100% + 6px);
+    padding: var(--space-2);
+    background-color: var(--color-warm-white);
+    border: var(--border-width-hairline) solid var(--color-linen-border);
+    border-radius: 8px;
+    box-shadow: var(--shadow-raised);
+  }
+
+  .quote-form :global(.picker-pop[hidden]) {
+    display: none;
+  }
+
+  /* Right-aligned when the field sits in the second grid column and the
+     popover would otherwise run off the edge. */
+  .quote-form :global(.picker-pop[data-align='end']) {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+  }
+
+  /* --- calendar --- */
+  .quote-form :global(.picker-cal) {
+    inline-size: 280px;
+    max-inline-size: calc(100vw - var(--space-5));
+  }
+
+  .quote-form :global(.picker-cal__head) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-1);
+    margin-block-end: var(--space-2);
+  }
+
+  .quote-form :global(.picker-cal__title) {
+    font-size: var(--text-form-label);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-obsidian);
+  }
+
+  .quote-form :global(.picker-nav) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 34px;
+    block-size: 34px;
+    padding: 0;
+    background-color: var(--color-obsidian);
+    color: var(--color-warm-white);
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  .quote-form :global(.picker-nav:hover) {
+    background-color: var(--color-night-graphite);
+  }
+
+  .quote-form :global(.picker-nav[disabled]) {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .quote-form :global(.picker-cal__weekdays) {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 2px;
+    margin-block-end: 2px;
+  }
+
+  .quote-form :global(.picker-cal__weekday) {
+    text-align: center;
+    font-size: 11px;
+    line-height: 1.6;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-slate-taupe);
+  }
+
+  .quote-form :global(.picker-cal__grid) {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 2px;
+  }
+
+  .quote-form :global(.picker-day) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 36px;
+    padding: 0;
+    font-family: inherit;
+    font-size: var(--text-small);
+    color: var(--color-ink);
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color var(--motion-hover) var(--motion-easing-premium),
+      border-color var(--motion-hover) var(--motion-easing-premium),
+      color var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  .quote-form :global(.picker-day:hover:not([disabled])) {
+    background-color: var(--color-heritage-ivory);
+  }
+
+  .quote-form :global(.picker-day[disabled]) {
+    color: var(--color-mist-taupe);
+    cursor: not-allowed;
+  }
+
+  .quote-form :global(.picker-day[data-outside='true']) {
+    color: var(--color-mist-taupe);
+  }
+
+  /* Today is outlined; the selected day is filled. */
+  .quote-form :global(.picker-day[data-today='true']) {
+    border-color: var(--gold-rule-strong);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .quote-form :global(.picker-day[data-selected='true']) {
+    background-color: var(--color-champagne-gold);
+    border-color: var(--color-champagne-gold);
+    color: var(--color-obsidian);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .quote-form :global(.picker-foot) {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin-block-start: var(--space-2);
+    padding-block-start: var(--space-2);
+    border-block-start: var(--border-width-hairline) solid var(--color-linen-border);
+  }
+
+  .quote-form :global(.picker-action) {
+    min-block-size: 34px;
+    padding-inline: var(--space-2);
+    font-family: inherit;
+    font-size: var(--text-small);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-obsidian);
+    background-color: transparent;
+    border: var(--border-width-hairline) solid var(--color-linen-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  .quote-form :global(.picker-action:hover) {
+    border-color: var(--color-champagne-gold);
+  }
+
+  /* --- time --- */
+  .quote-form :global(.picker-time) {
+    inline-size: 248px;
+    max-inline-size: calc(100vw - var(--space-5));
+  }
+
+  .quote-form :global(.picker-time__cols) {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: var(--space-1);
+  }
+
+  .quote-form :global(.picker-time__col) {
+    max-block-size: 188px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    display: grid;
+    gap: 2px;
+    padding: 2px;
+    border: var(--border-width-hairline) solid var(--color-linen-border);
+    border-radius: 6px;
+    scrollbar-width: thin;
+  }
+
+  .quote-form :global(.picker-time__label) {
+    font-size: 11px;
+    line-height: 1.6;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-slate-taupe);
+    margin-block-end: 2px;
+  }
+
+  .quote-form :global(.picker-opt) {
+    min-block-size: 34px;
+    padding-inline: var(--space-1);
+    font-family: inherit;
+    font-size: var(--text-small);
+    color: var(--color-ink);
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color var(--motion-hover) var(--motion-easing-premium),
+      color var(--motion-hover) var(--motion-easing-premium);
+  }
+
+  .quote-form :global(.picker-opt:hover) {
+    background-color: var(--color-heritage-ivory);
+  }
+
+  .quote-form :global(.picker-opt[aria-selected='true']) {
+    background-color: var(--color-champagne-gold);
+    color: var(--color-obsidian);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  @media (max-width: 480px) {
+    .quote-form :global(.picker-pop) {
+      inset-inline: 0;
+    }
+
+    .quote-form :global(.picker-cal),
+    .quote-form :global(.picker-time) {
+      inline-size: 100%;
+    }
+
+    .quote-form :global(.picker-day) {
+      min-block-size: 40px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .quote-form :global(.picker-day),
+    .quote-form :global(.picker-opt),
+    .quote-form :global(.picker-nav),
+    .quote-form :global(.picker-action),
+    .quote-form :global(.picker-toggle) {
+      transition: none;
+    }
+  }
 </style>
 
 <script>
@@ -2605,5 +2924,537 @@ const vehicleCopy: Record<string, string> = {
     // deep link is not cleared by the first filter pass.
     applyUrlVehicle();
     showStep(1, false);
+  }
+</script>
+
+<script>
+  /**
+   * WMC date and time pickers.
+   *
+   * Progressive enhancement only. The native input stays in the DOM and stays
+   * the single value carrier: it keeps holding an ISO date (YYYY-MM-DD) or a
+   * 24-hour time (HH:MM), and every write goes through the same input/change
+   * events typing would fire — so the session draft, validation, the review
+   * step and the Web3Forms payload all keep reading exactly what they read
+   * before. If this script never runs, both fields remain ordinary native
+   * date and time inputs and the form still works.
+   */
+  const quoteRoot = document.querySelector<HTMLElement>('[data-quote-form]');
+
+  if (quoteRoot) {
+    const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const MONTHS = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
+    ];
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const iso = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const parseIso = (v: string): Date | null => {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v.trim());
+      if (!m) return null;
+      const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+      return Number.isNaN(d.getTime()) ? null : d;
+    };
+
+    /** Writes through the input exactly as typing would. */
+    const commit = (input: HTMLInputElement, val: string) => {
+      input.value = val;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+
+    interface Picker {
+      open: () => void;
+      close: (focusInput?: boolean) => void;
+      isOpen: () => boolean;
+      refresh: () => void;
+    }
+
+    const pickers = new Map<string, Picker>();
+
+    const buildShell = (input: HTMLInputElement, label: string) => {
+      const wrap = input.closest<HTMLElement>('.field');
+      if (!wrap) return null;
+      wrap.classList.add('picker-field');
+
+      // The trigger is positioned against the input alone, never the whole
+      // field: the field also contains the label and the error line, so
+      // centring on it pushed the icon well above the input box.
+      const control = document.createElement('div');
+      control.className = 'picker-control';
+      input.parentNode?.insertBefore(control, input);
+      control.appendChild(input);
+
+      input.dataset.picker = 'true';
+      // readonly keeps the value and the localised display, but stops the
+      // browser's own picker (and the mobile OS wheel) from opening.
+      input.readOnly = true;
+      input.setAttribute('autocomplete', 'off');
+      input.setAttribute('aria-haspopup', 'dialog');
+      input.setAttribute('aria-expanded', 'false');
+
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'picker-toggle';
+      toggle.setAttribute('aria-label', label);
+      toggle.tabIndex = -1;
+      toggle.innerHTML =
+        input.type === 'time'
+          ? '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3.2 1.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
+          : '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+      control.appendChild(toggle);
+
+      const pop = document.createElement('div');
+      pop.className = 'picker-pop';
+      pop.setAttribute('role', 'dialog');
+      pop.setAttribute('aria-label', label);
+      pop.hidden = true;
+      wrap.appendChild(pop);
+
+      return { wrap, toggle, pop };
+    };
+
+    // ----------------------------------------------------------------
+    // Date
+    // ----------------------------------------------------------------
+    const createDatePicker = (input: HTMLInputElement, label: string, minFor: () => Date | null) => {
+      const shell = buildShell(input, label);
+      if (!shell) return;
+      const { toggle, pop } = shell;
+
+      pop.classList.add('picker-cal');
+      let view = new Date();
+      let open = false;
+      let focusedIso = '';
+
+      const head = document.createElement('div');
+      head.className = 'picker-cal__head';
+      const prev = document.createElement('button');
+      prev.type = 'button';
+      prev.className = 'picker-nav';
+      prev.setAttribute('aria-label', 'Previous month');
+      prev.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      const title = document.createElement('span');
+      title.className = 'picker-cal__title';
+      title.setAttribute('aria-live', 'polite');
+      const next = document.createElement('button');
+      next.type = 'button';
+      next.className = 'picker-nav';
+      next.setAttribute('aria-label', 'Next month');
+      next.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      head.append(prev, title, next);
+
+      const weekdays = document.createElement('div');
+      weekdays.className = 'picker-cal__weekdays';
+      for (const w of WEEKDAYS) {
+        const s = document.createElement('span');
+        s.className = 'picker-cal__weekday';
+        s.textContent = w;
+        s.setAttribute('aria-hidden', 'true');
+        weekdays.appendChild(s);
+      }
+
+      const grid = document.createElement('div');
+      grid.className = 'picker-cal__grid';
+      grid.setAttribute('role', 'grid');
+
+      const foot = document.createElement('div');
+      foot.className = 'picker-foot';
+      const clear = document.createElement('button');
+      clear.type = 'button';
+      clear.className = 'picker-action';
+      clear.textContent = 'Clear';
+      const todayBtn = document.createElement('button');
+      todayBtn.type = 'button';
+      todayBtn.className = 'picker-action';
+      todayBtn.textContent = 'Today';
+      foot.append(clear, todayBtn);
+
+      pop.append(head, weekdays, grid, foot);
+
+      const render = () => {
+        const min = minFor();
+        const selected = parseIso(input.value);
+        const today = startOfDay(new Date());
+        title.textContent = `${MONTHS[view.getMonth()]} ${view.getFullYear()}`;
+
+        grid.replaceChildren();
+        const first = new Date(view.getFullYear(), view.getMonth(), 1);
+        // Monday-first offset.
+        const offset = (first.getDay() + 6) % 7;
+        const start = new Date(first);
+        start.setDate(first.getDate() - offset);
+
+        for (let i = 0; i < 42; i += 1) {
+          const day = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+          const key = iso(day);
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'picker-day';
+          btn.setAttribute('role', 'gridcell');
+          btn.dataset.date = key;
+          btn.textContent = String(day.getDate());
+          if (day.getMonth() !== view.getMonth()) btn.dataset.outside = 'true';
+          if (key === iso(today)) btn.dataset.today = 'true';
+          if (selected && key === iso(selected)) {
+            btn.dataset.selected = 'true';
+            btn.setAttribute('aria-current', 'date');
+          }
+          if (min && day < min) btn.disabled = true;
+          btn.tabIndex = key === (focusedIso || iso(selected ?? today)) ? 0 : -1;
+          btn.setAttribute(
+            'aria-label',
+            `${WEEKDAYS[(day.getDay() + 6) % 7]} ${day.getDate()} ${MONTHS[day.getMonth()]} ${day.getFullYear()}`,
+          );
+          grid.appendChild(btn);
+        }
+
+        // Disable the previous-month step when the whole month is before min.
+        const lastOfPrev = new Date(view.getFullYear(), view.getMonth(), 0);
+        prev.disabled = Boolean(min && lastOfPrev < min);
+      };
+
+      const focusDay = (key: string) => {
+        focusedIso = key;
+        const btn = grid.querySelector<HTMLButtonElement>(`[data-date="${key}"]`);
+        if (btn) {
+          grid.querySelectorAll<HTMLButtonElement>('.picker-day').forEach((b) => (b.tabIndex = -1));
+          btn.tabIndex = 0;
+          btn.focus();
+        }
+      };
+
+      const move = (days: number) => {
+        const base = parseIso(focusedIso) ?? parseIso(input.value) ?? startOfDay(new Date());
+        const target = new Date(base.getFullYear(), base.getMonth(), base.getDate() + days);
+        if (target.getMonth() !== view.getMonth() || target.getFullYear() !== view.getFullYear()) {
+          view = new Date(target.getFullYear(), target.getMonth(), 1);
+          render();
+        }
+        focusDay(iso(target));
+      };
+
+      const api: Picker = {
+        isOpen: () => open,
+        refresh: render,
+        open: () => {
+          if (open) return;
+          closeAll(input);
+          open = true;
+          pop.hidden = false;
+          input.dataset.open = 'true';
+          toggle.dataset.open = 'true';
+          input.setAttribute('aria-expanded', 'true');
+          const selected = parseIso(input.value);
+          view = selected ? new Date(selected.getFullYear(), selected.getMonth(), 1) : new Date();
+          focusedIso = iso(selected ?? startOfDay(new Date()));
+          render();
+          focusDay(focusedIso);
+        },
+        close: (focusInput = false) => {
+          if (!open) return;
+          open = false;
+          pop.hidden = true;
+          delete input.dataset.open;
+          delete toggle.dataset.open;
+          input.setAttribute('aria-expanded', 'false');
+          if (focusInput) input.focus();
+        },
+      };
+      pickers.set(input.name, api);
+
+      const choose = (key: string) => {
+        commit(input, key);
+        api.close(true);
+      };
+
+      grid.addEventListener('click', (event) => {
+        const btn = (event.target as HTMLElement).closest<HTMLButtonElement>('.picker-day');
+        if (!btn || btn.disabled || !btn.dataset.date) return;
+        choose(btn.dataset.date);
+      });
+
+      prev.addEventListener('click', () => {
+        view = new Date(view.getFullYear(), view.getMonth() - 1, 1);
+        render();
+      });
+      next.addEventListener('click', () => {
+        view = new Date(view.getFullYear(), view.getMonth() + 1, 1);
+        render();
+      });
+      clear.addEventListener('click', () => {
+        commit(input, '');
+        api.close(true);
+      });
+      todayBtn.addEventListener('click', () => {
+        const min = minFor();
+        const today = startOfDay(new Date());
+        choose(iso(min && today < min ? min : today));
+      });
+
+      pop.addEventListener('keydown', (event) => {
+        const key = event.key;
+        if (key === 'Escape') {
+          event.preventDefault();
+          api.close(true);
+          return;
+        }
+        const steps: Record<string, number> = {
+          ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7,
+        };
+        if (key in steps) {
+          event.preventDefault();
+          move(steps[key]);
+          return;
+        }
+        if (key === 'PageUp' || key === 'PageDown') {
+          event.preventDefault();
+          view = new Date(view.getFullYear(), view.getMonth() + (key === 'PageUp' ? -1 : 1), 1);
+          render();
+          const d = parseIso(focusedIso);
+          if (d) {
+            const t = new Date(view.getFullYear(), view.getMonth(), Math.min(d.getDate(), 28));
+            focusDay(iso(t));
+          }
+          return;
+        }
+        if (key === 'Home' || key === 'End') {
+          event.preventDefault();
+          const d = parseIso(focusedIso);
+          if (!d) return;
+          const dow = (d.getDay() + 6) % 7;
+          move(key === 'Home' ? -dow : 6 - dow);
+        }
+      });
+
+      const openers = (event: Event) => {
+        event.preventDefault();
+        api.open();
+      };
+      input.addEventListener('mousedown', openers);
+      toggle.addEventListener('click', openers);
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ' || event.key === 'ArrowDown') {
+          event.preventDefault();
+          api.open();
+        }
+      });
+    };
+
+    // ----------------------------------------------------------------
+    // Time
+    // ----------------------------------------------------------------
+    const createTimePicker = (input: HTMLInputElement, label: string) => {
+      const shell = buildShell(input, label);
+      if (!shell) return;
+      const { toggle, pop } = shell;
+
+      pop.classList.add('picker-time');
+      let open = false;
+
+      const cols = document.createElement('div');
+      cols.className = 'picker-time__cols';
+
+      const makeCol = (name: string, values: string[], render: (v: string) => string) => {
+        const holder = document.createElement('div');
+        const lab = document.createElement('div');
+        lab.className = 'picker-time__label';
+        lab.textContent = name;
+        const list = document.createElement('div');
+        list.className = 'picker-time__col';
+        list.setAttribute('role', 'listbox');
+        list.setAttribute('aria-label', name);
+        for (const v of values) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'picker-opt';
+          b.setAttribute('role', 'option');
+          b.setAttribute('aria-selected', 'false');
+          b.dataset.value = v;
+          b.textContent = render(v);
+          list.appendChild(b);
+        }
+        holder.append(lab, list);
+        return { holder, list };
+      };
+
+      const hours = Array.from({ length: 12 }, (_, i) => String(i + 1));
+      const minutes = Array.from({ length: 60 }, (_, i) => pad(i));
+      const hourCol = makeCol('Hour', hours, (v) => v);
+      const minCol = makeCol('Min', minutes, (v) => v);
+      const merCol = makeCol('', ['AM', 'PM'], (v) => v);
+      cols.append(hourCol.holder, minCol.holder, merCol.holder);
+
+      const foot = document.createElement('div');
+      foot.className = 'picker-foot';
+      const clear = document.createElement('button');
+      clear.type = 'button';
+      clear.className = 'picker-action';
+      clear.textContent = 'Clear';
+      const done = document.createElement('button');
+      done.type = 'button';
+      done.className = 'picker-action';
+      done.textContent = 'Done';
+      foot.append(clear, done);
+
+      pop.append(cols, foot);
+
+      /** Current value as 12-hour parts, defaulting to 09:00 when empty. */
+      const parts = () => {
+        const m = /^(\d{2}):(\d{2})$/.exec(input.value.trim());
+        const h24 = m ? Number(m[1]) : 9;
+        const min = m ? m[2] : '00';
+        const mer = h24 >= 12 ? 'PM' : 'AM';
+        const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+        return { h12: String(h12), min, mer, set: Boolean(m) };
+      };
+
+      const write = (h12: string, min: string, mer: string) => {
+        let h = Number(h12) % 12;
+        if (mer === 'PM') h += 12;
+        commit(input, `${pad(h)}:${min}`);
+      };
+
+      const mark = () => {
+        const p = parts();
+        const pairs: [HTMLElement, string][] = [
+          [hourCol.list, p.h12],
+          [minCol.list, p.min],
+          [merCol.list, p.mer],
+        ];
+        for (const [list, val] of pairs) {
+          list.querySelectorAll<HTMLButtonElement>('.picker-opt').forEach((b) => {
+            const on = b.dataset.value === val && p.set;
+            b.setAttribute('aria-selected', String(on));
+            if (on) b.scrollIntoView({ block: 'nearest' });
+          });
+        }
+      };
+
+      const onPick = (list: HTMLElement) => {
+        list.addEventListener('click', (event) => {
+          const b = (event.target as HTMLElement).closest<HTMLButtonElement>('.picker-opt');
+          if (!b || !b.dataset.value) return;
+          const p = parts();
+          const h = list === hourCol.list ? b.dataset.value : p.h12;
+          const m = list === minCol.list ? b.dataset.value : p.min;
+          const mer = list === merCol.list ? b.dataset.value : p.mer;
+          write(h, m, mer);
+          mark();
+        });
+      };
+      onPick(hourCol.list);
+      onPick(minCol.list);
+      onPick(merCol.list);
+
+      const api: Picker = {
+        isOpen: () => open,
+        refresh: mark,
+        open: () => {
+          if (open) return;
+          closeAll(input);
+          open = true;
+          pop.hidden = false;
+          input.dataset.open = 'true';
+          toggle.dataset.open = 'true';
+          input.setAttribute('aria-expanded', 'true');
+          mark();
+          const first = hourCol.list.querySelector<HTMLButtonElement>('[aria-selected="true"]')
+            ?? hourCol.list.querySelector<HTMLButtonElement>('.picker-opt');
+          first?.focus();
+        },
+        close: (focusInput = false) => {
+          if (!open) return;
+          open = false;
+          pop.hidden = true;
+          delete input.dataset.open;
+          delete toggle.dataset.open;
+          input.setAttribute('aria-expanded', 'false');
+          if (focusInput) input.focus();
+        },
+      };
+      pickers.set(input.name, api);
+
+      clear.addEventListener('click', () => {
+        commit(input, '');
+        mark();
+        api.close(true);
+      });
+      done.addEventListener('click', () => api.close(true));
+
+      pop.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          api.close(true);
+        }
+      });
+
+      const openers = (event: Event) => {
+        event.preventDefault();
+        api.open();
+      };
+      input.addEventListener('mousedown', openers);
+      toggle.addEventListener('click', openers);
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ' || event.key === 'ArrowDown') {
+          event.preventDefault();
+          api.open();
+        }
+      });
+    };
+
+    const closeAll = (except?: HTMLInputElement) => {
+      pickers.forEach((p, name) => {
+        if (except && name === except.name) return;
+        p.close();
+      });
+    };
+
+    const el = (name: string) =>
+      quoteRoot.querySelector<HTMLInputElement>(`input[name="${name}"]`);
+
+    const pickupDate = el('pickup_date');
+    const returnDate = el('return_date');
+    const pickupTime = el('pickup_time');
+    const returnTime = el('return_time');
+
+    const todayStart = () => startOfDay(new Date());
+
+    if (pickupDate) createDatePicker(pickupDate, 'Choose the pickup date', todayStart);
+    if (returnDate) {
+      // The return can never precede the outbound, which is the same rule the
+      // form already validates — the calendar simply stops offering those days.
+      createDatePicker(returnDate, 'Choose the return date', () => {
+        const out = pickupDate ? parseIso(pickupDate.value) : null;
+        const today = todayStart();
+        return out && out > today ? out : today;
+      });
+    }
+    if (pickupTime) createTimePicker(pickupTime, 'Choose the pickup time');
+    if (returnTime) createTimePicker(returnTime, 'Choose the return time');
+
+    // Changing the outbound date re-bounds the return calendar, and clears a
+    // return that is now impossible.
+    pickupDate?.addEventListener('change', () => {
+      if (!returnDate) return;
+      const out = parseIso(pickupDate.value);
+      const back = parseIso(returnDate.value);
+      if (out && back && back < out) commit(returnDate, '');
+      pickers.get('return_date')?.refresh();
+    });
+
+    document.addEventListener('mousedown', (event) => {
+      const target = event.target as HTMLElement;
+      if (target.closest('.picker-pop') || target.closest('[data-picker]') || target.closest('.picker-toggle')) return;
+      closeAll();
+    });
+
+    document.addEventListener('focusin', (event) => {
+      const target = event.target as HTMLElement;
+      if (target.closest('.picker-pop') || target.closest('[data-picker]') || target.closest('.picker-toggle')) return;
+      closeAll();
+    });
   }
 </script>

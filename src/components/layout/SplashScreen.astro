@@ -1,0 +1,267 @@
+---
+/**
+ * Entry splash.
+ *
+ * Deliberately opt-in rather than opt-out: the overlay is inert until an
+ * inline head script adds `wmc-splash` to <html>, so a browser with no JS —
+ * or one where the script fails — simply never sees it and the page renders
+ * normally underneath. It never waits on images, never counts progress, and
+ * is removed from the DOM entirely once finished so it cannot linger or
+ * swallow a click.
+ *
+ * The large "WMC" in the composition is the approved monogram asset itself,
+ * not type set to look like it: the mark is never recreated in typography.
+ */
+import { Image } from 'astro:assets';
+import wmcMonogram from '../../assets/brand/WMC_Monogram.webp';
+---
+
+<div class="splash" data-splash aria-hidden="true">
+  <div class="splash__inner">
+    <p class="splash__eyebrow">West Midlands Coaches Ltd</p>
+
+    <span class="splash__mark">
+      <Image
+        src={wmcMonogram}
+        alt=""
+        widths={[320, 480, 720]}
+        sizes="(min-width: 768px) 340px, 240px"
+        loading="eager"
+        class="splash__mark-image"
+      />
+    </span>
+
+    <p class="splash__tagline">Transport, Properly Organised.</p>
+
+    <span class="splash__track" aria-hidden="true">
+      <span class="splash__line"></span>
+    </span>
+  </div>
+</div>
+
+<style>
+  /*
+   * Inert by default. Only the html.wmc-splash class — added by the inline
+   * head script below, and only when this session has not seen it — brings
+   * the overlay into play.
+   */
+  .splash {
+    display: none;
+  }
+
+  :global(html.wmc-splash) .splash {
+    display: grid;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    place-items: center;
+    padding: var(--space-4);
+    background-color: var(--color-obsidian);
+    opacity: 1;
+    transition: opacity 380ms var(--motion-easing-premium);
+  }
+
+  /* Fading out: the overlay stops taking pointer input immediately, so it can
+     never intercept a click even if the transition stalls. */
+  :global(html.wmc-splash) .splash[data-closing='true'] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .splash__inner {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    gap: var(--space-3);
+    inline-size: 100%;
+    max-inline-size: 420px;
+  }
+
+  .splash__eyebrow {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.6;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-mist-taupe);
+  }
+
+  /* The approved monogram, framed at its own aspect and never redrawn. */
+  .splash__mark {
+    display: block;
+    inline-size: 240px;
+    max-inline-size: 68vw;
+  }
+
+  .splash__mark-image {
+    inline-size: 100%;
+    block-size: auto;
+  }
+
+  .splash__tagline {
+    margin: 0;
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    color: var(--color-warm-white);
+  }
+
+  /* The journey line: a single gold pass, sized to the hold so it completes
+     as the splash leaves. No percentage, no spinner, no loading copy. */
+  .splash__track {
+    display: block;
+    inline-size: min(220px, 60vw);
+    block-size: 1px;
+    margin-block-start: var(--space-2);
+    background-color: var(--color-charcoal-border);
+    overflow: hidden;
+  }
+
+  .splash__line {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--color-champagne-gold),
+      transparent
+    );
+    transform: translateX(-100%);
+  }
+
+  @media (min-width: 768px) {
+    .splash__eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.26em;
+    }
+
+    .splash__mark {
+      inline-size: 340px;
+    }
+
+    .splash__inner {
+      gap: var(--space-4);
+      max-inline-size: 520px;
+    }
+  }
+
+  /* --- entrance --- */
+  :global(html.wmc-splash) .splash__eyebrow,
+  :global(html.wmc-splash) .splash__mark,
+  :global(html.wmc-splash) .splash__tagline {
+    opacity: 0;
+    animation: splash-rise 520ms var(--motion-easing-premium) forwards;
+  }
+
+  :global(html.wmc-splash) .splash__mark {
+    animation-delay: 90ms;
+  }
+
+  :global(html.wmc-splash) .splash__tagline {
+    animation-delay: 220ms;
+  }
+
+  /* One pass across the track, timed to the hold for each breakpoint. */
+  :global(html.wmc-splash) .splash__line {
+    animation: splash-sweep 2000ms var(--motion-easing-premium) 160ms forwards;
+  }
+
+  @media (min-width: 768px) {
+    :global(html.wmc-splash) .splash__line {
+      animation-duration: 3000ms;
+    }
+  }
+
+  @keyframes splash-rise {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes splash-sweep {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  /* Reduced motion: everything is simply present, and the overlay leaves at
+     once rather than animating. */
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.wmc-splash) .splash {
+      transition-duration: 1ms;
+    }
+
+    :global(html.wmc-splash) .splash__eyebrow,
+    :global(html.wmc-splash) .splash__mark,
+    :global(html.wmc-splash) .splash__tagline,
+    :global(html.wmc-splash) .splash__line {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
+
+<script is:inline>
+  /*
+   * Runs before first paint so the overlay is in place with no flash of the
+   * page behind it. Kept tiny and dependency-free on purpose: everything it
+   * touches is wrapped, so a blocked sessionStorage cannot stop the page.
+   */
+  (function () {
+    try {
+      if (sessionStorage.getItem('wmc-splash-seen') === '1') return;
+      sessionStorage.setItem('wmc-splash-seen', '1');
+    } catch (e) {
+      // Storage unavailable (private mode, blocked cookies): show nothing
+      // rather than risk showing the splash on every navigation.
+      return;
+    }
+    document.documentElement.classList.add('wmc-splash');
+  })();
+</script>
+
+<script>
+  const root = document.documentElement;
+
+  if (root.classList.contains('wmc-splash')) {
+    const splash = document.querySelector<HTMLElement>('[data-splash]');
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const desktop = window.matchMedia('(min-width: 768px)').matches;
+    // Held long enough to read as a deliberate entry, never long enough to
+    // feel like waiting. Nothing here depends on images or page load.
+    const hold = reduced ? 0 : desktop ? 3000 : 2000;
+    const fade = reduced ? 1 : 380;
+
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      root.classList.remove('wmc-splash');
+      splash?.remove();
+    };
+
+    const close = () => {
+      if (!splash) return finish();
+      splash.dataset.closing = 'true';
+      // Remove on transitionend, with a timer as the authority so a paused or
+      // skipped transition can never leave the overlay on screen.
+      splash.addEventListener('transitionend', finish, { once: true });
+      window.setTimeout(finish, fade + 200);
+    };
+
+    window.setTimeout(close, hold);
+    // Last-resort failsafe, independent of every timer above.
+    window.setTimeout(finish, hold + 2000);
+  }
+</script>

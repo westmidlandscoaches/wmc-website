@@ -148,6 +148,11 @@ const vehicle = getCutout('car-01')!;
     z-index: 1;
     inline-size: 100%;
     block-size: auto;
+    /* Same bounded box as a PageHero cutout, so the Audi is not free to grow
+       past the scale every other hero vehicle is held to. */
+    max-inline-size: var(--hero-vehicle-max-inline);
+    max-block-size: var(--hero-vehicle-max-block);
+    margin-inline: auto;
     /* The cutout keeps its own transparent margin; nothing is cropped. */
     object-fit: contain;
   }
@@ -263,7 +268,6 @@ const vehicle = getCutout('car-01')!;
 
     .home-hero__stage :global(.home-hero__vehicle) {
       inline-size: 116%;
-      max-inline-size: none;
     }
   }
 
@@ -287,7 +291,6 @@ const vehicle = getCutout('car-01')!;
 
     .home-hero__stage :global(.home-hero__vehicle) {
       inline-size: 108%;
-      max-inline-size: none;
     }
   }
 
@@ -312,7 +315,6 @@ const vehicle = getCutout('car-01')!;
 
     .home-hero__stage :global(.home-hero__vehicle) {
       inline-size: 112%;
-      max-inline-size: none;
     }
   }
 
