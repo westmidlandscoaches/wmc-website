@@ -5,8 +5,8 @@
  * Structure and animation sequence mirror the CMD SplashIntro system —
  * framed mark tile, tracked eyebrow, wordmark, support line, three signal
  * lines, then a progress track with a travelling lead — rebuilt in WMC
- * identity: Heritage Ivory ground, Ink text, Champagne Gold accent,
- * Source Sans 3.
+ * identity: Obsidian ground, Warm White and WMC Silver type, Champagne Gold
+ * accent, Source Sans 3.
  *
  * Deliberately opt-in rather than opt-out: the overlay is inert until an
  * inline head script adds `wmc-splash` to <html>, so a browser with no JS —
@@ -74,14 +74,15 @@ import wmcMonogram from '../../assets/brand/WMC_Monogram.webp';
     padding: calc(env(safe-area-inset-top, 0px) + var(--space-4)) var(--space-3)
       calc(env(safe-area-inset-bottom, 0px) + var(--space-4));
     overflow: hidden;
-    color: var(--color-ink);
-    /* Warm White centre falling to Heritage Ivory, with two very quiet gold
-       washes on opposing diagonals. */
+    color: var(--color-warm-white);
+    /* Obsidian ground lifted a little at the centre by Night Graphite, with
+       two very quiet gold washes on opposing diagonals. Depth only — nothing
+       bright enough to read as a light panel. */
     background:
-      radial-gradient(circle at 50% 44%, rgb(255 255 255 / 0.92), transparent 58%),
-      radial-gradient(circle at 16% 18%, rgb(194 156 89 / 0.10), transparent 46%),
-      radial-gradient(circle at 84% 82%, rgb(194 156 89 / 0.07), transparent 48%),
-      linear-gradient(165deg, var(--color-warm-white) 0%, var(--color-heritage-ivory) 100%);
+      radial-gradient(circle at 50% 44%, rgb(17 17 15 / 0.9), transparent 60%),
+      radial-gradient(circle at 16% 18%, rgb(194 156 89 / 0.07), transparent 46%),
+      radial-gradient(circle at 84% 82%, rgb(180 178 176 / 0.05), transparent 48%),
+      linear-gradient(165deg, var(--color-obsidian) 0%, var(--color-night-graphite) 100%);
     opacity: 1;
     transition: opacity 400ms var(--motion-easing-standard);
   }
@@ -109,27 +110,30 @@ import wmcMonogram from '../../assets/brand/WMC_Monogram.webp';
     overflow: hidden;
   }
 
-  /* Two distant points of gold, on opposing diagonals. */
+  /*
+   * Two distant points on opposing diagonals: gold and silver only, small and
+   * dim, with a short halo rather than a broad bloom.
+   */
   .splash__ambient {
     position: absolute;
-    inline-size: 8px;
-    block-size: 8px;
+    inline-size: 5px;
+    block-size: 5px;
     border-radius: 50%;
-    background-color: var(--color-champagne-gold);
-    box-shadow:
-      0 0 12px 2px rgb(194 156 89 / 0.45),
-      0 0 60px 26px rgb(194 156 89 / 0.10);
     opacity: 0;
   }
 
   .splash__ambient--a {
     inset-inline-start: 13%;
     inset-block-start: 21%;
+    background-color: var(--color-champagne-gold);
+    box-shadow: 0 0 8px 1px rgb(194 156 89 / 0.22);
   }
 
   .splash__ambient--b {
     inset-inline-end: 15%;
     inset-block-end: 23%;
+    background-color: var(--color-wmc-silver);
+    box-shadow: 0 0 8px 1px rgb(180 178 176 / 0.18);
   }
 
   :global(html.wmc-splash) .splash__ambient--a {
@@ -154,12 +158,12 @@ import wmcMonogram from '../../assets/brand/WMC_Monogram.webp';
     inline-size: clamp(3.25rem, 9vw, 4.5rem);
     block-size: clamp(3.25rem, 9vw, 4.5rem);
     padding: 0.42rem;
-    border: 1px solid var(--gold-rule);
+    border: 1px solid rgb(194 156 89 / 0.34);
     border-radius: 1rem;
-    background-color: rgb(255 255 255 / 0.78);
+    background-color: rgb(26 26 23 / 0.72);
     box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.6),
-      0 0.6rem 1.6rem rgb(11 10 9 / 0.10);
+      inset 0 1px 0 rgb(251 249 244 / 0.06),
+      0 0.6rem 1.6rem rgb(0 0 0 / 0.34);
     opacity: 0;
   }
 
@@ -178,7 +182,7 @@ import wmcMonogram from '../../assets/brand/WMC_Monogram.webp';
 
   .splash__eyebrow {
     margin: 0.15rem 0 0;
-    color: var(--color-slate-taupe);
+    color: var(--color-wmc-silver);
     font-size: clamp(0.6rem, 1.5vw, 0.68rem);
     font-weight: var(--font-weight-semibold);
     letter-spacing: 0.26em;
@@ -188,7 +192,7 @@ import wmcMonogram from '../../assets/brand/WMC_Monogram.webp';
 
   .splash__wordmark {
     margin: 0;
-    color: var(--color-obsidian);
+    color: var(--color-warm-white);
     font-size: clamp(1.95rem, 3.2vw, 3.4rem);
     font-weight: var(--font-weight-bold);
     letter-spacing: 0.06em;
@@ -199,7 +203,7 @@ import wmcMonogram from '../../assets/brand/WMC_Monogram.webp';
   .splash__support {
     max-inline-size: 84vw;
     margin: 0;
-    color: var(--color-slate-taupe);
+    color: var(--color-heritage-ivory);
     font-size: clamp(0.8rem, 2vw, 0.95rem);
     text-wrap: balance;
     opacity: 0;
@@ -219,9 +223,9 @@ import wmcMonogram from '../../assets/brand/WMC_Monogram.webp';
     background: linear-gradient(
       90deg,
       transparent 0%,
-      var(--color-mist-taupe) 22%,
+      rgb(180 178 176 / 0.55) 22%,
       var(--color-champagne-gold) 50%,
-      var(--color-mist-taupe) 78%,
+      rgb(180 178 176 / 0.55) 78%,
       transparent 100%
     );
     background-size: 220% 100%;
@@ -249,7 +253,7 @@ import wmcMonogram from '../../assets/brand/WMC_Monogram.webp';
     block-size: 2px;
     margin-block-start: 0.9rem;
     border-radius: 2px;
-    background-color: var(--color-linen-border);
+    background-color: var(--color-charcoal-border);
     overflow: hidden;
   }
 
@@ -261,7 +265,7 @@ import wmcMonogram from '../../assets/brand/WMC_Monogram.webp';
     transform: scaleX(0.02);
     background: linear-gradient(
       90deg,
-      var(--gold-rule-strong) 0%,
+      rgb(180 178 176 / 0.7) 0%,
       var(--color-champagne-gold) 100%
     );
   }
@@ -274,7 +278,7 @@ import wmcMonogram from '../../assets/brand/WMC_Monogram.webp';
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgb(255 255 255 / 0.46) 50%,
+      rgb(251 249 244 / 0.34) 50%,
       transparent 100%
     );
     background-size: 34% 100%;
@@ -301,7 +305,7 @@ import wmcMonogram from '../../assets/brand/WMC_Monogram.webp';
     block-size: 6px;
     border-radius: 50%;
     background-color: var(--color-champagne-gold);
-    box-shadow: 0 0 6px 1px rgb(194 156 89 / 0.45);
+    box-shadow: 0 0 5px 1px rgb(194 156 89 / 0.3);
   }
 
   /* --- sequence: tile, eyebrow, wordmark, support, signals, progress --- */

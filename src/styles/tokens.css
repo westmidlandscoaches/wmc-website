@@ -15,12 +15,12 @@
   --color-charcoal-border: #38362f;
 
   /*
-   * WMC Silver is intentionally NOT defined yet.
-   * There is an unresolved governance discrepancy over the approved hex value
-   * (candidates under review include #B4B2B0 and #BBBAB8 — neither is confirmed).
-   * Do not reference a --color-wmc-silver custom property until this is resolved.
-   * When approved, add it here rather than hard-coding it at call sites.
+   * WMC Silver. The hex was previously unresolved (#B4B2B0 and #BBBAB8 were
+   * both under review); the project owner confirmed #B4B2B0 when specifying
+   * the dark splash palette, so it is recorded here as the single source of
+   * truth rather than hard-coded at the call site.
    */
+  --color-wmc-silver: #b4b2b0;
 
   /* Colour — functional */
   --color-success-light: #2e7d5a;
