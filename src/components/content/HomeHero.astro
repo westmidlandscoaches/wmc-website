@@ -1,11 +1,10 @@
 ---
 import { Image } from 'astro:assets';
 import Button from '../ui/Button.astro';
-import { getCutout } from '../../data/fleetVisuals';
+import heroFleet from '../../assets/hero/wmc-home-hero-fleet.webp';
 
-// The homepage stage uses the supplied background-removed Audi. The photograph
-// itself is untouched: everything behind and beneath it is CSS.
-const vehicle = getCutout('car-01')!;
+// The homepage stage uses the supplied background-removed fleet composition.
+// The photograph itself is untouched: everything behind and beneath it is CSS.
 ---
 
 <section class="home-hero">
@@ -28,10 +27,10 @@ const vehicle = getCutout('car-01')!;
     <div class="home-hero__stage">
       <span class="home-hero__glow" aria-hidden="true"></span>
       <Image
-        src={vehicle.image}
-        alt={vehicle.alt}
-        widths={[520, 760, 1040, 1448]}
-        sizes="(min-width: 1280px) 58vw, (min-width: 1024px) 56vw, (min-width: 640px) 84vw, 100vw"
+        src={heroFleet}
+        alt="WMC chauffeur car, minibus and coach in West Midlands Coaches livery"
+        widths={[640, 960, 1360, 1770]}
+        sizes="(min-width: 1024px) 58vw, (min-width: 768px) 88vw, 94vw"
         loading="eager"
         fetchpriority="high"
         class="home-hero__vehicle"
@@ -136,11 +135,31 @@ const vehicle = getCutout('car-01')!;
   }
 
   /* --- vehicle stage --- */
+  .home-hero {
+    --hero-vehicle-max-inline: min(94vw, 34rem);
+    --hero-vehicle-max-block: 34vh;
+  }
+
+  @media (min-width: 768px) {
+    .home-hero {
+      --hero-vehicle-max-inline: min(88vw, 44rem);
+      --hero-vehicle-max-block: 40vh;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .home-hero {
+      --hero-vehicle-max-inline: min(58vw, 940px);
+      --hero-vehicle-max-block: 48vh;
+    }
+  }
+
   .home-hero__stage {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    min-inline-size: 0;
   }
 
   .home-hero__stage :global(.home-hero__vehicle) {
@@ -171,8 +190,8 @@ const vehicle = getCutout('car-01')!;
   .home-hero__shadow {
     position: absolute;
     z-index: 0;
-    inset-block-end: 12%;
-    inset-inline: 16%;
+    inset-block-end: 10%;
+    inset-inline: 8%;
     block-size: 4%;
     border-radius: 50%;
     background: radial-gradient(closest-side, rgb(0 0 0 / 0.55), transparent 78%);
@@ -201,12 +220,12 @@ const vehicle = getCutout('car-01')!;
     }
 
     .home-hero__stage {
-      justify-content: flex-end;
-      margin-inline-end: calc(var(--space-3) * -1);
+      justify-content: center;
+      margin-inline-end: 0;
     }
 
     .home-hero__stage :global(.home-hero__vehicle) {
-      inline-size: min(104%, 620px);
+      inline-size: 100%;
     }
   }
 
@@ -237,7 +256,7 @@ const vehicle = getCutout('car-01')!;
     }
 
     .home-hero__stage :global(.home-hero__vehicle) {
-      inline-size: min(88%, 880px);
+      inline-size: 100%;
     }
   }
 
@@ -263,11 +282,11 @@ const vehicle = getCutout('car-01')!;
     }
 
     .home-hero__stage {
-      margin-inline-end: calc(var(--space-4) * -1);
+      margin-inline-end: 0;
     }
 
     .home-hero__stage :global(.home-hero__vehicle) {
-      inline-size: 116%;
+      inline-size: 100%;
     }
   }
 
@@ -290,7 +309,7 @@ const vehicle = getCutout('car-01')!;
     }
 
     .home-hero__stage :global(.home-hero__vehicle) {
-      inline-size: 108%;
+      inline-size: 100%;
     }
   }
 
@@ -309,18 +328,19 @@ const vehicle = getCutout('car-01')!;
     }
 
     .home-hero__stage {
-      /* Breaks the inner padding so the car reads at full presence. */
-      margin-inline-end: calc(var(--space-6) * -1);
+      /* Slightly past the inner padding for presence on the right, but never
+         far enough to push the coach off the edge. */
+      margin-inline-end: calc(var(--space-3) * -1);
     }
 
     .home-hero__stage :global(.home-hero__vehicle) {
-      inline-size: 112%;
+      inline-size: 100%;
     }
   }
 
   @media (min-width: 1440px) {
     .home-hero__stage {
-      margin-inline-end: calc(var(--space-8) * -1);
+      margin-inline-end: calc(var(--space-4) * -1);
     }
   }
 
