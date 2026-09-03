@@ -211,13 +211,18 @@ const vehicleCopy: Record<string, string> = {
         <div class="conditional" data-conditional="luggage">
           <div class="field-row">
             <div class="field">
+              <label class="field__label" for="luggage_hand">Approximate number of hand-luggage items</label>
+              <input class="field__input" id="luggage_hand" name="luggage_hand" type="number" min="0" step="1" inputmode="numeric" aria-describedby="luggage_hand_help" />
+              <p class="field__help" id="luggage_hand_help">Handbags, backpacks, laptop bags and cabin-size bags.</p>
+            </div>
+            <div class="field">
               <label class="field__label" for="luggage_cases">Approximate number of large cases</label>
               <input class="field__input" id="luggage_cases" name="luggage_cases" type="number" min="0" step="1" inputmode="numeric" />
             </div>
-            <div class="field">
-              <label class="field__label" for="luggage_other">Other / bulky luggage</label>
-              <input class="field__input" id="luggage_other" name="luggage_other" type="text" />
-            </div>
+          </div>
+          <div class="field">
+            <label class="field__label" for="luggage_other">Other / bulky luggage</label>
+            <input class="field__input" id="luggage_other" name="luggage_other" type="text" />
           </div>
         </div>
       </fieldset>
@@ -2527,7 +2532,12 @@ const vehicleCopy: Record<string, string> = {
             ['Passengers', value('passengers')],
             [
               'Luggage',
-              [labelFor('luggage'), value('luggage_cases') ? `${value('luggage_cases')} large cases` : '', value('luggage_other')]
+              [
+                labelFor('luggage'),
+                value('luggage_hand') ? `${value('luggage_hand')} hand-luggage items` : '',
+                value('luggage_cases') ? `${value('luggage_cases')} large cases` : '',
+                value('luggage_other'),
+              ]
                 .filter(Boolean)
                 .join(' · '),
             ],
@@ -2698,6 +2708,7 @@ const vehicleCopy: Record<string, string> = {
       add('Passengers', value('passengers'));
 
       add('Luggage', labelFor('luggage'));
+      add('Hand-luggage items', value('luggage_hand'));
       add('Approximate Large Cases', value('luggage_cases'));
       add('Other / Bulky Luggage', value('luggage_other'));
 
