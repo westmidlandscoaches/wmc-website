@@ -411,9 +411,14 @@ import heroFleet from '../../assets/hero/wmc-home-hero-fleet.webp';
 
   if (hero) {
     hero.dataset.anim = 'on';
-    requestAnimationFrame(() => {
+    // rAF normally starts the entrance on the next frame, but it can be
+    // throttled indefinitely (background or low-power tabs). The timer is a
+    // fallback for exactly that, so the start-state is never held for long.
+    const start = () => {
       hero.dataset.ready = 'true';
-    });
+    };
+    requestAnimationFrame(start);
+    window.setTimeout(start, 60);
 
     // Safety net: if the entrance never completes (paused tab, unsupported
     // animations), drop both attributes. That removes the animation rules

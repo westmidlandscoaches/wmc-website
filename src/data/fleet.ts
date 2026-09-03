@@ -10,10 +10,10 @@
 import car01NoBg from '../assets/images/fleet/cars/wmc-car-01-nobg.webp';
 import car02NoBg from '../assets/images/fleet/cars/wmc-car-02-nobg.webp';
 import car03NoBg from '../assets/images/fleet/cars/wmc-car-03-nobg.webp';
+import minibus02NoBg from '../assets/images/fleet/minibuses/wmc-minibus-02-nobg.webp';
 import minibus04NoBg from '../assets/images/fleet/minibuses/wmc-minibus-04-nobg.webp';
 import minibus05NoBg from '../assets/images/fleet/minibuses/wmc-minibus-05-nobg.webp';
 import minibus06NoBg from '../assets/images/fleet/minibuses/wmc-minibus-06-nobg.webp';
-import minibus07NoBg from '../assets/images/fleet/minibuses/wmc-minibus-07-nobg.webp';
 import minibus08NoBg from '../assets/images/fleet/minibuses/wmc-minibus-08-nobg.webp';
 import minibus09NoBg from '../assets/images/fleet/minibuses/wmc-minibus-09-nobg.webp';
 import coach01NoBg from '../assets/images/fleet/coaches/wmc-coach-01-nobg.webp';
@@ -99,7 +99,7 @@ export const fleetVehicles: FleetVehicle[] = [
     seats: 16,
     seatGroup: '16-Seater',
     makeModel: 'Mercedes-Benz Sprinter',
-    colour: 'White',
+    colour: 'Grey',
     serviceLevel: 'Standard',
     category: 'minibus',
     features: [
@@ -111,7 +111,7 @@ export const fleetVehicles: FleetVehicle[] = [
       'TV',
       'Fridge',
     ],
-    image: minibus07NoBg,
+    image: minibus02NoBg,
   },
   {
     id: 'sprinter-16-white-executive',

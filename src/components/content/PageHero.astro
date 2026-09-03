@@ -394,4 +394,113 @@ const hasActions = Boolean(primaryCta || secondaryCta || tertiaryCta);
       aspect-ratio: 16 / 11;
     }
   }
+
+  /* ---------------------------------------------------------------
+     Entrance
+
+     The same opt-in pattern and timing as the home hero: the start state
+     only applies once JS has set data-anim, so a failed or blocked script
+     leaves the hero fully visible instead of blank. Only opacity and
+     transform animate, so nothing reflows and no layout shifts.
+     --------------------------------------------------------------- */
+  .page-hero[data-anim='on']:not([data-ready]) .page-hero__copy > *,
+  .page-hero[data-anim='on']:not([data-ready]) .page-hero__media {
+    opacity: 0;
+  }
+
+  .page-hero[data-ready='true'] .page-hero__copy > * {
+    animation: page-hero-rise 480ms var(--motion-easing-premium) both;
+  }
+
+  .page-hero[data-ready='true'] .page-hero__copy > *:nth-child(2) {
+    animation-delay: 70ms;
+  }
+
+  .page-hero[data-ready='true'] .page-hero__copy > *:nth-child(3) {
+    animation-delay: 140ms;
+  }
+
+  .page-hero[data-ready='true'] .page-hero__copy > *:nth-child(4) {
+    animation-delay: 210ms;
+  }
+
+  .page-hero[data-ready='true'] .page-hero__copy > *:nth-child(5) {
+    animation-delay: 280ms;
+  }
+
+  .page-hero[data-ready='true'] .page-hero__media {
+    animation: page-hero-media 640ms var(--motion-easing-premium) both;
+    animation-delay: 90ms;
+  }
+
+  @keyframes page-hero-rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes page-hero-media {
+    from {
+      opacity: 0;
+      transform: translateX(24px) scale(1.015);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Stacked layouts lift rather than slide, so nothing travels sideways
+     under a narrow viewport. */
+  @media (max-width: 1023px) {
+    @keyframes page-hero-media {
+      from {
+        opacity: 0;
+        transform: translateY(16px) scale(1.01);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-hero .page-hero__copy > *,
+    .page-hero .page-hero__media {
+      opacity: 1;
+      animation: none !important;
+    }
+  }
 </style>
+
+<script>
+  // Only opts into the entrance once JS is running, so a failed script leaves
+  // every hero fully visible rather than blank.
+  const heroes = document.querySelectorAll<HTMLElement>('.page-hero');
+
+  heroes.forEach((hero) => {
+    hero.dataset.anim = 'on';
+    // rAF normally starts the entrance on the next frame, but it can be
+    // throttled indefinitely (background or low-power tabs). The timer is a
+    // fallback for exactly that, so the start-state is never held for long.
+    const start = () => {
+      hero.dataset.ready = 'true';
+    };
+    requestAnimationFrame(start);
+    window.setTimeout(start, 60);
+
+    // Safety net: if the entrance never completes (paused tab, unsupported
+    // animations), drop both attributes. That removes the animation rules
+    // along with the start-state, so a hero can never stay invisible.
+    window.setTimeout(() => {
+      hero.removeAttribute('data-ready');
+      hero.removeAttribute('data-anim');
+    }, 1600);
+  });
+</script>
