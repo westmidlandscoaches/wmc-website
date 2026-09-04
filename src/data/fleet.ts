@@ -15,7 +15,6 @@ import minibus04NoBg from '../assets/images/fleet/minibuses/wmc-minibus-04-nobg.
 import minibus05NoBg from '../assets/images/fleet/minibuses/wmc-minibus-05-nobg.webp';
 import minibus06NoBg from '../assets/images/fleet/minibuses/wmc-minibus-06-nobg.webp';
 import minibus08NoBg from '../assets/images/fleet/minibuses/wmc-minibus-08-nobg.webp';
-import minibus09NoBg from '../assets/images/fleet/minibuses/wmc-minibus-09-nobg.webp';
 import coach01NoBg from '../assets/images/fleet/coaches/wmc-coach-01-nobg.webp';
 import coach02NoBg from '../assets/images/fleet/coaches/wmc-coach-02-nobg.webp';
 
@@ -37,9 +36,10 @@ export interface FleetVehicle {
   /** Client-supplied features. Empty when none were provided. */
   features: string[];
   /**
-   * Photograph, used only where the supplied filename or folder identified
-   * this exact vehicle. Undefined means imagery is still awaited — never a
-   * stand-in borrowed from another vehicle.
+   * Photograph, used where the supplied filename or folder identified this
+   * vehicle. Undefined means imagery is still awaited. Two vehicles share one
+   * photograph only where WMC has explicitly asked for it — see the 19-Seater
+   * Standard below.
    */
   image?: ImageMetadata;
 }
@@ -95,12 +95,17 @@ export const fleetVehicles: FleetVehicle[] = [
   },
 
   {
+    /*
+     * The id is a stable machine value: it appears in ?vehicle= deep links and
+     * in saved quote drafts, so it keeps its original wording even though the
+     * colour and service level have since been revised by WMC.
+     */
     id: 'sprinter-16-white-standard-01',
     seats: 16,
     seatGroup: '16-Seater',
     makeModel: 'Mercedes-Benz Sprinter',
     colour: 'Grey',
-    serviceLevel: 'Standard',
+    serviceLevel: 'Luxury',
     category: 'minibus',
     features: [
       'Air Conditioning',
@@ -121,7 +126,7 @@ export const fleetVehicles: FleetVehicle[] = [
     colour: 'White',
     serviceLevel: 'Executive',
     category: 'minibus',
-    features: ['Air Conditioning', 'Leather Seats', 'Armrests', 'Charging Ports'],
+    features: ['Air Conditioning', 'Leather Seats', 'Armrests'],
     image: minibus08NoBg,
   },
   {
@@ -145,7 +150,11 @@ export const fleetVehicles: FleetVehicle[] = [
     serviceLevel: 'Standard',
     category: 'minibus',
     features: ['Standard Seating'],
-    image: minibus09NoBg,
+    /*
+     * Shares the 16-Seater Standard photograph at WMC's direction: the two
+     * vehicles are presented with the same image rather than one of their own.
+     */
+    image: minibus04NoBg,
   },
 
   {
@@ -156,7 +165,7 @@ export const fleetVehicles: FleetVehicle[] = [
     colour: 'Silver',
     serviceLevel: 'Executive',
     category: 'minibus',
-    features: ['Air Conditioning', 'Leather Seats', 'Armrests', 'Charging Ports', 'TV'],
+    features: ['Air Conditioning', 'Leather Seats', 'Armrests', 'Charging Ports', 'TV', 'Fridge'],
     image: minibus05NoBg,
   },
 
