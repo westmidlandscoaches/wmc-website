@@ -17,7 +17,9 @@ export const primaryCta: NavLink = { label: 'Request a Quote', href: '/request-a
 export const contact = {
   phoneDisplay: '0121 661 8560',
   phoneHref: 'tel:+441216618560',
-  whatsappHref: 'https://wa.me/441216618560',
+  /* WhatsApp is a separate business line from the number people call. */
+  whatsappDisplay: '+44 7861 115991',
+  whatsappHref: 'https://wa.me/447861115991',
   address: '429 Meadway, Birmingham, B33 0DZ, United Kingdom',
   addressLines: ['429 Meadway', 'Birmingham', 'B33 0DZ', 'United Kingdom'],
   /** Client-supplied Google Maps destination. Do not alter this URL. */
